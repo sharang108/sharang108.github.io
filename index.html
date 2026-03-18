@@ -170,6 +170,27 @@
   .dp-btn-copy{background:none;color:var(--muted2);border-color:var(--border);}
   .dp-btn-copy:hover{color:var(--text);border-color:var(--border2);}
 
+  /* debug view */
+  .dbg-form{display:flex;flex-direction:column;gap:12px;}
+  .dbg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .dbg-field{display:flex;flex-direction:column;gap:5px;}
+  .dbg-field.full{grid-column:1/-1;}
+  .dbg-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+  .dbg-label span{color:var(--coral);margin-left:2px;}
+  .dbg-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;transition:border-color .1s,background var(--tr);width:100%;}
+  .dbg-input:focus{border-color:var(--border2);}
+  .dbg-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;resize:vertical;outline:none;transition:border-color .1s,background var(--tr);width:100%;line-height:1.6;}
+  .dbg-textarea:focus{border-color:var(--border2);}
+  .dbg-actions{display:flex;gap:8px;align-items:center;padding-top:4px;}
+  .dbg-submit{font-family:var(--mono);font-size:11px;font-weight:500;padding:8px 18px;border-radius:4px;cursor:pointer;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.1);color:var(--coral);transition:all .12s;}
+  .dbg-submit:hover{background:rgba(248,113,113,.18);}
+  .dbg-reset{font-family:var(--mono);font-size:11px;padding:8px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .12s;}
+  .dbg-reset:hover{color:var(--text);border-color:var(--border2);}
+  .dbg-hint{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;}
+  .dbg-banner{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);border-left:3px solid var(--coral);border-radius:6px;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.6;}
+  .dbg-banner strong{color:var(--text);}
+  .dbg-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;width:100%;cursor:pointer;transition:border-color .1s;}
+
   /* modal */
   .moverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .15s;}
   .moverlay.open{opacity:1;pointer-events:all;}
@@ -272,6 +293,7 @@
         <button class="vtab sel" onclick="setView('problems',this)">Problems</button>
         <button class="vtab"     onclick="setView('timer',this)">Timer</button>
         <button class="vtab"     onclick="setView('patterns',this)">Decision points</button>
+        <button class="vtab"     onclick="setView('debug',this)">Debug</button>
       </div>
     </div>
 
@@ -345,6 +367,69 @@
     <!-- DECISION POINTS VIEW -->
     <div id="view-patterns" style="display:none">
       <div class="dp-grid" id="dp-grid"></div>
+    </div>
+
+    <!-- DEBUG VIEW -->
+    <div id="view-debug" style="display:none">
+      <div class="dbg-banner">
+        <strong>Debug = diagnose your thinking, not fix your code.</strong><br/>
+        Fill in what you know, hit "Debug in Claude". I'll identify exactly where your mental model broke and ask you one question that leads you to the fix yourself. I won't rewrite your solution.
+      </div>
+      <div class="dbg-form">
+        <div class="dbg-row">
+          <div class="dbg-field">
+            <div class="dbg-label">Problem <span>*</span></div>
+            <select class="dbg-select" id="dbg-problem" onchange="dbgFillMeta()">
+              <option value="">— select problem —</option>
+            </select>
+          </div>
+          <div class="dbg-field">
+            <div class="dbg-label">Or enter LC number manually</div>
+            <input class="dbg-input" id="dbg-lc-manual" placeholder="e.g. 704" type="number" oninput="dbgManualLc()"/>
+          </div>
+        </div>
+        <div class="dbg-row">
+          <div class="dbg-field">
+            <div class="dbg-label">Input <span>*</span></div>
+            <input class="dbg-input" id="dbg-input" placeholder='e.g. nums=[-1,0,3,5,9,12], target=9'/>
+          </div>
+          <div class="dbg-field">
+            <div class="dbg-label">Expected output <span>*</span></div>
+            <input class="dbg-input" id="dbg-expected" placeholder="e.g. 4"/>
+          </div>
+        </div>
+        <div class="dbg-row">
+          <div class="dbg-field">
+            <div class="dbg-label">What your code returned</div>
+            <input class="dbg-input" id="dbg-got" placeholder="e.g. -1"/>
+          </div>
+          <div class="dbg-field">
+            <div class="dbg-label">Error type (if any)</div>
+            <select class="dbg-select" id="dbg-error-type">
+              <option value="">— none / unknown —</option>
+              <option value="Wrong answer">Wrong answer</option>
+              <option value="Index out of bounds">Index out of bounds</option>
+              <option value="Infinite loop / TLE">Infinite loop / TLE</option>
+              <option value="NullPointerException">NullPointerException</option>
+              <option value="Stack overflow">Stack overflow</option>
+              <option value="Off by one">Off by one</option>
+            </select>
+          </div>
+        </div>
+        <div class="dbg-field full">
+          <div class="dbg-label">Your code <span>*</span></div>
+          <textarea class="dbg-textarea" id="dbg-code" rows="8" placeholder="Paste your failing solution here..."></textarea>
+        </div>
+        <div class="dbg-field full">
+          <div class="dbg-label">What you thought your code would do at the failing step</div>
+          <textarea class="dbg-textarea" id="dbg-thinking" rows="3" placeholder="e.g. I expected left to converge on index 4 but it seems to overshoot — I think my mid calculation is wrong when the array has even length..."></textarea>
+        </div>
+        <div class="dbg-actions">
+          <button class="dbg-submit" onclick="openDebugInClaude()">→ Debug in Claude</button>
+          <button class="dbg-reset"  onclick="resetDebugForm()">Clear</button>
+          <span class="dbg-hint">Opens a new Claude chat with your debug prompt pre-filled</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -473,7 +558,7 @@ function toggleMax(){isMax=!isMax;document.getElementById('app').classList.toggl
 
 function setView(v, btn){
   currentView=v;
-  ['problems','timer','patterns'].forEach(x=>{document.getElementById('view-'+x).style.display=x===v?'block':'none';});
+  ['problems','timer','patterns','debug'].forEach(x=>{document.getElementById('view-'+x).style.display=x===v?'block':'none';});
   document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('sel'));
   if(btn)btn.classList.add('sel');
 }
@@ -810,8 +895,90 @@ function exportXLSX(){
   XLSX.writeFile(wb,`dsa-progress-${today}.xlsx`);
 }
 
+// ── DEBUG ─────────────────────────────────────────────────────────────────
+function initDebugDropdown(){
+  const sel=document.getElementById('dbg-problem');
+  PATTERNS.forEach(g=>{
+    const grp=document.createElement('optgroup');
+    grp.label=`${g.phaseLabel} — ${g.name}`;
+    g.problems.forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=p.id;
+      opt.textContent=`LC ${p.lc} — ${p.title}`;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  });
+}
+
+function dbgFillMeta(){
+  const id=parseInt(document.getElementById('dbg-problem').value);
+  if(!id)return;
+  document.getElementById('dbg-lc-manual').value='';
+}
+
+function dbgManualLc(){
+  document.getElementById('dbg-problem').value='';
+}
+
+function getDebugProblemLabel(){
+  const selVal=document.getElementById('dbg-problem').value;
+  const manual=document.getElementById('dbg-lc-manual').value.trim();
+  if(selVal){
+    const p=ALL.find(x=>x.id===parseInt(selVal));
+    return p?`LC ${p.lc} — ${p.title}`:'';
+  }
+  if(manual) return`LC ${manual}`;
+  return'';
+}
+
+function openDebugInClaude(){
+  const code    =document.getElementById('dbg-code').value.trim();
+  const inputVal=document.getElementById('dbg-input').value.trim();
+  const expected=document.getElementById('dbg-expected').value.trim();
+  const got     =document.getElementById('dbg-got').value.trim();
+  const thinking=document.getElementById('dbg-thinking').value.trim();
+  const errType =document.getElementById('dbg-error-type').value;
+  const probLabel=getDebugProblemLabel();
+
+  if(!code||!inputVal||!expected){
+    alert('Problem input, expected output, and your code are required.');return;
+  }
+
+  const lines=[
+    probLabel?`${probLabel} — Debug session`:'Debug session',
+    '',
+    'My solution is failing. Diagnose my thinking, not just my code.',
+    '',
+    'My code:',
+    '```',
+    code,
+    '```',
+    '',
+    'Failing test case:',
+    `  Input:    ${inputVal}`,
+    `  Expected: ${expected}`,
+    got   ?`  Got:      ${got}`:'',
+    errType?`  Error:    ${errType}`:'',
+    '',
+    thinking?`What I thought my code would do at the failing step:\n${thinking}`:
+             'I am not sure why it is failing.',
+    '',
+    'Do NOT rewrite my solution. Identify exactly where my mental model is wrong,',
+    'then ask me one question that leads me to the fix myself.',
+  ].filter(l=>l!==null).join('\n');
+
+  window.open(`https://claude.ai/new?q=${encodeURIComponent(lines)}`,'_blank');
+}
+
+function resetDebugForm(){
+  ['dbg-problem','dbg-error-type'].forEach(id=>{document.getElementById(id).value='';});
+  ['dbg-lc-manual','dbg-input','dbg-expected','dbg-got','dbg-code','dbg-thinking'].forEach(id=>{document.getElementById(id).value='';});
+}
+
 // ── INIT
 render();
+initDebugDropdown();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
