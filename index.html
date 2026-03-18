@@ -212,6 +212,7 @@
       <span class="phase-pill pill-done">Phase 1 ✓</span>
       <span class="phase-pill pill-active">Phase 2 active</span>
       <span class="phase-pill pill-locked">Phase 3–5 🔒</span>
+      <button class="icon-btn" onclick="exportXLSX()" title="Export to Excel" style="width:auto;padding:0 10px;font-family:var(--mono);font-size:10px;gap:5px;">⬇ Export</button>
       <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
       <button class="icon-btn" id="max-btn"   onclick="toggleMax()"   title="Maximize">⛶</button>
     </div>
@@ -648,8 +649,132 @@ function pauseTimer(){
 }
 function resetTimer(){clearInterval(timerInterval);timerSeconds=0;timerRunning=false;timerPhase=0;document.getElementById('timer-display').textContent='00:00';document.getElementById('timer-display').className='timer-display';document.getElementById('timer-status').textContent='Select a phase to start';document.querySelectorAll('.tp-phase').forEach(el=>{el.classList.remove('active-phase','done-phase');});}
 
+// ── EXPORT ───────────────────────────────────────────────────────────────────
+function exportXLSX(){
+  if(typeof XLSX==='undefined'){
+    alert('SheetJS still loading — try again in a second.');return;
+  }
+  const wb=XLSX.utils.book_new();
+  const today=new Date().toISOString().slice(0,10);
+
+  // ── Sheet 1: Problems ─────────────────────────────────────────────────────
+  const STATUS_LABEL={'solved':'Solved','review':'Needs review','audited':'Audited','todo':'Todo'};
+  const LEVEL_LABEL={1:'L1 — Recognition',2:'L2 — Recall',3:'L3 — Transfer',4:'L4 — Teaching'};
+
+  const probRows=[['LC #','Title','Pattern','Phase','Difficulty','Time complexity','Space complexity','Status','Pattern level','Audit status','Notes','LeetCode URL']];
+  PATTERNS.forEach(g=>{
+    const lv=patLevel[g.id]||0;
+    const at=patAudit[g.id]||'';
+    g.problems.forEach(p=>{
+      const st=statuses[p.id]||'todo';
+      probRows.push([
+        p.lc,
+        p.title,
+        g.name,
+        g.phaseLabel,
+        p.diff,
+        p.time,
+        p.space,
+        STATUS_LABEL[st]||st,
+        LEVEL_LABEL[lv]||'Not set',
+        at?at.charAt(0).toUpperCase()+at.slice(1):'—',
+        notes[p.id]||'',
+        `https://leetcode.com/problems/${SLUGS[p.lc]||p.lc}/`
+      ]);
+    });
+  });
+
+  const wsProbs=XLSX.utils.aoa_to_sheet(probRows);
+
+  // column widths
+  wsProbs['!cols']=[
+    {wch:7},{wch:42},{wch:16},{wch:10},{wch:10},
+    {wch:18},{wch:18},{wch:14},{wch:22},{wch:16},{wch:40},{wch:54}
+  ];
+
+  // header style (SheetJS CE supports limited styling via cell metadata)
+  const hdrRange=XLSX.utils.decode_range(wsProbs['!ref']);
+  for(let c=hdrRange.s.c;c<=hdrRange.e.c;c++){
+    const addr=XLSX.utils.encode_cell({r:0,c});
+    if(!wsProbs[addr])continue;
+    wsProbs[addr].s={font:{bold:true},fill:{fgColor:{rgb:'1A3A2A'}},font:{bold:true,color:{rgb:'FFFFFF'}}};
+  }
+
+  // freeze header row
+  wsProbs['!freeze']={xSplit:0,ySplit:1};
+
+  XLSX.utils.book_append_sheet(wb,wsProbs,'Problems');
+
+  // ── Sheet 2: Summary ─────────────────────────────────────────────────────
+  const p1probs=PATTERNS.filter(g=>g.phase===1).flatMap(g=>g.problems);
+  const p2probs=PATTERNS.filter(g=>g.phase===2).flatMap(g=>g.problems);
+  const allProbs=PATTERNS.flatMap(g=>g.problems);
+
+  const countBy=(arr,val)=>arr.filter(p=>(statuses[p.id]||'todo')===val).length;
+  const solvedOrAudited=p=>['solved','audited'].includes(statuses[p.id]||'todo');
+
+  const summaryRows=[
+    ['DSA Prep — Export Summary',''],
+    ['Exported on',today],
+    ['',''],
+    ['── Overall ──',''],
+    ['Total problems',allProbs.length],
+    ['Solved',allProbs.filter(solvedOrAudited).length],
+    ['Audited',countBy(allProbs,'audited')],
+    ['Needs review',countBy(allProbs,'review')],
+    ['Todo',allProbs.filter(p=>!statuses[p.id]||statuses[p.id]==='todo').length],
+    ['',''],
+    ['── Phase 1 (complete) ──',''],
+    ['Total',p1probs.length],
+    ['Solved',p1probs.filter(solvedOrAudited).length],
+    ['',''],
+    ['── Phase 2 (active) ──',''],
+    ['Total',p2probs.length],
+    ['Solved',p2probs.filter(solvedOrAudited).length],
+    ['Remaining',p2probs.filter(p=>!solvedOrAudited(p)).length],
+    ['',''],
+    ['── Pattern internalization ──',''],
+    ...PATTERNS.map(g=>[g.name,LEVEL_LABEL[patLevel[g.id]]||'Not set']),
+    ['',''],
+    ['── Audit status ──',''],
+    ...PATTERNS.map(g=>{
+      const at=patAudit[g.id]||'';
+      return [g.name,at?at.charAt(0).toUpperCase()+at.slice(1):'—'];
+    }),
+  ];
+
+  const wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols']=[{wch:32},{wch:28}];
+  XLSX.utils.book_append_sheet(wb,wsSummary,'Summary');
+
+  // ── Sheet 3: Per-pattern breakdown ───────────────────────────────────────
+  const patRows=[['Pattern','Phase','Problems total','Solved','Audited','Needs review','Todo','% complete','Internalization level','Audit status']];
+  PATTERNS.forEach(g=>{
+    const ps=g.problems;
+    const sol=ps.filter(solvedOrAudited).length;
+    const aud=countBy(ps,'audited');
+    const rev=countBy(ps,'review');
+    const todo=ps.filter(p=>!statuses[p.id]||statuses[p.id]==='todo').length;
+    const pct=ps.length?Math.round(sol/ps.length*100)+'%':'0%';
+    const at=patAudit[g.id]||'';
+    patRows.push([
+      g.name,g.phaseLabel,ps.length,sol,aud,rev,todo,pct,
+      LEVEL_LABEL[patLevel[g.id]]||'Not set',
+      at?at.charAt(0).toUpperCase()+at.slice(1):'—'
+    ]);
+  });
+  const wsPat=XLSX.utils.aoa_to_sheet(patRows);
+  wsPat['!cols']=[{wch:18},{wch:10},{wch:16},{wch:8},{wch:9},{wch:14},{wch:6},{wch:12},{wch:24},{wch:16}];
+  wsPat['!freeze']={xSplit:0,ySplit:1};
+  XLSX.utils.book_append_sheet(wb,wsPat,'By pattern');
+
+  // ── Write ─────────────────────────────────────────────────────────────────
+  XLSX.writeFile(wb,`dsa-progress-${today}.xlsx`);
+}
+
 // ── INIT
 render();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
