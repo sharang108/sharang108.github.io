@@ -478,7 +478,7 @@ function setFilter(f){
 
 // ── NEXT UP
 function getNext(){for(const g of PATTERNS){if(g.phase<2)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
-function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nOpen with the full brief: problem statement, pattern (${p.patternName||''}), real-world analogy, step-by-step approach, the two most common bugs, and complexity. Then wait for me to attempt it.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
+function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Pattern: name it and explain WHY this problem fits that pattern (${p.patternName||''})\n- Real-world analogy (intuition only, no implementation)\n- The 1–2 core decision points I need to figure out myself\n- The two most common bugs engineers hit — name them, do NOT solve them\n- Time and space complexity of the optimal solution\n\nDo NOT give a step-by-step approach, pseudocode, loop structure, variable names, or any implementation hints. Stop after the brief and wait for my attempt.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
 function openNextClaude(){const n=getNext();if(n)window.open(claudeUrl(n),'_blank');}
 function openInClaude(){const p=ALL.find(x=>x.id===activeId);if(p)window.open(claudeUrl(p),'_blank');}
 function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)window.open(claudeUrl(p),'_blank');}
