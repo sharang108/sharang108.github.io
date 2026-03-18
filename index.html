@@ -156,13 +156,19 @@
 
   /* decision points view */
   .dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .dp-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;}
+  .dp-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;}
   .dp-pat{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;}
   .dp-phase-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:6px;vertical-align:middle;}
-  .dp-points{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+  .dp-points{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;flex:1;}
   .dp-point{font-size:12px;color:var(--muted2);padding-left:12px;position:relative;line-height:1.5;}
   .dp-point::before{content:'·';position:absolute;left:0;color:var(--muted);}
   .dp-point strong{color:var(--text);font-weight:500;}
+  .dp-footer{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+  .dp-btn{font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .1s;white-space:nowrap;}
+  .dp-btn-learn{background:rgba(96,165,250,.1);color:var(--blue);border-color:rgba(96,165,250,.25);}
+  .dp-btn-learn:hover{background:rgba(96,165,250,.17);}
+  .dp-btn-copy{background:none;color:var(--muted2);border-color:var(--border);}
+  .dp-btn-copy:hover{color:var(--text);border-color:var(--border2);}
 
   /* modal */
   .moverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .15s;}
@@ -329,7 +335,10 @@
           Approach: [your plan]<br/>
           Stuck specifically at: [exact decision point]"
         </div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px;">If you can't fill in "stuck at" → pattern recognition failed. Come to mentor before restarting.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);">If you can't fill in "stuck at" → pattern recognition failed. Come to mentor before restarting.</div>
+          <button id="copy-hint-btn" class="tc-btn" style="flex:none;width:auto;padding:4px 12px;" onclick="copyHintPrompt()">⎘ Copy prompt</button>
+        </div>
       </div>
     </div>
 
@@ -478,7 +487,7 @@ function setFilter(f){
 
 // ── NEXT UP
 function getNext(){for(const g of PATTERNS){if(g.phase<2)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
-function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Pattern: name it and explain WHY this problem fits that pattern (${p.patternName||''})\n- Real-world analogy (intuition only, no implementation)\n- The 1–2 core decision points I need to figure out myself\n- The two most common bugs engineers hit — name them, do NOT solve them\n- Time and space complexity of the optimal solution\n\nDo NOT give a step-by-step approach, pseudocode, loop structure, variable names, or any implementation hints. Stop after the brief and wait for my attempt.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
+function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Real-world analogy (intuition only, no implementation)\n- Optimal time and space complexity — the target to hit\n\nNothing else. No pattern name, no decision points, no bugs, no hints.\nStop after the brief and wait for my attempt.\n\nWhen I share my attempt, then identify: what pattern I used, where my thinking was right or wrong, and what to correct.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
 function openNextClaude(){const n=getNext();if(n)window.open(claudeUrl(n),'_blank');}
 function openInClaude(){const p=ALL.find(x=>x.id===activeId);if(p)window.open(claudeUrl(p),'_blank');}
 function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)window.open(claudeUrl(p),'_blank');}
@@ -579,6 +588,20 @@ function renderStats(){
   document.getElementById('p2-bar').style.width=`${Math.round(p2s/p2.length*100)}%`;
 }
 
+function learnPatternUrl(patternName){
+  const prompt=`I need to learn ${patternName} from scratch before attempting problems.\n\nTeach me in three parts:\n1. Mental model — what is this pattern doing, with a production system analogy\n2. Canonical skeleton — bare structure only, invariant in comments, no solution code\n3. Worked trace — walk one minimal example through the skeleton step by step\n\nAfter that, stop. I'll signal when I'm ready for the first problem.`;
+  return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
+}
+
+function copyHintPrompt(){
+  const text=`I've been on this 15 min.\nPattern: [what you identified]\nApproach: [your plan at a high level]\nStuck specifically at: [the exact decision point — one sentence]`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copy-hint-btn');
+    const orig=btn.textContent;btn.textContent='✓ Copied';
+    setTimeout(()=>{btn.textContent=orig;},1800);
+  });
+}
+
 function renderDecisionPoints(){
   const ph={1:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,2:`color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)`};
   let h='';
@@ -587,12 +610,27 @@ function renderDecisionPoints(){
       const bold=dp.split('—');
       return bold.length>1?`<li class="dp-point"><strong>${bold[0].trim()}</strong> —${bold[1]}</li>`:`<li class="dp-point">${dp}</li>`;
     }).join('');
+    const learnUrl=learnPatternUrl(g.name);
     h+=`<div class="dp-card">
       <div class="dp-pat">${g.name}<span class="dp-phase-tag" style="${ph[g.phase]||''}">${g.phaseLabel}</span></div>
       <ul class="dp-points">${pts}</ul>
+      <div class="dp-footer">
+        <a class="dp-btn dp-btn-learn" href="${learnUrl}" target="_blank" rel="noopener">→ Learn fresh in Claude</a>
+        <button class="dp-btn dp-btn-copy" onclick="copyPatternCard('${g.id}')">⎘ Copy prompt</button>
+      </div>
     </div>`;
   });
   document.getElementById('dp-grid').innerHTML=h;
+}
+
+function copyPatternCard(patId){
+  const g=PATTERNS.find(x=>x.id===patId);if(!g)return;
+  const text=`I need to learn ${g.name} from scratch before attempting problems.\n\nTeach me in three parts:\n1. Mental model — what is this pattern doing, with a production system analogy\n2. Canonical skeleton — bare structure only, invariant in comments, no solution code\n3. Worked trace — walk one minimal example through the skeleton step by step\n\nAfter that, stop. I'll signal when I'm ready for the first problem.`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btns=document.querySelectorAll('.dp-btn-copy');
+    const idx=PATTERNS.findIndex(x=>x.id===patId);
+    if(btns[idx]){const orig=btns[idx].textContent;btns[idx].textContent='✓ Copied';setTimeout(()=>{btns[idx].textContent=orig;},1800);}
+  });
 }
 
 // ── MODAL
