@@ -113,6 +113,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+  @media(max-width:600px){
+    .cards{grid-template-columns:1fr!important;padding:0 16px 40px!important;}
+    .status-strip{grid-template-columns:1fr!important;padding:0 16px 16px!important;}
+    .hero{padding:36px 16px 24px!important;}
+    .hero-title{font-size:20px!important;}
+    .topics{grid-template-columns:1fr!important;}
+  }
+
 </style>
 </head>
 <body>
