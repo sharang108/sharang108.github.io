@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HLD Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--amber:#fbbf24;--tr:0.18s ease;}
+[data-theme="dark"]{--bg:#0d0f11;--bg2:#13161a;--bg3:#1a1e23;--bg4:#1f242b;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e2e4e7;--muted:#4e5666;--muted2:#7a8090;}
+[data-theme="light"]{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0ede8;--bg4:#e8e5df;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1a1c20;--muted:#9a9fa8;--muted2:#6b7280;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;transition:background var(--tr),color var(--tr);}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;height:52px;gap:10px;}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 7px var(--amber);flex-shrink:0;}
+.tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
+.tb-sep,.tb-sub{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-right{margin-left:auto;display:flex;gap:7px;}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;text-decoration:none;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);}
+
+.content{max-width:640px;margin:80px auto;padding:0 24px;text-align:center;}
+.coming-icon{font-size:48px;margin-bottom:24px;}
+.coming-label{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px;}
+.coming-title{font-family:var(--mono);font-size:22px;font-weight:600;margin-bottom:14px;}
+.coming-desc{font-size:13px;color:var(--muted2);line-height:1.8;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto;}
+
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px;text-align:left;}
+.topic{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:10px 14px;}
+.t-title{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:3px;}
+.t-desc{font-size:11px;color:var(--muted2);}
+
+.prereq{background:var(--bg3);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--amber);border-radius:5px;padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.7;text-align:left;}
+.prereq strong{color:var(--text);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-dot"></div>
+  <a href="../index.html" style="font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;">prep-index</a>
+  <span class="tb-sep"> / </span>
+  <span class="tb-title">hld-prep</span>
+  <span class="tb-sep"> / </span>
+  <span class="tb-sub">coming soon</span>
+  <div class="tb-right">
+    <a href="../index.html" class="icon-btn">← Home</a>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="coming-icon">🌐</div>
+  <div class="coming-label">Track 3 — Not started</div>
+  <div class="coming-title">High Level Design</div>
+  <div class="coming-desc">
+    This track covers system design fundamentals — the kind of problems asked in senior and staff-level interviews. It unlocks after DSA Phase 3+ and LLD Phase 2 are complete.
+  </div>
+
+  <div class="topics">
+    <div class="topic">
+      <div class="t-title">Scalability fundamentals</div>
+      <div class="t-desc">Horizontal vs vertical, load balancing, stateless design</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">Database design</div>
+      <div class="t-desc">SQL vs NoSQL, sharding, replication, indexing</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">Caching</div>
+      <div class="t-desc">Cache strategies, eviction, Redis, CDN</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">Message queues</div>
+      <div class="t-desc">Kafka, SQS, async patterns, ordering guarantees</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">CAP theorem</div>
+      <div class="t-desc">Consistency vs availability tradeoffs, eventual consistency</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">System walkthroughs</div>
+      <div class="t-desc">URL shortener, Twitter feed, rate limiter, search</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">API design</div>
+      <div class="t-desc">REST vs GraphQL vs gRPC, pagination, versioning</div>
+    </div>
+    <div class="topic">
+      <div class="t-title">Reliability</div>
+      <div class="t-desc">Circuit breakers, retries, idempotency, SLOs</div>
+    </div>
+  </div>
+
+  <div class="prereq">
+    <strong>Recommended prerequisites before starting HLD:</strong><br/>
+    DSA Phase 2 complete · LLD Phases 1–2 complete · All core patterns at L3
+  </div>
+</div>
+
+<script>
+let isDark = true;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙 theme' : '☀️ theme';
+}
+</script>
+</body>
+</html>

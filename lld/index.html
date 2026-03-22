@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LLD Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+  --accent:#4ade80; --accent2:#22c55e; --amber:#fbbf24; --blue:#60a5fa;
+  --coral:#f87171; --purple:#a78bfa; --teal:#2dd4bf; --orange:#fb923c;
+  --tr:0.18s ease;
+}
+[data-theme="dark"]  { --bg:#0d0f11; --bg2:#13161a; --bg3:#1a1e23; --bg4:#1f242b; --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13); --text:#e2e4e7; --muted:#4e5666; --muted2:#7a8090; }
+[data-theme="light"] { --bg:#f5f4f0; --bg2:#ffffff; --bg3:#f0ede8; --bg4:#e8e5df; --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15); --text:#1a1c20; --muted:#9a9fa8; --muted2:#6b7280; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;transition:background var(--tr),color var(--tr);}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:52px;gap:10px;}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--purple);box-shadow:0 0 7px var(--purple);flex-shrink:0;}
+.tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
+.tb-sep,.tb-sub{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+.phase-pill{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;}
+.pill-active{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.25);}
+.pill-locked{background:var(--border);color:var(--muted2);border:1px solid var(--border2);}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;white-space:nowrap;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:272px 1fr;grid-template-rows:52px 1fr;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 32px;overflow-y:auto;transition:background var(--tr);}
+.s-sec{margin-bottom:22px;}
+.s-lbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 16px;margin-bottom:7px;}
+
+/* phase blocks */
+.pb{padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;}
+.pb:hover:not(.locked){background:var(--bg3);}
+.pb.locked{opacity:.4;cursor:default;}
+.pb-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.pb-name{font-family:var(--mono);font-size:11px;font-weight:500;}
+.pb-cnt{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.pb-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.f-act{background:var(--purple);}
+.f-lock{background:var(--muted);}
+
+/* filter nav */
+.fnav{padding:0 8px;display:flex;flex-direction:column;gap:1px;}
+.fbtn{font-family:var(--mono);font-size:11px;color:var(--muted2);padding:5px 8px;border-radius:4px;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .1s;display:flex;align-items:center;gap:6px;}
+.fbtn:hover{background:var(--bg3);color:var(--text);}
+.fbtn.sel{background:var(--bg3);color:var(--text);}
+.fdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.fbadge{margin-left:auto;font-size:9px;opacity:.5;font-family:var(--mono);}
+
+/* pat levels */
+.pat-levels{padding:0 16px;display:flex;flex-direction:column;gap:6px;}
+.pat-row{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.pat-name-s{font-family:var(--mono);font-size:10px;color:var(--muted2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.level-pips{display:flex;gap:3px;}
+.pip{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.pip.l1{background:var(--muted2);}
+.pip.l2{background:var(--blue);}
+.pip.l3{background:var(--amber);}
+.pip.l4{background:var(--purple);}
+.audit-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;white-space:nowrap;}
+.at-pending{color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);}
+.at-done{color:var(--accent);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);}
+.at-due{color:var(--coral);background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);}
+
+/* stats */
+.stats-strip{padding:0 16px;display:flex;flex-direction:column;gap:6px;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;}
+.stat-key{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.stat-val{font-family:var(--mono);font-size:11px;font-weight:500;}
+
+/* MAIN */
+.main{padding:22px 26px;overflow-y:auto;background:var(--bg);transition:background var(--tr);}
+.mhdr{margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.mhdr h1{font-family:var(--mono);font-size:16px;font-weight:500;flex:1;}
+.view-tabs{display:flex;gap:4px;}
+.vtab{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .1s;}
+.vtab:hover{color:var(--text);border-color:var(--border2);}
+.vtab.sel{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+
+/* NEXT UP */
+.next-up{background:var(--bg3);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--purple);border-radius:6px;padding:11px 14px;margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+.nu-lbl{font-family:var(--mono);font-size:9px;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.nu-title{font-family:var(--mono);font-size:13px;font-weight:500;}
+.nu-meta{font-size:11px;color:var(--muted2);margin-top:1px;font-family:var(--mono);}
+.nu-actions{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.nbtn{font-family:var(--mono);font-size:11px;font-weight:500;white-space:nowrap;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;transition:all .12s;display:inline-flex;align-items:center;gap:4px;}
+.btn-purple{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.btn-purple:hover{background:rgba(167,139,250,.18);}
+.btn-blue{background:rgba(96,165,250,.1);color:var(--blue);border-color:rgba(96,165,250,.25);}
+.btn-blue:hover{background:rgba(96,165,250,.17);}
+.btn-amber{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.btn-amber:hover{background:rgba(251,191,36,.18);}
+
+/* TIMER */
+.timer-panel{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:20px;}
+.tp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tp-title{font-family:var(--mono);font-size:11px;font-weight:600;}
+.tp-sub{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.tp-phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.tp-phase{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:10px 12px;}
+.tp-phase.active-phase{border-color:var(--amber);background:rgba(251,191,36,.05);}
+.tp-phase.done-phase{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04);}
+.tp-num{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.tp-name{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:2px;}
+.tp-limit{font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;}
+.tp-desc{font-size:11px;color:var(--muted2);line-height:1.5;}
+.timer-display{font-family:var(--mono);font-size:22px;font-weight:600;text-align:center;margin:8px 0 4px;}
+.timer-display.warn{color:var(--amber);}
+.timer-display.over{color:var(--coral);}
+.timer-controls{display:flex;gap:6px;margin-top:8px;}
+.tc-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);transition:all .1s;flex:1;text-align:center;}
+.tc-btn:hover{color:var(--text);border-color:var(--text);}
+.tc-btn.primary{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.tc-btn.primary:hover{background:rgba(167,139,250,.18);}
+
+/* PROBLEM TABLE */
+.pgroup{margin-bottom:28px;}
+.phdr{display:flex;align-items:center;gap:10px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.pname{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;}
+.pcnt{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.ptag{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em;margin-left:auto;}
+.ptype-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;margin-left:6px;}
+.tag-micro{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+.tag-system{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2);}
+
+.pcols{display:grid;grid-template-columns:36px 1fr 110px 80px 70px 28px 42px;padding:3px 9px 5px;gap:4px;}
+.ch{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.ch.c{text-align:center;}
+
+.prow{display:grid;grid-template-columns:36px 1fr 110px 80px 70px 28px 42px;align-items:center;padding:8px 9px;border-radius:5px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all .1s;gap:4px;}
+.prow:hover{background:var(--bg3);border-color:var(--border);}
+.pr-num{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.pr-title{font-family:var(--sans);font-size:13px;display:flex;align-items:center;gap:6px;}
+.pr-note{font-size:10px;opacity:.6;}
+.pr-patterns{font-family:var(--mono);font-size:9px;color:var(--muted2);line-height:1.5;}
+.pr-cx{font-family:var(--mono);font-size:10px;color:var(--muted2);text-align:center;line-height:1.5;}
+.dbadge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;text-align:center;width:fit-content;margin:0 auto;}
+.d-easy{color:var(--accent);background:rgba(74,222,128,.08);}
+.d-med{color:var(--amber);background:rgba(251,191,36,.08);}
+.d-hard{color:var(--coral);background:rgba(248,113,113,.08);}
+
+.sdot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;margin:0 auto;font-family:var(--mono);}
+.sd-solved{background:rgba(74,222,128,.15);color:var(--accent);}
+.sd-review{background:rgba(251,191,36,.15);color:var(--amber);}
+.sd-audited{background:rgba(167,139,250,.15);color:var(--purple);}
+.sd-todo{background:var(--border);color:var(--muted);}
+
+.row-open{font-family:var(--mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 7px;border-radius:3px;cursor:pointer;transition:all .1s;white-space:nowrap;}
+.row-open:hover{border-color:var(--purple);color:var(--purple);}
+
+/* DEBUG VIEW */
+.dbg-banner{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-left:3px solid var(--purple);border-radius:6px;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.6;}
+.dbg-banner strong{color:var(--text);}
+.dbg-form{display:flex;flex-direction:column;gap:12px;}
+.dbg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dbg-field{display:flex;flex-direction:column;gap:5px;}
+.dbg-field.full{grid-column:1/-1;}
+.dbg-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.dbg-label span{color:var(--coral);margin-left:2px;}
+.dbg-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;transition:border-color .1s;width:100%;}
+.dbg-input:focus{border-color:var(--border2);}
+.dbg-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;resize:vertical;outline:none;transition:border-color .1s;width:100%;line-height:1.6;}
+.dbg-textarea:focus{border-color:var(--border2);}
+.dbg-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;width:100%;cursor:pointer;}
+.dbg-actions{display:flex;gap:8px;align-items:center;padding-top:4px;}
+.dbg-submit{font-family:var(--mono);font-size:11px;font-weight:500;padding:8px 18px;border-radius:4px;cursor:pointer;border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.1);color:var(--purple);transition:all .12s;}
+.dbg-submit:hover{background:rgba(167,139,250,.18);}
+.dbg-reset{font-family:var(--mono);font-size:11px;padding:8px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .12s;}
+.dbg-reset:hover{color:var(--text);border-color:var(--border2);}
+.dbg-hint{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .15s;}
+.moverlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;width:600px;max-width:96vw;padding:24px;position:relative;transform:translateY(8px);transition:transform .15s,background var(--tr);max-height:90vh;overflow-y:auto;}
+.moverlay.open .modal{transform:translateY(0);}
+.mclose{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--muted2);background:none;border:1px solid var(--border);padding:3px 7px;border-radius:3px;cursor:pointer;transition:all .1s;}
+.mclose:hover{color:var(--text);border-color:var(--border2);}
+.m-id{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-bottom:3px;}
+.m-title{font-family:var(--mono);font-size:15px;font-weight:500;margin-bottom:10px;}
+.mmeta{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;}
+.mfield{display:flex;flex-direction:column;gap:2px;}
+.mlabel{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.mval{font-family:var(--mono);font-size:12px;}
+.m-desc{font-size:12px;color:var(--muted2);line-height:1.7;background:var(--bg3);border-radius:4px;padding:10px 12px;margin-bottom:12px;border:1px solid var(--border);}
+.m-desc strong{color:var(--text);font-weight:500;}
+.m-reqs{margin-bottom:12px;}
+.m-req{display:flex;gap:8px;font-size:11px;color:var(--muted2);padding:4px 0;line-height:1.6;}
+.m-req::before{content:'·';color:var(--muted);flex-shrink:0;}
+.m-solid{font-family:var(--mono);font-size:10px;color:var(--muted2);background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 10px;margin-bottom:12px;line-height:1.8;}
+.m-solid strong{color:var(--purple);}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.note-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;resize:none;line-height:1.7;outline:none;transition:border-color .1s;}
+.note-area:focus{border-color:var(--border2);}
+.mlinks{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.mlbtn{font-family:var(--mono);font-size:10px;font-weight:500;padding:5px 10px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .1s;}
+.mactions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.mbtn{font-family:var(--mono);font-size:11px;font-weight:500;padding:6px 13px;border-radius:4px;cursor:pointer;border:1px solid;transition:all .1s;}
+.mb-solve{background:rgba(74,222,128,.1);color:var(--accent);border-color:rgba(74,222,128,.3);}
+.mb-solve:hover{background:rgba(74,222,128,.18);}
+.mb-review{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.mb-review:hover{background:rgba(251,191,36,.18);}
+.mb-audit{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.mb-audit:hover{background:rgba(167,139,250,.18);}
+.mb-ghost{background:none;color:var(--muted2);border-color:var(--border);}
+.mb-ghost:hover{color:var(--text);border-color:var(--border2);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-dot"></div>
+  <span class="tb-title">lld-prep</span>
+  <span class="tb-sep"> / </span>
+  <span class="tb-sub">index</span>
+  <div class="tb-right">
+    <span class="phase-pill pill-active">Phase 1–2 active</span>
+    <span class="phase-pill pill-locked">Phase 3–4 🔒</span>
+    <span class="phase-pill" style="background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.25);">Modern ✓</span>
+    <a class="icon-btn" href="pattern-lab.html">⇄ Pattern lab</a>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="s-sec">
+    <div class="s-lbl">Progress</div>
+    <div id="phase-progress"></div>
+  </div>
+  <div class="s-sec">
+    <div class="s-lbl">Filter by pattern</div>
+    <div class="fnav" id="fnav"></div>
+  </div>
+  <div class="s-sec">
+    <div class="s-lbl">Internalization</div>
+    <div class="pat-levels" id="pat-levels"></div>
+  </div>
+  <div class="s-sec">
+    <div class="s-lbl">Stats</div>
+    <div class="stats-strip" id="stats-strip"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+  <div class="mhdr">
+    <h1 id="main-title">All problems</h1>
+    <div class="view-tabs">
+      <button class="vtab sel" onclick="setView('problems',this)">Problems</button>
+      <button class="vtab"     onclick="setView('timer',this)">Timer</button>
+      <button class="vtab"     onclick="setView('debug',this)">Debug</button>
+    </div>
+  </div>
+
+  <!-- PROBLEMS VIEW -->
+  <div id="view-problems">
+    <div class="next-up" id="next-up" style="display:none">
+      <div>
+        <div class="nu-lbl">↳ next up</div>
+        <div class="nu-title" id="nu-title">—</div>
+        <div class="nu-meta"  id="nu-meta">—</div>
+      </div>
+      <div class="nu-actions">
+        <button class="nbtn btn-purple" onclick="openNextClaude()">→ Open in Claude</button>
+      </div>
+    </div>
+    <div id="prob-container"></div>
+  </div>
+
+  <!-- TIMER VIEW -->
+  <div id="view-timer" style="display:none">
+    <div class="timer-panel">
+      <div class="tp-header">
+        <span class="tp-title">Struggle timer</span>
+        <span class="tp-sub" id="timer-phase-label">Select a phase to start</span>
+      </div>
+      <div class="tp-phases">
+        <div class="tp-phase" id="tp1">
+          <div class="tp-num">Phase 1</div>
+          <div class="tp-name">Pattern identification</div>
+          <div class="tp-limit">5 min max</div>
+          <div class="tp-desc">Read the problem. Name the pattern and the trigger that signals it. If you can't — come to mentor immediately.</div>
+        </div>
+        <div class="tp-phase" id="tp2">
+          <div class="tp-num">Phase 2</div>
+          <div class="tp-name">Design attempt</div>
+          <div class="tp-limit">20 min max</div>
+          <div class="tp-desc">Sketch classes, relationships, interfaces. The struggle with composition vs inheritance is the learning.</div>
+        </div>
+        <div class="tp-phase" id="tp3">
+          <div class="tp-num">Phase 3</div>
+          <div class="tp-name">Targeted hint</div>
+          <div class="tp-limit">On request</div>
+          <div class="tp-desc">Tell mentor: "Pattern: X. My structure: Y. Stuck specifically at: Z." Minimum nudge only.</div>
+        </div>
+      </div>
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted2);margin-bottom:8px" id="timer-status">Select a phase to start</div>
+      <div class="timer-controls">
+        <button class="tc-btn primary" onclick="startTimer(1)">Phase 1 (5 min)</button>
+        <button class="tc-btn primary" onclick="startTimer(2)">Phase 2 (20 min)</button>
+        <button class="tc-btn" onclick="pauseTimer()">Pause</button>
+        <button class="tc-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;">
+      <div style="font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:10px;">Hint format — copy this when stuck after 20 min</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.8;background:var(--bg4);padding:10px 12px;border-radius:4px;border:1px solid var(--border);">
+        "I've been on this 20 min.<br/>
+        Pattern: [what you identified + the trigger that told you]<br/>
+        My structure: [classes you have, relationships between them]<br/>
+        Stuck specifically at: [one sentence — the exact decision point]"
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button id="copy-hint-btn" class="tc-btn" style="flex:none;width:auto;padding:4px 12px;" onclick="copyHint()">⎘ Copy prompt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBUG VIEW -->
+  <div id="view-debug" style="display:none">
+    <div class="dbg-banner">
+      <strong>Debug = diagnose your design thinking, not fix your code.</strong><br/>
+      Describe your class structure and where it broke down. I'll identify exactly where your mental model failed and ask you one question that leads you to the fix.
+    </div>
+    <div class="dbg-form">
+      <div class="dbg-row">
+        <div class="dbg-field">
+          <div class="dbg-label">Problem <span>*</span></div>
+          <select class="dbg-select" id="dbg-problem"></select>
+        </div>
+        <div class="dbg-field">
+          <div class="dbg-label">Pattern you identified</div>
+          <select class="dbg-select" id="dbg-pattern">
+            <option value="">— select pattern —</option>
+            <option>Factory Method</option>
+            <option>Strategy</option>
+            <option>Observer</option>
+            <option>Decorator</option>
+            <option>Singleton</option>
+            <option>Command</option>
+            <option>State</option>
+            <option>Multiple patterns</option>
+            <option>Not sure</option>
+          </select>
+        </div>
+      </div>
+      <div class="dbg-field full">
+        <div class="dbg-label">Your class structure <span>*</span></div>
+        <textarea class="dbg-textarea" id="dbg-classes" rows="5" placeholder="List your classes and their relationships. e.g.:&#10;- NotificationService (context)&#10;- Notifier (ABC) ← EmailNotifier, SMSNotifier&#10;- NotifierFactory.create(kind) → Notifier&#10;Don't write full code — sketch the structure."></textarea>
+      </div>
+      <div class="dbg-row">
+        <div class="dbg-field">
+          <div class="dbg-label">What broke / what felt wrong</div>
+          <select class="dbg-select" id="dbg-issue">
+            <option value="">— select issue type —</option>
+            <option>Wrong relationship (used inheritance instead of composition)</option>
+            <option>SOLID violation I can see but can't fix</option>
+            <option>Not sure how to handle extensibility</option>
+            <option>Interface design — too fat or too thin</option>
+            <option>Where to put the logic — wrong class</option>
+            <option>Pattern identification was wrong</option>
+            <option>Multiple issues</option>
+          </select>
+        </div>
+        <div class="dbg-field">
+          <div class="dbg-label">SOLID violation (if known)</div>
+          <select class="dbg-select" id="dbg-solid">
+            <option value="">— none identified / unknown —</option>
+            <option>S — Single Responsibility</option>
+            <option>O — Open/Closed</option>
+            <option>L — Liskov Substitution</option>
+            <option>I — Interface Segregation</option>
+            <option>D — Dependency Inversion</option>
+          </select>
+        </div>
+      </div>
+      <div class="dbg-field full">
+        <div class="dbg-label">What you thought your design would achieve</div>
+        <textarea class="dbg-textarea" id="dbg-thinking" rows="3" placeholder="e.g. I thought having NotificationService call EmailNotifier directly was fine because the factory handles it, but now adding a new channel requires changing the service..."></textarea>
+      </div>
+      <div class="dbg-actions">
+        <button class="dbg-submit" onclick="openDebugClaude()">→ Debug in Claude</button>
+        <button class="dbg-reset" onclick="resetDebug()">Clear</button>
+        <span class="dbg-hint">Opens Claude with your design context pre-filled</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="moverlay" id="moverlay" onclick="closeIfOutside(event)">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()">✕ close</button>
+    <div class="m-id"  id="m-id"></div>
+    <div class="m-title" id="m-title"></div>
+    <div class="mmeta">
+      <div class="mfield"><div class="mlabel">Type</div>    <div class="mval" id="m-type"></div></div>
+      <div class="mfield"><div class="mlabel">Pattern(s)</div><div class="mval" id="m-pat"></div></div>
+      <div class="mfield"><div class="mlabel">Difficulty</div><div class="mval" id="m-diff"></div></div>
+      <div class="mfield"><div class="mlabel">Phase</div>   <div class="mval" id="m-phase"></div></div>
+      <div class="mfield"><div class="mlabel">Status</div>  <div class="mval" id="m-status"></div></div>
+    </div>
+    <div class="m-desc" id="m-desc"></div>
+    <div class="m-reqs" id="m-reqs"></div>
+    <div class="m-solid" id="m-solid"></div>
+    <div class="mlinks">
+      <button class="mlbtn btn-purple" onclick="openModalClaude()">→ Open in Claude</button>
+      <button class="mlbtn btn-amber"  onclick="copyModalPrompt()">⎘ Copy mentor prompt</button>
+      <a class="mlbtn" id="m-learn-link" href="pattern-lab.html" target="_blank"
+         style="background:rgba(45,212,191,.08);color:var(--teal);border-color:rgba(45,212,191,.25);">
+        ⇄ Learn pattern
+      </a>
+    </div>
+    <hr class="divider"/>
+    <div class="mlabel" style="margin-bottom:6px">Notes / insights</div>
+    <textarea class="note-area" id="m-notes" rows="3" placeholder="Design decisions · SOLID violations caught · what broke in audit · pattern insight..."></textarea>
+    <div class="mactions">
+      <button class="mbtn mb-solve"  onclick="markStatus('solved')">✓ Solved</button>
+      <button class="mbtn mb-review" onclick="markStatus('review')">↻ Review</button>
+      <button class="mbtn mb-audit"  onclick="markStatus('audited')">★ Audited</button>
+      <button class="mbtn mb-ghost"  onclick="markStatus('todo')">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// DATA — 7-10 micro-problems per pattern + full system designs
+// ─────────────────────────────────────────────────────────────────
+const GROUPS = [
+  // ── PHASE 1: CORE PATTERNS ────────────────────────────────────
+  {
+    id:'factory', name:'Factory Method', phase:1, color:'var(--accent)',
+    problems:[
+      {id:1,  title:'Notification dispatcher',       diff:'easy', type:'micro',
+       desc:'A service sends notifications via email or SMS. The channel is chosen at runtime from user preferences.',
+       reqs:['Notifier ABC with send()', 'EmailNotifier and SMSNotifier concrete classes', 'NotifierFactory.create(kind) → Notifier', 'Caller never instantiates a concrete notifier directly'],
+       solid:'OCP: new channels = new class + registry entry, zero edits to factory body. DIP: caller depends on Notifier ABC, never the concrete.'},
+      {id:2,  title:'Log handler factory',           diff:'easy', type:'micro',
+       desc:'A logging library supports console, file, and cloud (e.g. CloudWatch) output. The handler is configured once at startup via a string key.',
+       reqs:['LogHandler ABC with write(level, msg)', 'Three concrete handlers', 'Factory with registry dict', 'Raise ValueError for unknown handler type'],
+       solid:'OCP: add CloudWatchHandler without touching existing code. SRP: each handler does one thing.'},
+      {id:3,  title:'Payment gateway factory',       diff:'easy', type:'micro',
+       desc:'A checkout flow supports Stripe, PayPal, and UPI. Gateway selection comes from user\'s saved preference.',
+       reqs:['PaymentGateway ABC with charge(amount, currency)', 'Three concrete gateways', 'Factory that maps string key to class', 'Return type is always PaymentGateway, never concrete'],
+       solid:'LSP: every gateway must honour the charge() contract — same return shape, same exceptions.'},
+      {id:4,  title:'Report generator',              diff:'med',  type:'micro',
+       desc:'A reporting tool exports data in PDF, CSV, and Excel formats. Format is user-selected. New formats will be added without touching existing code.',
+       reqs:['ReportGenerator ABC with generate(data) → bytes', 'Concrete classes per format', 'Factory with self-registration (each class registers itself)', 'Graceful error for unsupported format'],
+       solid:'OCP + self-registration: adding a format = one new file, zero factory edits. Contrast with a registry you have to manually update.'},
+      {id:5,  title:'UI component factory',          diff:'med',  type:'micro',
+       desc:'A cross-platform UI toolkit creates buttons, text fields, and checkboxes. The OS (Windows, macOS, Linux) is detected at startup and determines which concrete widgets to create.',
+       reqs:['Abstract factory with createButton(), createTextField()', 'WindowsFactory and MacFactory implementations', 'Application class uses the factory interface — never concrete widget classes', 'Switching OS = one constructor argument change'],
+       solid:'This is Abstract Factory — recognise the difference from Factory Method. DIP is the core principle: Application depends on AbstractFactory, not WindowsFactory.'},
+      {id:6,  title:'Database connection factory',   diff:'med',  type:'micro',
+       desc:'A backend service needs to connect to PostgreSQL in prod, SQLite in dev, and a mock in tests. The config file determines which connection is created.',
+       reqs:['Connection ABC with query(), execute(), close()', 'Three concrete implementations', 'Factory reads an env variable to select the class', 'MockConnection stores queries for assertion in tests'],
+       solid:'DIP is the entire point: service code depends on Connection ABC. Factory is the only place that knows about concrete classes. Testability is the payoff.'},
+      {id:7,  title:'Serializer factory',            diff:'med',  type:'micro',
+       desc:'A data pipeline serialises objects to JSON, MessagePack, or Protobuf depending on downstream service requirements. Format is decided per-request from a header.',
+       reqs:['Serializer ABC with serialize(obj) → bytes and deserialize(bytes) → obj', 'Three concrete serializers', 'Thread-safe factory (multiple requests concurrently)', 'Factory caches serializer instances (they\'re stateless)'],
+       solid:'SRP: factory manages creation + caching. Serializer manages encoding only. Caching in the factory, not inside the serializer.'},
+      {id:8,  title:'Cloud storage adapter',         diff:'hard', type:'micro',
+       desc:'An application stores files on S3, GCS, or Azure Blob. The provider is configured per-tenant. Adding a new provider must require zero changes to upload/download logic.',
+       reqs:['StorageProvider ABC: upload(key, data), download(key) → data, delete(key)', 'Three concrete providers', 'Factory with per-tenant config loading', 'Raises ProviderNotFoundError with clear message'],
+       solid:'Full SOLID audit required: write one sentence per principle justifying your design choices.'},
+    ]
+  },
+  {
+    id:'strategy', name:'Strategy', phase:1, color:'var(--accent)',
+    problems:[
+      {id:9,  title:'Sorting algorithm selector',    diff:'easy', type:'micro',
+       desc:'A data processing tool lets users pick between QuickSort, MergeSort, and HeapSort at runtime based on dataset characteristics.',
+       reqs:['SortStrategy ABC with sort(data) → list', 'Three concrete strategies', 'DataProcessor context with set_strategy() and process()', 'Sorting logic never inside DataProcessor'],
+       solid:'SRP: DataProcessor orchestrates, strategies sort. OCP: new algorithm = new class. DIP: DataProcessor depends on SortStrategy, never QuickSort.'},
+      {id:10, title:'Discount pricing engine',       diff:'easy', type:'micro',
+       desc:'An e-commerce platform applies different discount strategies: percentage off, fixed amount, buy-2-get-1, and loyalty tier. Strategy is selected per user session.',
+       reqs:['DiscountStrategy ABC with apply(price) → price', 'Four concrete strategies', 'PricingEngine holds one strategy, swappable at runtime', 'Strategies are stateless and independently testable'],
+       solid:'ISP: each strategy has one method. LSP: every strategy must return a valid price — never negative, never None.'},
+      {id:11, title:'Route planning strategies',     diff:'easy', type:'micro',
+       desc:'A navigation app offers fastest, shortest, and avoid-tolls routing. Users switch strategies mid-journey.',
+       reqs:['RouteStrategy ABC with calculate(origin, dest) → Route', 'Three concrete strategies', 'Navigator context, strategy swappable at runtime', 'Switching strategy replaces one reference, no subclassing'],
+       solid:'Composition over inheritance: why does Navigator hold a strategy rather than subclass it? Write the justification.'},
+      {id:12, title:'Compression strategy',          diff:'med',  type:'micro',
+       desc:'A file archiver supports ZIP, GZIP, and LZ4 compression. The algorithm is chosen based on file type and size constraints.',
+       reqs:['CompressionStrategy ABC: compress(data) → bytes, decompress(bytes) → data', 'Three concrete strategies', 'Context selects strategy automatically based on rules', 'Strategies can be injected for testing without file I/O'],
+       solid:'DIP: selection logic depends on CompressionStrategy interface. The rule-based selector is a separate class from the context that uses the strategy.'},
+      {id:13, title:'Authentication strategies',     diff:'med',  type:'micro',
+       desc:'An API supports password auth, OAuth2, and API key auth. The strategy is determined by the Authorization header type at request time.',
+       reqs:['AuthStrategy ABC with authenticate(request) → User | None', 'Three concrete strategies', 'AuthMiddleware selects and applies the right strategy', 'Failing auth returns None, not raises — callers handle None'],
+       solid:'LSP is critical here: all strategies must return User | None with identical semantics. A strategy that raises on bad credentials instead of returning None breaks callers.'},
+      {id:14, title:'Tax calculation engine',        diff:'med',  type:'micro',
+       desc:'A billing system applies different tax rules per country: flat rate (US), tiered (UK), VAT with exemptions (EU). Rules change quarterly.',
+       reqs:['TaxStrategy ABC with calculate(amount, line_items) → TaxResult', 'Three concrete strategies', 'TaxResult dataclass with breakdown field', 'Strategies read country config, not hardcoded rates'],
+       solid:'OCP + SRP: changing UK tax rules means editing UKTaxStrategy only. BillingService never changes for tax rule updates.'},
+      {id:15, title:'Stacked discount strategies',   diff:'med',  type:'micro',
+       desc:'Marketing needs to stack multiple discounts: loyalty + seasonal + promo code, applied in a specific order. The combination changes per campaign.',
+       reqs:['DiscountStrategy ABC with apply(price) → price', 'CompositeDiscountStrategy that holds a list of strategies', 'PricingEngine applies the composite', 'Order of application matters — seasonal before loyalty'],
+       solid:'Composite pattern + Strategy: recognise both. LSP: composite must satisfy same contract as a single strategy.'},
+      {id:16, title:'Export format strategies',      diff:'hard', type:'micro',
+       desc:'A reporting dashboard exports to PDF, XLSX, and CSV. Each format has different pagination, styling, and data transformation requirements. New formats quarterly.',
+       reqs:['ExportStrategy ABC: export(report_data) → bytes, content_type() → str', 'Three concrete strategies', 'ExportService with strategy injection', 'content_type() used to set HTTP response headers — strategies own their MIME type'],
+       solid:'Full audit: ISP consideration — should content_type() be on the strategy or on a separate metadata class? Justify your choice.'},
+    ]
+  },
+  {
+    id:'observer', name:'Observer', phase:1, color:'var(--accent)',
+    problems:[
+      {id:17, title:'Stock price alert system',      diff:'easy', type:'micro',
+       desc:'A trading app notifies UI, risk engine, and audit logger when a stock price changes. New notification targets are added regularly.',
+       reqs:['Observer ABC with update(event, data)', 'Subject with subscribe/unsubscribe/notify', 'Three concrete observers', 'notify() continues if one observer raises — others must not be skipped'],
+       solid:'OCP: add a new observer = new class + subscribe(). Subject never changes. SRP: Subject manages state, each observer manages its own reaction.'},
+      {id:18, title:'Order status notifications',    diff:'easy', type:'micro',
+       desc:'When an order status changes (placed → confirmed → shipped → delivered), multiple services react: email service, inventory system, analytics tracker.',
+       reqs:['OrderSubject with status change triggering notify()', 'Observer ABC', 'Four concrete observers', 'Observers receive old and new status so they can filter relevant transitions'],
+       solid:'DIP: OrderSubject depends on Observer ABC — never EmailService directly. Adding AnalyticsObserver requires zero changes to OrderSubject.'},
+      {id:19, title:'User session event bus',        diff:'easy', type:'micro',
+       desc:'A web backend emits events on user login, logout, and failed attempts. Security monitor, session cache, and activity log each react differently.',
+       reqs:['EventBus with subscribe(event_type, observer) — type-specific subscription', 'Observer ABC', 'Subject fires events with event type + payload', 'Security monitor only subscribes to failed_login events'],
+       solid:'ISP: observers subscribe to specific event types, not all events. A SecurityMonitor should not receive order.placed events.'},
+      {id:20, title:'File watcher',                  diff:'med',  type:'micro',
+       desc:'A CLI tool watches a directory for file changes (created, modified, deleted). Observers include a log writer, a compiler trigger, and a backup service. Observers can be added via config.',
+       reqs:['FileWatcher subject polling or using OS events', 'Observer ABC with on_change(path, event_type)', 'Three concrete observers', 'Observers registered from config file at startup — no hardcoded list'],
+       solid:'OCP + DIP: FileWatcher never imports concrete observers. Observer list comes from config + dynamic loading.'},
+      {id:21, title:'Metrics aggregator',            diff:'med',  type:'micro',
+       desc:'A system metrics collector (CPU, memory, disk) broadcasts readings every second. Dashboard, alerting system, and data persister each consume the same stream differently.',
+       reqs:['MetricsSubject that pushes readings', 'Observer ABC', 'Dashboard averages last 60s, Alerter checks thresholds, Persister writes to DB', 'Observers have internal state — they\'re not stateless'],
+       solid:'SRP: each observer\'s aggregation logic is entirely self-contained. Subject knows nothing about averaging or thresholds.'},
+      {id:22, title:'Selective event subscription',  diff:'med',  type:'micro',
+       desc:'A marketplace has buyers and sellers. Buyers subscribe to price drops for specific products. Sellers subscribe to new offers on their listings. Neither should receive events irrelevant to them.',
+       reqs:['Subject supports topic-based subscription: subscribe(topic, observer)', 'Buyer observer filters by product_id', 'Seller observer filters by listing_id', 'Unsubscribe by topic without affecting other subscriptions'],
+       solid:'ISP: fat subject interface with one subscribe() is bad here. Design topic-specific subscription cleanly.'},
+      {id:23, title:'Crash-safe notification chain', diff:'med',  type:'micro',
+       desc:'A payment system notifies 5 downstream services when a payment completes. If the analytics service crashes, the receipt emailer and fraud checker must still be notified.',
+       reqs:['notify() wraps each observer call in try/except', 'Errors logged but not re-raised', 'Order of notification is deterministic (list order)', 'Dead-letter queue for failed observer calls (store failed events)'],
+       solid:'SRP: error handling is in Subject.notify(), not in individual observers. Observers are not responsible for their own fault tolerance.'},
+      {id:24, title:'Reactive config reloader',      diff:'hard', type:'micro',
+       desc:'A long-running service watches a config file. When it changes, all components that depend on config (rate limiter, feature flags, DB pool size) automatically reload without restart.',
+       reqs:['ConfigWatcher subject', 'Components implement Observer and hold their own config reference', 'Hot-reload: components update in-memory config, no process restart', 'Thread safety: config reads and writes must not race'],
+       solid:'Full SOLID audit. Thread safety discussion: where does the lock live — in Subject, in observers, or in a shared config object?'},
+    ]
+  },
+  {
+    id:'decorator', name:'Decorator', phase:1, color:'var(--accent)',
+    problems:[
+      {id:25, title:'Logging middleware',             diff:'easy', type:'micro',
+       desc:'A service has a data fetcher. Add request logging and timing to it without modifying the fetcher class.',
+       reqs:['DataFetcher ABC with fetch(query) → data', 'LoggingDecorator wraps any DataFetcher', 'TimingDecorator wraps any DataFetcher', 'Both can be stacked in any order'],
+       solid:'OCP: new cross-cutting concern = new decorator, zero changes to DataFetcher. SRP: fetcher fetches, logger logs, timer times.'},
+      {id:26, title:'Text formatter pipeline',        diff:'easy', type:'micro',
+       desc:'A text processing tool needs to apply transformations: trim whitespace, uppercase, replace words, add prefix/suffix. Transformations stack and the order matters.',
+       reqs:['TextTransformer ABC with transform(text) → text', 'Four concrete decorators', 'Decorators composable in arbitrary order', 'The same decorator can appear twice in the chain'],
+       solid:'Decorator order = result order. Write a test case showing that trim-then-upper gives different result than upper-then-trim.'},
+      {id:27, title:'HTTP request decorator',         diff:'easy', type:'micro',
+       desc:'An HTTP client needs optional retry logic, auth header injection, and request timing — all independently toggleable per client instance.',
+       reqs:['HttpClient ABC with send(request) → response', 'RetryDecorator, AuthDecorator, TimingDecorator', 'Each decorator is independently useful', 'A client with all three wraps: Timing(Auth(Retry(BaseClient)))'],
+       solid:'Composition: show why Timing(Auth(Retry(x))) is better than a subclass HttpClientWithTimingAndAuthAndRetry.'},
+      {id:28, title:'Data source pipeline',           diff:'med',  type:'micro',
+       desc:'A data pipeline reads from a source and can optionally apply encryption, compression, and caching layers. Combinations change per deployment.',
+       reqs:['DataSource ABC: read() → bytes, write(bytes)', 'EncryptionDecorator, CompressionDecorator, CacheDecorator', 'Cache decorator short-circuits read() — does not call wrapped if cache hit', 'Decorators stackable in any order — but document which order makes semantic sense'],
+       solid:'LSP challenge: CacheDecorator.write() must also invalidate cache — if it doesn\'t, it violates the contract that write then read returns the new data.'},
+      {id:29, title:'Permission-checking decorator',  diff:'med',  type:'micro',
+       desc:'A file system service needs read and write permission checks as optional layers. Some clients get both, some only read-check, some bypass checks entirely (admin).',
+       reqs:['FileSystem ABC: read(path), write(path, data)', 'ReadPermissionDecorator, WritePermissionDecorator', 'PermissionDecorator raises PermissionDeniedError, does not return None', 'Admin path: use BaseFileSystem directly, no decorator'],
+       solid:'LSP: decorator raises an exception, base class does not — is this an LSP violation? Discuss.'},
+      {id:30, title:'Notification enrichment chain',  diff:'med',  type:'micro',
+       desc:'A notification service sends messages. Before sending, messages can be enriched: add sender metadata, personalise with user name, translate to preferred language, add unsubscribe link.',
+       reqs:['Notification dataclass (recipient, subject, body)', 'NotificationEnricher ABC with enrich(notification) → Notification', 'Four concrete enrichers', 'Enrichers are stateless — same input always gives same output'],
+       solid:'SRP + ISP: enrichers are pure functions on Notification. Should they modify in-place or return a new object? Justify immutability choice.'},
+      {id:31, title:'Rate-limited API client',        diff:'med',  type:'micro',
+       desc:'An external API client needs: rate limiting (N requests/second), automatic retry on 429, circuit breaker on repeated failures, and request logging.',
+       reqs:['ApiClient ABC with call(endpoint, params) → response', 'RateLimitDecorator, RetryDecorator, CircuitBreakerDecorator, LoggingDecorator', 'Circuit breaker opens after 5 consecutive failures, half-opens after 30s', 'Stack order: Logging(CircuitBreaker(RateLimit(Retry(BaseClient))))'],
+       solid:'State pattern inside CircuitBreakerDecorator: the decorator has its own state machine. Discuss combining Decorator + State.'},
+      {id:32, title:'Caching decorator with TTL',     diff:'hard', type:'micro',
+       desc:'A read-heavy service needs a generic caching layer that can wrap any data source. Cache has TTL per entry, LRU eviction, and must be thread-safe for concurrent reads.',
+       reqs:['Cacheable ABC with fetch(key) → value', 'CacheDecorator with TTL and LRU eviction', 'Thread-safe: concurrent reads must not corrupt cache state', 'Cache miss: call wrapped fetch(), store result with TTL'],
+       solid:'Full audit. SRP: does the decorator own TTL logic or delegate to a Cache class? DIP: CacheDecorator depends on Cacheable — what does it depend on for the cache store?'},
+    ]
+  },
+
+  // ── PHASE 2: BEHAVIOURAL PATTERNS ────────────────────────────
+  {
+    id:'command', name:'Command', phase:2, color:'var(--amber)',
+    problems:[
+      {id:33, title:'Text editor undo/redo',          diff:'easy', type:'micro',
+       desc:'A text editor supports insert and delete operations with full undo/redo history.',
+       reqs:['Command ABC: execute(), undo()', 'InsertCommand, DeleteCommand', 'CommandHistory with execute(cmd), undo(), redo()', 'Redo stack clears when a new command is executed'],
+       solid:'SRP: TextEditor handles state, Commands handle operation logic, CommandHistory handles history. Three classes, three reasons to change.'},
+      {id:34, title:'File system operations',         diff:'easy', type:'micro',
+       desc:'A file manager supports create, delete, rename, and move with full undo. Delete stores file contents for undo.',
+       reqs:['Command ABC: execute(), undo()', 'Four concrete commands', 'DeleteCommand stores file contents before executing', 'History stack, undo pops and calls undo()'],
+       solid:'OCP: new operation = new Command class. FileManager never changes to add operations.'},
+      {id:35, title:'Smart home controller',          diff:'easy', type:'micro',
+       desc:'A smart home app controls lights, thermostat, and TV. Each action is a command. A "scene" button triggers multiple commands as a batch.',
+       reqs:['Command ABC: execute()', 'Device commands (TurnOnLight, SetThermostat, etc.)', 'MacroCommand runs a list of commands', 'Remote control maps buttons to commands — swappable'],
+       solid:'Composite Command (Macro) satisfies same interface as single Command — LSP. Remote only depends on Command ABC.'},
+      {id:36, title:'Transaction command queue',      diff:'med',  type:'micro',
+       desc:'A banking system queues debit and credit operations for batch execution at end-of-day. Operations can be rolled back if any fail.',
+       reqs:['TransactionCommand: execute(), rollback() (not undo — semantically different)', 'Debit, Credit concrete commands', 'TransactionQueue: queue(cmd), run_all(), rollback_all()', 'Atomic: if any command fails, rollback all previously executed'],
+       solid:'LSP: rollback() must be semantically correct inverse of execute(). A rollback that does nothing silently is an LSP violation.'},
+      {id:37, title:'Job scheduler with retry',       diff:'med',  type:'micro',
+       desc:'A background job system wraps operations as commands, queues them, and retries failed jobs up to N times before moving to dead-letter queue.',
+       reqs:['Job (Command) ABC: execute() → bool (success)', 'JobQueue with enqueue(), run_next(), retry logic', 'RetryableJob wraps a Job with max_retries', 'Dead-letter queue for exhausted jobs'],
+       solid:'Decorator + Command: RetryableJob decorates a Job. Discuss: should retry logic live in the command or the queue?'},
+      {id:38, title:'Drawing canvas with history',    diff:'med',  type:'micro',
+       desc:'A vector drawing tool supports draw, move, resize, and delete operations on shapes, with unlimited undo/redo.',
+       reqs:['DrawCommand ABC: execute(), undo()', 'Four shape operation commands', 'Commands capture full shape state at execution time (for undo)', 'GroupCommand for multi-shape operations'],
+       solid:'State snapshot in commands: commands store the pre-execution state of affected shapes. Discuss memento-like approach vs inverse operation.'},
+      {id:39, title:'API request pipeline',           diff:'med',  type:'micro',
+       desc:'An API gateway processes requests through a configurable pipeline: auth check, rate limit, transform request, call upstream, transform response. Each step is a command, pipeline is configurable per route.',
+       reqs:['PipelineCommand ABC: execute(context) → context', 'Five concrete pipeline steps', 'Pipeline holds ordered list of commands, executes sequentially', 'Short-circuit: if auth fails, remaining commands skipped'],
+       solid:'Chain-of-responsibility crossover. Discuss how Command pipeline differs from Chain of Responsibility.'},
+      {id:40, title:'Audit-logged command bus',       diff:'hard', type:'micro',
+       desc:'A CQRS-style command bus routes commands to handlers, persists every command to an audit log before execution, and supports replaying commands from a given timestamp.',
+       reqs:['Command base with timestamp, correlation_id', 'CommandBus: register(command_type, handler), dispatch(command)', 'AuditLog persists command before dispatch', 'Replay: load commands from audit log and re-dispatch in order'],
+       solid:'Full audit. DIP: CommandBus depends on abstract handler interface. SRP: bus routes, audit log persists, handlers execute — three classes.'},
+    ]
+  },
+  {
+    id:'state', name:'State', phase:2, color:'var(--amber)',
+    problems:[
+      {id:41, title:'Vending machine',                diff:'easy', type:'micro',
+       desc:'A vending machine has states: Idle, HasCoin, Dispensing, OutOfStock. Each state handles insert_coin, select_item, and dispense differently.',
+       reqs:['VendingState ABC: insert_coin(ctx), select_item(ctx), dispense(ctx)', 'Four state classes', 'VendingMachine delegates all operations to current state', 'Invalid operations in a state print error, never raise unhandled exception'],
+       solid:'OCP: adding a Refunding state = new class. VendingMachine and existing states untouched. SRP: each state owns its own guard logic.'},
+      {id:42, title:'Traffic light controller',       diff:'easy', type:'micro',
+       desc:'A traffic light cycles Red → Green → Yellow → Red. Emergency mode interrupts the cycle and holds Red until cleared.',
+       reqs:['TrafficLightState ABC: next(ctx), emergency(ctx), clear_emergency(ctx)', 'Four states (Red, Green, Yellow, Emergency)', 'Timer triggers next() automatically', 'Emergency from any state goes to EmergencyState; clear returns to Red'],
+       solid:'State transitions are encapsulated in state classes. TrafficLight.next() just delegates — it has no if-statements about current state.'},
+      {id:43, title:'Order lifecycle',                diff:'easy', type:'micro',
+       desc:'An e-commerce order moves through: Pending → Confirmed → Shipped → Delivered. Cancel is valid from Pending and Confirmed only. Return is valid from Delivered only.',
+       reqs:['OrderState ABC: confirm(ctx), ship(ctx), deliver(ctx), cancel(ctx), return_item(ctx)', 'Five state classes', 'Invalid transitions give a clear error message', 'Order stores history of state transitions with timestamps'],
+       solid:'LSP: every state must handle every operation. Invalid-state operations return an error, never leave the system in an inconsistent state.'},
+      {id:44, title:'TCP connection state machine',   diff:'med',  type:'micro',
+       desc:'Model a simplified TCP connection lifecycle: Closed → Listening → SynReceived → Established → Closing. Each state handles open(), send(), receive(), close() differently.',
+       reqs:['TCPState ABC with four operations', 'Five state classes', 'TCPConnection as context, delegates to current state', 'send() in Closed state raises ConnectionError'],
+       solid:'This is the canonical State pattern example. Map every transition to a clear trigger. Discuss: who owns the transition logic — the state or the context?'},
+      {id:45, title:'Media player states',            diff:'med',  type:'micro',
+       desc:'A media player has states: Stopped, Playing, Paused, Buffering. Controls (play, pause, stop, buffer) behave differently in each state. Double-clicking play while playing should not restart.',
+       reqs:['PlayerState ABC: play(ctx), pause(ctx), stop(ctx), buffer(ctx)', 'Four state classes', 'Idempotent transitions: play() in Playing state is a no-op', 'Buffering auto-transitions to Playing when buffer fills'],
+       solid:'Idempotency is an LSP consideration: play() in Playing state must not crash or corrupt state. No-op is the correct LSP-compliant behaviour.'},
+      {id:46, title:'Document approval workflow',     diff:'med',  type:'micro',
+       desc:'A document moves through: Draft → Submitted → UnderReview → Approved / Rejected. Approved docs can be Archived. Rejected docs return to Draft for revision.',
+       reqs:['DocumentState ABC: submit(ctx), review(ctx), approve(ctx), reject(ctx), archive(ctx)', 'Six state classes', 'Each transition validates permissions (reviewer role required for approve)', 'State history tracked on Document'],
+       solid:'Role-based guard in state: where does the role check live — in the state or in the context? SRP says state checks transition validity, a separate AuthService checks permissions.'},
+      {id:47, title:'Subscription billing states',    diff:'med',  type:'micro',
+       desc:'A SaaS subscription: Trial → Active → PastDue → Suspended → Cancelled. Payment success/failure drives transitions. Suspended users lose feature access but data is retained.',
+       reqs:['SubscriptionState ABC: pay(ctx), fail_payment(ctx), cancel(ctx), reactivate(ctx)', 'Five state classes', 'PastDue has a grace period — 3 failed payments → Suspended', 'Cancelled → cannot reactivate (terminal state)'],
+       solid:'Terminal state is a pattern: Cancelled state\'s reactivate() raises TerminalStateError — is this an LSP violation? Discuss.'},
+      {id:48, title:'Elevator controller',            diff:'hard', type:'micro',
+       desc:'An elevator has states: Idle, MovingUp, MovingDown, DoorOpen, Maintenance. It handles floor requests, door open/close, emergency stop. Multiple elevators in a building share a dispatcher.',
+       reqs:['ElevatorState ABC: request_floor(ctx, floor), open_door(ctx), close_door(ctx), emergency(ctx)', 'Five state classes', 'Dispatcher assigns nearest idle elevator to floor requests', 'Maintenance state: all operations except clear_maintenance() are rejected'],
+       solid:'Full audit. Multi-elevator: Dispatcher + Observer (elevator publishes state changes, dispatcher observes). Identify both patterns and justify their combination.'},
+    ]
+  },
+  {
+    id:'singleton', name:'Singleton', phase:2, color:'var(--amber)',
+    problems:[
+      {id:49, title:'Thread-safe logger',             diff:'easy', type:'micro',
+       desc:'A multi-threaded backend service needs a single shared logger. All threads write to the same output. Log level is configurable once at startup.',
+       reqs:['Logger singleton with info(), warning(), error()', 'Thread-safe instantiation (double-checked lock)', '__init__ guard to prevent re-initialisation', 'Log level filterable — messages below level are dropped'],
+       solid:'SRP violation is explicit here: Logger manages instantiation AND logging. Acknowledge it. Discuss how DI mitigates the testability problem.'},
+      {id:50, title:'App configuration store',        diff:'easy', type:'micro',
+       desc:'A service reads config from environment variables once at startup. All components access the same config object. Config is read-only after initialisation.',
+       reqs:['AppConfig singleton', 'Reads env vars in __init__', 'Frozen after init — no setters', 'Raises if required env var is missing'],
+       solid:'DIP violation: classes that call AppConfig() directly have a hidden dependency. Show a DI-compatible pattern that keeps singleton behaviour in prod but allows injection in tests.'},
+      {id:51, title:'Database connection pool',       diff:'med',  type:'micro',
+       desc:'A web service needs a single connection pool shared across all request handlers. Pool is sized at startup from config. New pool per request would exhaust connections.',
+       reqs:['ConnectionPool singleton with get_connection(), release_connection()', 'Pool size from config', 'Thread-safe: concurrent requests cannot get same connection', 'Raises PoolExhaustedError if all connections in use'],
+       solid:'This is a legitimate Singleton use case. Write a one-paragraph justification for why Singleton is correct here (not just convenient).'},
+      {id:52, title:'Feature flag service',           diff:'med',  type:'micro',
+       desc:'A feature flag service loads flag definitions from a remote config at startup and caches them for the process lifetime. All services read from the same in-memory cache.',
+       reqs:['FeatureFlagService singleton', 'is_enabled(flag_name, user_id) → bool', 'Loaded from remote config once, cached in-memory', 'Refresh mechanism: reload() can update flags without restart'],
+       solid:'Singleton + refresh: reload() must be thread-safe. Discuss lock strategy for reads (many) vs writes (rare) — read/write lock vs full lock.'},
+      {id:53, title:'Testable singleton via DI',      diff:'med',  type:'micro',
+       desc:'Refactor a badly-written Singleton (direct getInstance() calls everywhere) into a testable design that keeps singleton scope in production but allows mock injection in tests.',
+       reqs:['Original: class calls AppConfig.getInstance() directly', 'Refactored: AppConfig injected via constructor', 'Container (simple registry) manages singleton lifecycle', 'Tests inject MockAppConfig without touching production code'],
+       solid:'This problem is about fixing DIP violations. The Singleton pattern is not removed — its scope is managed externally. This is the production-correct approach.'},
+      {id:54, title:'Rate limiter shared state',      diff:'med',  type:'micro',
+       desc:'A rate limiter tracks request counts per API key across all request handlers. The counter store must be a single shared instance to avoid duplicate counting.',
+       reqs:['RateLimiter singleton with is_allowed(api_key) → bool', 'Sliding window counter per API key', 'Thread-safe counter increments', 'Counters expire after window duration'],
+       solid:'Thread safety is the design challenge. Counter reads + increments must be atomic. Discuss threading.Lock vs collections.Counter thread-safety guarantees.'},
+    ]
+  },
+
+  // ── PHASE 1 BATCH 1 ADDITIONS ────────────────────────────────
+  {
+    id:'builder', name:'Builder', phase:1, color:'var(--accent)',
+    problems:[
+      {id:67, title:'Query config builder',           diff:'easy', type:'micro',
+       desc:'A database query runner needs configurable queries: table, limit, offset, order-by, and filters. Callers should not pass 7 positional args to a constructor.',
+       reqs:['QueryConfigBuilder with fluent setters returning self','limit(), offset(), order_by(), filter() methods','build() validates and returns frozen QueryConfig','Calling build() twice returns two equal but independent objects'],
+       solid:'SRP: builder owns construction, QueryConfig owns data. ISP: callers only call the setters they need.'},
+      {id:68, title:'Email message builder',          diff:'easy', type:'micro',
+       desc:'An email service constructs messages with to, cc, bcc, subject, body (text and HTML), attachments, and reply-to. Many fields are optional.',
+       reqs:['EmailBuilder with fluent API','to() is required — build() raises if missing','Multiple cc() / attachment() calls accumulate a list','build() returns immutable Email dataclass'],
+       solid:'Validation at build(): required fields checked once, not on every setter. Immutable product prevents mutation after sending.'},
+      {id:69, title:'HTTP request builder',           diff:'easy', type:'micro',
+       desc:'An HTTP client needs a fluent request builder. Requests have method, URL, headers, query params, body, timeout, auth, and retry config. Some combinations are invalid.',
+       reqs:['RequestBuilder: method(), url(), header(), param(), body(), timeout(), auth()','build() raises InvalidRequestError for GET+body, missing URL, auth without HTTPS','Returns frozen HttpRequest','Default: GET, 30s timeout, 0 retries'],
+       solid:'OCP: adding a new option = one new setter. Cross-field validation isolated entirely in build().'},
+      {id:70, title:'SQL query builder',              diff:'med',  type:'micro',
+       desc:'A query builder constructs SELECT statements: table, columns, WHERE clauses, JOINs, GROUP BY, HAVING, ORDER BY, LIMIT. Clauses must appear in valid SQL order.',
+       reqs:['SQLQueryBuilder fluent API','select(), from_table(), where(), join(), group_by(), order_by(), limit()','build() returns a validated SQL string','Calling where() multiple times ANDs the conditions'],
+       solid:'Builder handles clause accumulation and ordering. No SQL logic leaks into the caller.'},
+      {id:71, title:'Test data builder (fixture factory)', diff:'med', type:'micro',
+       desc:'Tests need realistic User, Order, and Product objects with sensible defaults. Most tests only customise 1–2 fields. Constructors with 12 params make tests brittle.',
+       reqs:['UserBuilder, OrderBuilder, ProductBuilder with defaults for all fields','Each setter overrides one default','build() returns a fully populated object','Builders composable: OrderBuilder uses UserBuilder for the customer field'],
+       solid:'This is the "Test Data Builder" pattern. Discuss why test builders often violate SRP intentionally — and why that\'s acceptable in test code.'},
+      {id:72, title:'Report config builder',          diff:'med',  type:'micro',
+       desc:'A reporting system generates PDF reports with configurable layout: title, subtitle, header, footer, logo, page orientation, font, margins, watermark, page numbers.',
+       reqs:['ReportConfigBuilder fluent API, all fields optional except title','build() validates: margins must be positive, font size 8–72','Immutable ReportConfig product','Director class that calls builder in standard sequences for common report types'],
+       solid:'Director + Builder: Director encodes common construction sequences. Builder remains reusable without the Director.'},
+      {id:73, title:'Pipeline config builder',        diff:'hard', type:'micro',
+       desc:'A data pipeline builder configures source, transformations (ordered list), sink, retry policy, alerting, and scheduling. Transformations have dependencies — some must run before others.',
+       reqs:['PipelineBuilder with source(), transform(), sink(), retry(), schedule()','Transformation dependency validation at build() — raises if ordering violated','build() returns immutable PipelineConfig','Builder prevents adding transforms after sink() is called'],
+       solid:'Full SOLID audit. State machine inside the builder: source must be set before transforms, sink last. Discuss whether this is a builder or a state machine.'},
+    ]
+  },
+  {
+    id:'abstract-factory', name:'Abstract Factory', phase:1, color:'var(--accent)',
+    problems:[
+      {id:74, title:'Cross-platform UI widgets',      diff:'easy', type:'micro',
+       desc:'A desktop app renders on Windows and macOS. Widgets (Button, Checkbox, TextField) must look and behave consistently per platform. Mixing Windows and Mac widgets is forbidden.',
+       reqs:['UIFactory ABC: create_button(), create_checkbox(), create_text_field()','WindowsFactory and MacFactory concrete implementations','Application takes UIFactory — never concrete widget classes','Switching platform = changing one constructor argument'],
+       solid:'OCP by family: adding LinuxFactory = new file, zero edits. OCP limitation: adding a new widget type breaks all factories.'},
+      {id:75, title:'Multi-cloud resource provisioner', diff:'easy', type:'micro',
+       desc:'A DevOps tool provisions compute, storage, and networking resources. Resources in one deployment must all come from the same cloud (AWS, GCP, Azure).',
+       reqs:['CloudFactory ABC: create_compute(), create_storage(), create_network()','Three concrete factory families','Provisioner uses AbstractFactory — never names a cloud provider','Family consistency guaranteed by factory selection'],
+       solid:'DIP: Provisioner depends on CloudFactory and abstract resource types. The cloud name appears only at the factory construction site.'},
+      {id:76, title:'Database driver factory',        diff:'easy', type:'micro',
+       desc:'A persistence layer supports PostgreSQL and SQLite. Each requires a compatible Connection, Cursor, and QueryBuilder. Mixing Postgres connection with SQLite cursor causes runtime errors.',
+       reqs:['DBFactory ABC: create_connection(), create_cursor(), create_query_builder()','PostgresFactory and SQLiteFactory','Repository uses DBFactory — never vendor-specific classes','TestFactory returns in-memory SQLite versions of all three'],
+       solid:'TestFactory is a complete third family. This is the correct way to make persistence testable without mocking individual classes.'},
+      {id:77, title:'Document format family',         diff:'med',  type:'micro',
+       desc:'A document editor supports two format families: Rich (bold, italic, images) and Plain (text only, no formatting). A document must not mix rich elements with plain renderers.',
+       reqs:['DocumentFactory ABC: create_paragraph(), create_heading(), create_image()','RichDocumentFactory and PlainDocumentFactory','PlainDocumentFactory.create_image() returns a PlaceholderImage that renders as "[IMAGE]"','Renderer accepts DocumentFactory — never concrete element classes'],
+       solid:'LSP: PlaceholderImage must satisfy the Image interface even though it renders as text. Discuss how to handle family members with genuinely incompatible capabilities.'},
+      {id:78, title:'Notification channel family',    diff:'med',  type:'micro',
+       desc:'A notification system supports two delivery families: Realtime (WebSocket push, in-app badge, desktop notification) and Async (email, SMS, push notification). A user\'s preference selects the whole family.',
+       reqs:['NotificationFactory ABC: create_primary(), create_secondary(), create_fallback()','RealtimeFactory and AsyncFactory','NotificationService uses factory — never channel classes directly','Factories read user preference at construction time'],
+       solid:'Abstract Factory shines when the family must be consistent. Show concretely what breaks if you mix Realtime primary with Async fallback.'},
+      {id:79, title:'Game entity factory',            diff:'med',  type:'micro',
+       desc:'A strategy game has two factions: Orcs and Elves. Each faction has Warriors, Archers, and Siege units with different stats and behaviours. A battle must not mix faction units.',
+       reqs:['ArmyFactory ABC: create_warrior(), create_archer(), create_siege()','OrcFactory and ElfFactory','Battle accepts ArmyFactory — faction-agnostic','Adding a Dwarf faction = one new factory class, zero changes elsewhere'],
+       solid:'OCP by family demonstrated concretely. Adding a third faction touches zero existing code.'},
+      {id:80, title:'Theme system for a design tool', diff:'hard', type:'micro',
+       desc:'A design application supports Light and Dark themes. Each theme provides consistent colours, typography, and spacing tokens as a family. Mixing light colours with dark typography produces broken UIs.',
+       reqs:['ThemeFactory ABC: create_color_palette(), create_typography(), create_spacing()','LightTheme and DarkTheme factory families','Components accept ThemeFactory — never access tokens directly','SystemThemeFactory detects OS preference and delegates to Light or Dark at runtime'],
+       solid:'Full SOLID audit. Discuss: is ThemeFactory a better fit than Singleton for a global theme — and why?'},
+    ]
+  },
+
+  // ── PHASE 1 STRUCTURAL BATCH 1 ───────────────────────────────
+  {
+    id:'adapter', name:'Adapter', phase:1, color:'var(--accent)',
+    problems:[
+      {id:81, title:'Third-party logger adapter',     diff:'easy', type:'micro',
+       desc:'Your codebase uses a Logger ABC with log(level, msg). A new observability library has a completely different interface. Wrap it without modifying your Logger ABC or the library.',
+       reqs:['Logger ABC: log(level, msg)','ThirdPartyLogger with write_info(), write_error(), write_warn()','ThirdPartyLoggerAdapter implements Logger, wraps ThirdPartyLogger','Client code never imports ThirdPartyLogger'],
+       solid:'DIP: client depends on Logger ABC. Adapter is the boundary — the only place ThirdPartyLogger is imported.'},
+      {id:82, title:'Payment SDK adapter',            diff:'easy', type:'micro',
+       desc:'Your checkout calls gateway.charge(amount, currency). The payment SDK provides process_payment(payload: dict). Write an adapter so your checkout never knows about the SDK.',
+       reqs:['PaymentGateway ABC: charge(amount, currency) → TransactionResult','SDK class with incompatible dict-based API','PaymentSDKAdapter translates calls and maps exceptions','MockPaymentAdapter for tests returns configurable results'],
+       solid:'Adapter as an isolation boundary: SDK exceptions mapped to your domain exceptions inside the adapter. Callers never catch SDK-specific errors.'},
+      {id:83, title:'Legacy data format adapter',     diff:'easy', type:'micro',
+       desc:'New code expects UserProfile(name, email, created_at). A legacy system returns raw dicts with snake_case, camelCase mixed keys and Unix timestamps. Adapt without modifying either.',
+       reqs:['UserProfile dataclass (target)','LegacyUserService returning raw dicts (adaptee)','LegacyUserAdapter implementing a UserService ABC','Timestamp conversion and key normalisation inside adapter only'],
+       solid:'Adapter owns all format translation. Zero format logic leaks into business code.'},
+      {id:84, title:'Analytics provider adapter',    diff:'med',  type:'micro',
+       desc:'Your app tracks events via AnalyticsClient ABC with track() and identify(). Three providers have different SDKs. Switching providers must require zero changes to tracking call sites.',
+       reqs:['AnalyticsClient ABC: track(event, props), identify(user_id, traits)','MixpanelAdapter, AmplitudeAdapter, SegmentAdapter','SDK imports exist only inside adapter files','MockAnalyticsAdapter stores calls for test assertions'],
+       solid:'Adapter as a library quarantine zone. Discuss: what happens to your codebase if you skip the adapter and call SDKs directly everywhere.'},
+      {id:85, title:'File system abstraction adapter', diff:'med', type:'micro',
+       desc:'Your service reads/writes files via FileStore ABC. In prod it uses S3. In dev it uses local disk. In tests it uses an in-memory dict. None of the implementations share an interface.',
+       reqs:['FileStore ABC: read(key) → bytes, write(key, bytes), delete(key)','S3Adapter, LocalDiskAdapter, InMemoryAdapter','Adapter selection from environment variable at startup','Write operations are idempotent — writing same key twice is safe'],
+       solid:'Three adapters, three environments. This is the correct Adapter + Abstract Factory combination for environment-switchable infrastructure.'},
+      {id:86, title:'Message queue adapter',          diff:'med',  type:'micro',
+       desc:'A job dispatcher publishes tasks via MessageQueue ABC. It needs to support SQS, RabbitMQ, and an in-memory queue for tests. Each has wildly different publish/consume APIs.',
+       reqs:['MessageQueue ABC: publish(topic, payload), consume(topic) → payload | None','Three adapters wrapping real queue clients','Adapter handles serialisation/deserialisation internally','In-memory adapter uses a deque — thread-safe'],
+       solid:'Adapters hide serialisation format differences. Callers pass Python objects — adapters handle JSON/Protobuf encoding.'},
+      {id:87, title:'Unified search adapter layer',   diff:'hard', type:'micro',
+       desc:'A search service queries Elasticsearch, Algolia, and a local SQLite FTS index. Each has different query syntax, result schemas, and pagination models. Callers use one unified SearchClient ABC.',
+       reqs:['SearchClient ABC: search(query, filters, page, size) → SearchResult','SearchResult dataclass with hits, total, next_page_token','Three adapters normalise results to SearchResult','Adapter handles pagination token translation per provider'],
+       solid:'Full SOLID audit. Discuss: what does the adapter do when a provider returns a field your SearchResult doesn\'t have? Where does that decision live?'},
+    ]
+  },
+  {
+    id:'proxy', name:'Proxy', phase:1, color:'var(--accent)',
+    problems:[
+      {id:88, title:'Lazy-loading image proxy',       diff:'easy', type:'micro',
+       desc:'A UI component displays images. Loading full-resolution images at startup is slow. Images should only be fetched when they\'re actually rendered.',
+       reqs:['Image ABC: render() → bytes','RealImage loads from disk/network in __init__','LazyImageProxy delays RealImage construction until first render()','Subsequent render() calls use the cached real image'],
+       solid:'Virtual proxy. SRP: RealImage fetches, Proxy manages lazy init. Client never knows whether the image is loaded.'},
+      {id:89, title:'Caching data service proxy',     diff:'easy', type:'micro',
+       desc:'A read-heavy service calls an expensive external API. The same key is requested thousands of times per minute. Add caching without touching the service or the API client.',
+       reqs:['DataService ABC: fetch(key) → value','RealDataService hits an external API','CachingProxy checks in-memory cache before delegating','Cache hit: return immediately. Miss: delegate, store, return'],
+       solid:'Proxy controls access pattern, not the real service. DIP: client depends on DataService — never CachingProxy directly.'},
+      {id:90, title:'Permission proxy',               diff:'easy', type:'micro',
+       desc:'A FileStore service has read, write, and delete. Different user roles get different access. The underlying FileStore must never receive unauthorised calls.',
+       reqs:['FileStore ABC: read(path), write(path, data), delete(path)','PermissionProxy checks role before delegating','Unauthorised calls raise PermissionDeniedError — never silently ignored','Admin role bypasses proxy (uses FileStore directly)'],
+       solid:'Protection proxy. LSP challenge: proxy raises where real service doesn\'t — argue whether this is an LSP violation.'},
+      {id:91, title:'Rate-limiting proxy',            diff:'med',  type:'micro',
+       desc:'An external API client must not exceed 100 requests/minute. All callers share the limit. Exceeding the limit should block (not fail) until a slot opens.',
+       reqs:['ApiClient ABC: call(endpoint, params) → response','RealApiClient makes HTTP calls','RateLimitingProxy tracks request count per window','Proxy blocks when limit reached, retries after window resets'],
+       solid:'Proxy owns rate limiting state. Callers never implement rate logic. Thread safety: shared limit across concurrent callers requires a lock.'},
+      {id:92, title:'Audit logging proxy',            diff:'med',  type:'micro',
+       desc:'A payment service processes charges. Every call must be logged to an audit trail: who called, what args, what result, how long it took. Logging must not require changing PaymentService.',
+       reqs:['PaymentService ABC: charge(), refund(), void()','AuditProxy wraps any PaymentService, logs every call','Log includes: timestamp, method, args (sanitised — no card numbers), result, duration','Proxy transparent: return value identical to real service'],
+       solid:'SRP: PaymentService handles payments, AuditProxy handles audit. Zero audit logic in PaymentService.'},
+      {id:93, title:'Stacked proxy chain',            diff:'med',  type:'micro',
+       desc:'An API client needs: rate limiting + caching + audit logging + permission checking. Each concern is a separate proxy. They must stack in the right order.',
+       reqs:['ApiClient ABC with call()','Four proxy classes: RateLimit, Cache, AuditLog, Permission','Correct stack order: Permission → AuditLog → RateLimit → Cache → Real','Each proxy independently removable without touching others'],
+       solid:'Discuss: how is this stack different from a Decorator chain? What makes Permission→AuditLog ordering semantically important?'},
+      {id:94, title:'Virtual proxy for ORM lazy loading', diff:'hard', type:'micro',
+       desc:'A User model has a posts relationship. Loading posts from DB every time User is loaded is wasteful. posts should be a proxy that queries the DB only when iterated or accessed.',
+       reqs:['User dataclass with posts: PostCollection','PostCollection is a LazyProxy — behaves like a list but loads from DB on first access','Supports len(), iter(), and index access','Already-loaded collections are not reloaded'],
+       solid:'Full audit. Virtual proxy implementing Python list protocol (__len__, __iter__, __getitem__). Discuss: this is what ORMs do internally — what are the risks of this pattern in production?'},
+    ]
+  },
+  {
+    id:'facade', name:'Facade', phase:1, color:'var(--accent)',
+    problems:[
+      {id:95, title:'Order placement facade',         diff:'easy', type:'micro',
+       desc:'Placing an order requires: inventory reservation, payment charge, confirmation email, and audit log. Callers should call one method, not orchestrate 4 subsystems.',
+       reqs:['OrderFacade.place_order(item_id, qty, card_token, email) → txn_id','Orchestrates Inventory, PaymentGateway, EmailService, AuditLog','Failure in any step rolls back previous steps','Caller imports only OrderFacade'],
+       solid:'SRP for callers: they do one thing. Facade owns the orchestration sequence. Discuss: is rollback logic in the facade an SRP violation?'},
+      {id:96, title:'Home automation facade',         diff:'easy', type:'micro',
+       desc:'A smart home has lighting, climate, security, and media subsystems. Users trigger scenes: "Leave Home", "Movie Night", "Wake Up". Each scene orchestrates 3–4 subsystem calls.',
+       reqs:['HomeAutomationFacade: leave_home(), movie_night(), wake_up()','Each scene method calls specific subsystem sequences','Subsystems injected (not constructed inside facade)','Advanced callers can still use subsystems directly'],
+       solid:'Facade with injected subsystems is testable. Discuss: injecting subsystems makes this a DIP-compliant facade.'},
+      {id:97, title:'Media encoding facade',          diff:'easy', type:'micro',
+       desc:'A video platform converts uploads to multiple formats. The pipeline involves: format detection, transcoding, thumbnail generation, metadata extraction, CDN upload. Callers call one method.',
+       reqs:['MediaEncodingFacade.process(file_path) → MediaAsset','Orchestrates 5 subsystem classes','Returns MediaAsset with URLs for all formats','Subsystems run in correct dependency order'],
+       solid:'Facade hides pipeline complexity. Callers are not affected when new formats are added internally.'},
+      {id:98, title:'Authentication facade',          diff:'med',  type:'micro',
+       desc:'Authentication involves: credential validation, session creation, MFA check, audit logging, rate limit check. Callers call login() and get a session or an exception.',
+       reqs:['AuthFacade: login(username, password) → Session, logout(session_id)','Orchestrates CredentialValidator, SessionStore, MFAService, AuditLog, RateLimiter','Each subsystem class independently testable','Facade raises AuthError with reason — callers do not inspect subsystem state'],
+       solid:'Facade isolates callers from the complexity of auth. DIP: subsystems injected. Discuss the failure ordering: rate limit before credential check — why?'},
+      {id:99, title:'Reporting pipeline facade',      diff:'med',  type:'micro',
+       desc:'Generating a report involves: data fetching, aggregation, formatting, PDF rendering, email delivery, and audit log. Different report types use different subsets of the pipeline.',
+       reqs:['ReportFacade: generate_daily(params), generate_weekly(params), generate_custom(params)','Each method calls a subset of subsystem classes','Custom report method accepts a builder config','PDF rendering and email delivery are optional (configurable)'],
+       solid:'OCP: adding a new report type = new facade method. Subsystem classes don\'t change. Discuss: should the three methods be on one facade or three separate facades?'},
+      {id:100, title:'E-commerce checkout facade',   diff:'med',  type:'micro',
+       desc:'Checkout involves: cart validation, coupon application, tax calculation, payment processing, inventory update, order creation, and notification dispatch. Seven subsystems, one user action.',
+       reqs:['CheckoutFacade.checkout(cart, user, payment_method) → Order','Correct subsystem call sequence with dependency ordering','Partial failure: if payment fails after inventory reserved, inventory must be released','Returns Order with all subsystem results embedded'],
+       solid:'Rollback in facade: when payment fails, facade must call Inventory.release(). Is this an SRP violation? Argue both sides.'},
+      {id:101, title:'Facade with command integration', diff:'hard', type:'micro',
+       desc:'A document processing facade (convert, OCR, index, store) needs full undo support. Each subsystem step must be reversible. The facade should expose undo() as a first-class operation.',
+       reqs:['DocumentFacade: process(doc) → ProcessedDoc, undo_last()','Each subsystem step wrapped as a Command','CommandHistory tracks steps for undo','undo() reverses steps in reverse order'],
+       solid:'Facade + Command: the facade orchestrates commands rather than subsystem classes directly. Discuss: does this change the facade\'s SRP — is it now also a CommandHistory?'},
+    ]
+  },
+
+  // ── PHASE 1 BATCH 2 ADDITIONS ────────────────────────────────
+  {
+    id:'composite', name:'Composite', phase:1, color:'var(--accent)',
+    problems:[
+      {id:102, title:'File system size calculator',   diff:'easy', type:'micro',
+       desc:'Calculate the total size of a directory tree. Files return their own size. Directories sum their children. Same size() call works on both.',
+       reqs:['FileSystemItem ABC with size() and display()','File (leaf) and Directory (composite)','Directory.add() accepts any FileSystemItem','display(indent) prints the full tree with sizes'],
+       solid:'OCP: new node type (SymLink) = new class. Directory.size() needs zero changes. ISP: add() only on Directory, not on the Component ABC.'},
+      {id:103, title:'UI widget tree',                diff:'easy', type:'micro',
+       desc:'A GUI framework has primitive widgets (Button, Label, TextInput) and containers (Panel, Window) that hold other widgets. render() traverses and draws the whole tree.',
+       reqs:['Widget ABC with render() and get_bounds()','Leaf widgets implement both directly','Panel/Window composite: render() delegates to children','Nested panels to arbitrary depth'],
+       solid:'Uniformity: render(window) works whether window is a Button or a Panel containing 50 nested panels. Client never checks type.'},
+      {id:104, title:'Organisation chart headcount',  diff:'easy', type:'micro',
+       desc:'An org chart has Employees (leaves) and Managers (composites who manage other employees or managers). headcount() on any node returns the total number of people in that subtree.',
+       reqs:['OrgNode ABC with headcount() and display()','Employee (leaf): headcount() returns 1','Manager (composite): headcount() sums children + 1 (self)','display() prints the hierarchy with indentation'],
+       solid:'Recursion belongs in Composite. Clients ask the root for headcount and get the right answer with zero knowledge of the tree structure.'},
+      {id:105, title:'Product bundle pricing',        diff:'med',  type:'micro',
+       desc:'An e-commerce store sells individual products and bundles. Bundles can contain products and nested bundles. total_price() works on any item. Bundles apply a percentage discount to their subtotal.',
+       reqs:['PricingItem ABC with price() and name()','Product (leaf) and Bundle (composite with discount %)','Nested bundles: outer discount applies to already-discounted inner total','display() shows price breakdown at each level'],
+       solid:'LSP: Bundle.price() must return a valid non-negative float. A bundle with 100% discount returns 0, not negative. Discuss where the discount-on-discount rule lives.'},
+      {id:106, title:'Menu tree renderer',            diff:'med',  type:'micro',
+       desc:'A restaurant app has a menu with categories (Starters, Mains, Desserts) containing items. Categories can be nested (e.g. Mains → Vegetarian → items). render() produces the full formatted menu.',
+       reqs:['MenuItem ABC with render() and total_items()','DishItem (leaf) with name and price','MenuCategory (composite) with subcategories or dishes','total_items() counts all leaf dishes in the subtree'],
+       solid:'total_items() is the uniform operation. A DishItem returns 1. A MenuCategory sums its children recursively. Client calls menu.total_items() once.'},
+      {id:107, title:'Task dependency tree',          diff:'med',  type:'micro',
+       desc:'A project has tasks that may have subtasks (which may have sub-subtasks). total_duration() returns the sum of all leaf task durations. The critical path is the longest root-to-leaf chain.',
+       reqs:['Task ABC with duration() and critical_path()','LeafTask: duration() returns its own estimate','CompositeTask: duration() sums children, critical_path() returns max child path','Detect circular dependencies at add() time'],
+       solid:'Circular dependency detection in add(): O(n) traversal up the tree. Discuss: should this be in the Composite or in a separate validator?'},
+      {id:108, title:'Permission tree evaluator',     diff:'hard', type:'micro',
+       desc:'An RBAC system has permissions organised as a tree. A PermissionGroup can contain individual Permissions and other PermissionGroups. has_permission(perm) returns True if any leaf in the subtree matches.',
+       reqs:['PermissionNode ABC with has_permission(perm) → bool','Permission (leaf): exact match','PermissionGroup (composite): returns True if any child returns True','Wildcard permissions: "files.*" matches "files.read", "files.write"'],
+       solid:'Full audit. LSP: has_permission must be consistent — if parent says True, at least one leaf must also say True. Wildcard matching in the leaf vs in the composite: where does it live?'},
+    ]
+  },
+  {
+    id:'chain-of-responsibility', name:'Chain of Responsibility', phase:2, color:'var(--amber)',
+    problems:[
+      {id:109, title:'Support ticket escalation',    diff:'easy', type:'micro',
+       desc:'A support system routes tickets by severity. Level 1 handles low severity, Level 2 handles medium, Level 3 handles everything. Each level passes what it can\'t handle to the next.',
+       reqs:['Handler ABC with set_next() and handle(ticket)','Three concrete handlers for severity levels','Chain built: L1.set_next(L2).set_next(L3)','Unhandled ticket at end of chain logs a warning'],
+       solid:'OCP: new severity level = new handler class. Existing handlers untouched. Chain reconfiguration = one set_next() change.'},
+      {id:110, title:'HTTP middleware pipeline',     diff:'easy', type:'micro',
+       desc:'A web server processes requests through: Auth check → Rate limiter → Logger → Route handler. Auth and RateLimit can short-circuit with error responses. Logger always passes on.',
+       reqs:['Middleware ABC with set_next() and handle(request) → response','Auth: 401 on bad token. RateLimit: 429 on exceeded. Logger: logs and passes on. Router: returns route response','Chain: Auth→RateLimit→Logger→Router','Request context passed through chain'],
+       solid:'Short-circuit vs pass-through: two distinct handler behaviours from the same interface. LSP: both must return a response (or None for unhandled).'},
+      {id:111, title:'Approval workflow',            diff:'easy', type:'micro',
+       desc:'An expense approval chain: Team Lead approves up to ₹10k, Manager up to ₹50k, Director up to ₹2L, CFO approves anything. Request passed up until someone has authority.',
+       reqs:['Approver ABC with set_next() and approve(expense)','Four concrete approvers with spending limits','Returns the approver\'s name who approved','Expenses over CFO limit are rejected with reason'],
+       solid:'Classic escalation. Discuss: should the chain return the approver name or just a bool — and what does each choice mean for the caller?'},
+      {id:112, title:'Input validation pipeline',    diff:'med',  type:'micro',
+       desc:'User registration validates: non-empty fields → email format → password strength → username uniqueness → profanity filter. Each validator either passes or returns a specific error. All validators run even after a failure (collect all errors).',
+       reqs:['Validator ABC with set_next() and validate(input) → list[Error]','Five concrete validators','Collect-all mode: chain continues after failure, errors accumulated','Return empty list on full success'],
+       solid:'Collect-all vs short-circuit: this chain accumulates errors rather than stopping. Discuss how the base Handler.handle() default changes for this use case.'},
+      {id:113, title:'Log level filter chain',       diff:'med',  type:'micro',
+       desc:'A logging system routes log messages to different outputs based on level: DEBUG to console, INFO to file, WARNING to file + email, ERROR to file + email + PagerDuty. A message may trigger multiple handlers.',
+       reqs:['LogHandler ABC with set_next() and handle(log_entry)','Four handlers, each also passes to next (fan-out, not escalation)','Each handler checks minimum level before acting','Chain is configurable — handlers added/removed at startup'],
+       solid:'Fan-out chain: every handler both acts AND passes on. This differs from escalation where only one handler acts. Discuss the base class default handle() for each variant.'},
+      {id:114, title:'Event processing pipeline',   diff:'med',  type:'micro',
+       desc:'A stream processor runs events through: deduplication → schema validation → enrichment → routing. Each step either passes the event forward or drops it. Dropped events go to a dead-letter queue.',
+       reqs:['Processor ABC with set_next() and process(event) → bool (True=passed, False=dropped)','Four processors with specific logic','Dropped events logged to dead-letter queue by the dropping processor','Pipeline configurable at runtime'],
+       solid:'False return = drop. Chain stops. Dead-letter logging in the dropping processor (SRP: each processor owns its drop behaviour). Discuss: should the dead-letter queue be injected or global?'},
+      {id:115, title:'Authentication handler chain',  diff:'hard', type:'micro',
+       desc:'An API supports three auth methods: API key (check header), OAuth token (validate JWT), Session cookie (check session store). Try each in order; first success wins. All fail = 401.',
+       reqs:['AuthHandler ABC with set_next() and authenticate(request) → User | None','Three handlers: ApiKeyHandler, JWTHandler, SessionHandler','First handler to return a User wins — chain stops','All three fail: final handler returns None, caller sends 401'],
+       solid:'Full audit. Discuss: should handlers raise on auth failure or return None — and why None is correct here (LSP) while raising would be correct in a protection proxy.'},
+    ]
+  },
+  {
+    id:'template-method', name:'Template Method', phase:2, color:'var(--amber)',
+    problems:[
+      {id:116, title:'ETL data pipeline',            diff:'easy', type:'micro',
+       desc:'All ETL jobs follow Extract → Validate → Transform → Load → Notify. The sequence never changes. Data sources (CSV, API, DB) and destinations vary.',
+       reqs:['DataPipeline ABC with run() as template method','extract(), transform(), load() are abstract','validate() and notify() implemented in base with sensible defaults','Subclasses override only the steps that differ'],
+       solid:'Hollywood Principle: base class calls subclass methods, not the reverse. Subclasses don\'t control the sequence. Adding a new source = new subclass, zero template changes.'},
+      {id:117, title:'Report generator framework',   diff:'easy', type:'micro',
+       desc:'Reports follow: fetch_data → validate → format → render → deliver. Validation and delivery are the same for all formats. Fetch, format, render differ by format (PDF, HTML, CSV).',
+       reqs:['ReportGenerator ABC with generate() template method','Three abstract hooks: fetch_data(), format_data(), render()','Two concrete steps in base: validate(), deliver()','Optional on_complete() hook (no-op default)'],
+       solid:'OCP: new format = new subclass. Base class never changes for new formats. Discuss: if one future format needs different validation, should validate() be overrideable?'},
+      {id:118, title:'Game turn sequence',           diff:'easy', type:'micro',
+       desc:'All turn-based games follow: start_turn → get_input → validate_move → apply_move → check_win → end_turn. Chess and TicTacToe differ in move validation and win conditions.',
+       reqs:['Game ABC with play_turn() template method','Abstract: get_input(), validate_move(), apply_move(), check_win()','Concrete in base: start_turn(), end_turn() (common logging)','Game loop calls play_turn() until game over'],
+       solid:'Template Method ensures game integrity — players can\'t skip validation. Subclass cannot reorder steps by overriding play_turn().'},
+      {id:119, title:'Build pipeline framework',     diff:'med',  type:'micro',
+       desc:'CI/CD builds follow: checkout → install_deps → run_tests → build_artifact → deploy → notify. Different languages (Python, Node, Java) implement each step differently. Notify is always the same.',
+       reqs:['BuildPipeline ABC with run() template','Five abstract steps + one concrete (notify)','Python/Node/Java subclasses','run() records duration of each step, stores in build report'],
+       solid:'Timing and reporting in the template method: run() wraps each step call with a timer. Subclasses cannot bypass timing. Discuss: is this an SRP violation of the template method?'},
+      {id:120, title:'Document parser framework',    diff:'med',  type:'micro',
+       desc:'Document parsing follows: open_file → detect_encoding → parse_header → parse_body → parse_footer → close_file. PDF, DOCX, and HTML differ in header/body/footer parsing. Open/close/encoding are shared.',
+       reqs:['DocumentParser ABC with parse() template','Three abstract: parse_header(), parse_body(), parse_footer()','Three concrete in base: open_file(), detect_encoding(), close_file()','Returns structured Document dataclass'],
+       solid:'Concrete steps in base are final — subclasses must not override them. Python has no final keyword — discuss how to enforce this by convention or with __init_subclass__.'},
+      {id:121, title:'Test lifecycle framework',     diff:'med',  type:'micro',
+       desc:'All tests follow: setup → run → teardown → report. This is literally how unittest.TestCase works. Implement your own lightweight version where test classes extend a base and override run().',
+       reqs:['TestCase ABC with execute() template: setup→run→teardown→report','setup() and teardown() are optional hooks (no-op defaults)','run() is abstract — must be overridden','report() in base: records pass/fail/error, prints result'],
+       solid:'This is Template Method in the wild — Python\'s unittest uses exactly this structure. Identify every hook and concrete step and justify the classification.'},
+      {id:122, title:'Data export framework',        diff:'hard', type:'micro',
+       desc:'An export framework handles: authenticate → query_data → paginate → serialise → compress → upload → notify. Different export targets (S3, SFTP, GCS) differ in authenticate, upload. Pagination and compression vary by data size heuristics.',
+       reqs:['Exporter ABC with export() template','Abstract: authenticate(), upload()','Concrete with overrideable hooks: paginate() (default 1000 rows), compress() (default gzip)','retry() wraps upload() — implemented in base, applies to all'],
+       solid:'Full audit. Hooks vs abstract steps: justify which steps are abstract vs overrideable defaults. Discuss: retry() in the base class — SRP violation or legitimate template concern?'},
+    ]
+  },
+  {
+    id:'iterator', name:'Iterator', phase:2, color:'var(--amber)',
+    problems:[
+      {id:123, title:'Paginated API iterator',       diff:'easy', type:'micro',
+       desc:'A REST API returns data in pages of 100. Design an iterator that fetches the next page transparently when the current page is exhausted. Caller uses a simple for loop.',
+       reqs:['PaginatedQuery implements __iter__ and __next__','Fetches next page only when current page is exhausted','StopIteration when API returns empty page','Page size configurable at construction'],
+       solid:'DIP: caller depends on the iterator protocol — never on the HTTP client. Lazy fetching is an implementation detail invisible to the caller.'},
+      {id:124, title:'Binary tree traversals',       diff:'easy', type:'micro',
+       desc:'A binary tree node should support in-order, pre-order, and post-order traversal via the iterator protocol. The traversal strategy is switchable without changing the tree structure.',
+       reqs:['TreeNode with __iter__ defaulting to in-order','InOrderIterator, PreOrderIterator, PostOrderIterator','TreeNode.traverse(order) returns the correct iterator','Generator-based implementation preferred'],
+       solid:'Three iterators, same tree. OCP: new traversal = new iterator class. TreeNode closed to modification.'},
+      {id:125, title:'CSV file row iterator',        diff:'easy', type:'micro',
+       desc:'A large CSV file should be read row by row without loading the entire file into memory. The iterator yields one parsed row (as a dict) at a time.',
+       reqs:['CSVIterator implements __iter__ and __next__','Reads one line per __next__ call — no full file load','Skips blank lines and comment lines (starting with #)','StopIteration at EOF, file closed automatically'],
+       solid:'Memory efficiency is the point. Discuss: how does this differ from Python\'s built-in csv.DictReader — and when would you write your own?'},
+      {id:126, title:'Graph BFS iterator',           diff:'med',  type:'micro',
+       desc:'A graph should support breadth-first traversal via the iterator protocol. The iterator yields nodes in BFS order. The caller uses a standard for loop — no traversal logic in the caller.',
+       reqs:['Graph with adjacency list representation','BFSIterator implements __iter__ and __next__','Handles disconnected graphs — visits all nodes','Visited set prevents infinite loops on cycles'],
+       solid:'Traversal state (queue, visited set) lives in the iterator, not the graph. Graph is closed to modification. New traversal (DFS) = new iterator class.'},
+      {id:127, title:'Database cursor iterator',     diff:'med',  type:'micro',
+       desc:'A database query result set should be iterable. Rows are fetched in batches from the DB cursor. The iterator transparently fetches the next batch when the current one is exhausted.',
+       reqs:['QueryResult implements __iter__ and __next__','Fetches rows in configurable batch size','StopIteration when cursor exhausted','Context manager support: with QueryResult(...) as rows — closes cursor on exit'],
+       solid:'Context manager + iterator: __enter__/__exit__ + __iter__/__next__. Discuss: should QueryResult be both a context manager and an iterator, or should these be separate classes?'},
+      {id:128, title:'Reverse linked list iterator',  diff:'med', type:'micro',
+       desc:'A linked list should support both forward and reverse iteration via the iterator protocol. Reverse requires O(n) extra space (store nodes in list during init). Forward is O(1).',
+       reqs:['LinkedList with __iter__ (forward) and __reversed__ (backward)','ForwardIterator: O(1) space, follows next pointers','ReverseIterator: O(n) space, built at init','Both iterators are independent — two can coexist'],
+       solid:'__reversed__ is Python\'s protocol for reverse iteration — implementing it makes reversed(ll) work. Discuss the space/time tradeoff of reverse traversal.'},
+      {id:129, title:'Infinite sequence generator',  diff:'hard', type:'micro',
+       desc:'Design iterators for: Fibonacci sequence (infinite), prime numbers (infinite sieve), and a cycling iterator (repeats a finite sequence forever). All implement the iterator protocol. Callers use itertools.islice to take N elements.',
+       reqs:['FibonacciIterator: yields Fibonacci numbers indefinitely','PrimeIterator: yields primes using the Sieve of Eratosthenes lazily','CycleIterator: wraps any iterable, cycles it indefinitely','All work with itertools.islice(it, N) to take first N'],
+       solid:'Full audit. Generator functions vs class-based: implement one of the three as a generator function and two as classes — justify each choice. Discuss thread safety of stateful iterators.'},
+    ]
+  },
+  {
+    id:'mediator', name:'Mediator', phase:2, color:'var(--amber)',
+    problems:[
+      {id:130, title:'Chat room mediator',           diff:'easy', type:'micro',
+       desc:'A group chat where users send messages. Users must not hold references to each other. Adding a new user requires zero changes to existing users.',
+       reqs:['ChatMediator ABC with send(message, sender)','User holds only a ChatMediator reference','ChatRoom (mediator) routes messages to all except sender','join() and leave() managed by the mediator'],
+       solid:'Decoupling: User knows nothing about other Users. Adding Dave to a 100-person chat = one room.join(dave) call. Without Mediator: 100 reference list updates.'},
+      {id:131, title:'Air traffic control',          diff:'easy', type:'micro',
+       desc:'Aircraft communicate only with the control tower, never with each other. Tower coordinates landing clearances, runway assignment, and hold instructions.',
+       reqs:['ATCMediator ABC with request_landing(aircraft) and instruct(aircraft, message)','Aircraft holds ATCMediator reference only','ControlTower tracks runway availability and queues','Emergency aircraft get priority clearance'],
+       solid:'Classic Mediator. Discuss: what happens to the tower class as coordination rules grow — and when does it become a God Object?'},
+      {id:132, title:'UI form coordinator',          diff:'easy', type:'micro',
+       desc:'A form has interdependent fields: selecting a country updates state dropdown, selecting "corporate" account type reveals company fields, enabling 2FA shows QR code field. Fields notify the mediator; mediator coordinates.',
+       reqs:['FormMediator ABC with field_changed(field_name, value)','FormField holds only FormMediator reference','FormDialog (mediator) implements coordination rules','Rules: country→state, account_type→company_fields, 2fa→qr_code'],
+       solid:'This is the canonical UI Mediator use case. Discuss: how many if-statements will FormDialog accumulate as the form grows — and at what point do you split it?'},
+      {id:133, title:'Stock exchange order matcher',  diff:'med',  type:'micro',
+       desc:'Buyers and sellers submit orders to an exchange. The exchange (mediator) matches buy/sell orders and executes trades. Buyers and sellers never interact directly.',
+       reqs:['ExchangeMediator with submit_buy(order), submit_sell(order)','Trader holds only ExchangeMediator reference','StockExchange matches orders: price, then time priority','Partial fills: order partially matched, remainder stays in book'],
+       solid:'Matching logic entirely in mediator. Traders are pure data submitters. OCP challenge: adding a new order type (stop-loss) = new method on mediator. Discuss.'},
+      {id:134, title:'Smart home device coordinator', diff:'med', type:'micro',
+       desc:'Smart home devices (lights, thermostat, alarm, blinds) react to each other\'s state changes through a home hub. When alarm activates, lights flash and blinds close. Devices never subscribe to each other directly.',
+       reqs:['HomeHubMediator with device_changed(device, event)','Device holds only HomeHubMediator reference','HomeHub implements all coordination rules as if-conditions','Scenes: "Leave Home" triggers multi-device sequence through mediator'],
+       solid:'Mediator vs Observer: Observer is fine for 1-to-many. Mediator handles many-to-many. Argue which is more appropriate for a smart home hub — then show concretely why Mediator wins when two devices must react to each other.'},
+      {id:135, title:'Multiplayer game event bus',   diff:'med',  type:'micro',
+       desc:'In a multiplayer game, players generate events (move, attack, pick_up_item, chat). The game server (mediator) routes events: move/attack broadcast to nearby players, chat broadcast to team, pick_up updates inventory and notifies area.',
+       reqs:['GameMediator with player_event(player, event_type, data)','Player holds only GameMediator reference','GameServer routes based on event type and game rules','Proximity check: only nearby players receive move/attack events'],
+       solid:'Routing complexity in the mediator: it must know game rules to route correctly. Discuss: is game rule logic an SRP violation for the mediator, or is "route correctly" a single responsibility?'},
+      {id:136, title:'Distributed service mesh mediator', diff:'hard', type:'micro',
+       desc:'Microservices in a service mesh communicate through a mediator (service registry + router). Services register themselves, discover others via the mediator, and never hold direct references to other services.',
+       reqs:['ServiceMediator with register(service), deregister(service), call(service_name, request)','Service holds only ServiceMediator reference — no direct service URLs','Mediator handles load balancing (round-robin across instances)','Circuit breaking: mediator stops routing to unhealthy services after 5 failures'],
+       solid:'Full audit. Mediator + Proxy: the mediator acts as a proxy for service-to-service calls. Identify where the circuit breaker logic lives — mediator, proxy, or separate class. Justify.'},
+    ]
+  },
+
+  // ── PHASE 1 BATCH 2 ADDITIONS ────────────────────────────────
+  {
+    id:'composite', name:'Composite', phase:1, color:'var(--accent)',
+    problems:[
+      {id:102, title:'File system size calculator',     diff:'easy', type:'micro',
+       desc:'Model a file system where directories contain files and other directories. `size()` must work identically on both — no isinstance checks allowed.',
+       reqs:['FileSystemItem ABC: size(), display(indent)','File (leaf) returns own byte count','Directory (composite) recursively sums children','display() shows indented tree — same call on root renders everything'],
+       solid:'LSP: Directory.size() must return non-negative int, same contract as File.size(). No isinstance checks anywhere in client code.'},
+      {id:103, title:'Organisation headcount',          diff:'easy', type:'micro',
+       desc:'An org chart has employees and managers. Managers have direct reports, who may themselves be managers. headcount() on any node returns total people in that subtree.',
+       reqs:['Employee ABC: headcount(), display()','IndividualContributor returns 1','Manager returns 1 + sum(child.headcount())','display() prints the org tree indented'],
+       solid:'OCP: adding Contractor (a new leaf type) = new class only. Manager and IndividualContributor unchanged.'},
+      {id:104, title:'UI component render tree',        diff:'easy', type:'micro',
+       desc:'A UI framework has Widgets (leaf: Button, Label) and Containers (Panel, Row) that hold other components. render() and dimensions() must work uniformly at any level.',
+       reqs:['Component ABC: render(), dimensions() → (width, height)','Leaf widgets have fixed dimensions','Container dimensions = bounding box of all children','No isinstance in render() or dimensions()'],
+       solid:'Composite + LSP: every Component must return valid dimensions. A Container with no children returns (0,0) — not None.'},
+      {id:105, title:'Menu system',                     diff:'med',  type:'micro',
+       desc:'A restaurant menu has categories (Starters, Mains, Desserts) and items. Categories can contain other categories (e.g. Vegetarian Mains). total_price() sums everything, item_count() counts leaves only.',
+       reqs:['MenuItem ABC: total_price(), item_count(), display()','FoodItem (leaf): price, name','MenuCategory (composite): list of MenuItems','display() renders indented menu tree'],
+       solid:'Composite with two aggregate operations. item_count() on Category counts only leaf descendants — not categories themselves.'},
+      {id:106, title:'Permission hierarchy',            diff:'med',  type:'micro',
+       desc:'A permissions system has individual permissions (read, write, delete) and permission groups that contain permissions or other groups. has_permission(name) checks if a given permission exists anywhere in the tree.',
+       reqs:['Permission ABC: has_permission(name) → bool','SinglePermission: returns True if name matches','PermissionGroup: returns True if any child has_permission(name)','Groups can be nested arbitrarily deep'],
+       solid:'Composite for recursive search. LSP: has_permission must return bool always — never raise for unknown names.'},
+      {id:107, title:'Expression tree evaluator',       diff:'med',  type:'micro',
+       desc:'An expression evaluator represents arithmetic expressions as trees: leaf nodes are numbers, composite nodes are operations (+, -, *, /). evaluate() on the root gives the result.',
+       reqs:['Expression ABC: evaluate() → float','NumberNode (leaf): returns its value','OperationNode (composite): evaluates left and right children, applies operator','Support nested expressions: (3 + 4) * (2 - 1)'],
+       solid:'Composite + recursion. No isinstance anywhere. Division by zero must raise — not return NaN silently.'},
+      {id:108, title:'Tax rule composite',              diff:'hard', type:'micro',
+       desc:'A tax engine applies rules that may be simple (flat 10%) or composite (apply child rules and sum). Rules can be nested: FederalTax contains StateAndLocalTax which contains CityTax. apply(amount) on any rule returns the total tax.',
+       reqs:['TaxRule ABC: apply(amount) → float, description() → str','FlatRateTax (leaf)','CompositeTax (composite): sums child results','description() returns a formatted breakdown string recursively'],
+       solid:'Full audit. Composite with both aggregation and string rendering. Where does rounding live — in leaf, composite, or caller?'},
+    ]
+  },
+  {
+    id:'chain-of-responsibility', name:'Chain of Responsibility', phase:1, color:'var(--accent)',
+    problems:[
+      {id:109, title:'Support ticket escalation',       diff:'easy', type:'micro',
+       desc:'A support system routes tickets by severity. L1 handles low, L2 handles medium, Engineering handles high. Each handler either resolves or passes up.',
+       reqs:['Handler ABC: set_next(handler) → handler, handle(ticket) → str | None','L1, L2, Engineering concrete handlers','Fluent chain wiring: l1.set_next(l2).set_next(eng)','Unhandled ticket (no next handler) returns None — caller handles this case'],
+       solid:'OCP: add SecurityHandler between L2 and Engineering = one new class + one rewired set_next. Zero changes to L1, L2, or Engineering.'},
+      {id:110, title:'HTTP request middleware',         diff:'easy', type:'micro',
+       desc:'A web framework processes requests through: auth check → rate limiter → input validator → business logic. Auth failure short-circuits — rate limiter never runs.',
+       reqs:['Middleware ABC: set_next(), handle(request) → Response','Four concrete middlewares','Auth failure returns 401 Response immediately','Business logic is the final handler — always produces a Response'],
+       solid:'CoR short-circuit pattern. Discuss: does always-calling-next make this Middleware or CoR? Answer: CoR is the umbrella; Middleware is a constrained variant.'},
+      {id:111, title:'Expense approval chain',          diff:'easy', type:'micro',
+       desc:'Expense requests are approved by managers (up to £500), directors (up to £5000), or CFO (any amount). Each approver either approves or escalates.',
+       reqs:['Approver ABC with set_next() and approve(expense) → str','Three concrete approvers with amount thresholds','Chain: manager → director → CFO','CFO always approves — no next handler needed'],
+       solid:'Classic CoR. The threshold check is the handler\'s guard condition. No approver knows about other approvers.'},
+      {id:112, title:'Log level filter chain',          diff:'med',  type:'micro',
+       desc:'A logging system routes log records through a filter chain: DEBUG handler logs to console, WARNING handler logs to file, ERROR handler sends to alerting. Each handler only processes records at its level or above.',
+       reqs:['LogHandler ABC: set_next(), handle(record)','Three handlers with level thresholds','A single log call may trigger multiple handlers (all matching levels process it)','Unlike classic CoR, passing on does NOT stop current handler from also processing'],
+       solid:'Modified CoR: handler processes AND passes on — not exclusive. Discuss how this differs from classic CoR and why it\'s still valid.'},
+      {id:113, title:'Event validation pipeline',       diff:'med',  type:'micro',
+       desc:'An event system validates incoming events through a pipeline: schema check → business rule check → duplicate detection → rate limit check. Any failure returns a specific ValidationError.',
+       reqs:['Validator ABC: set_next(), validate(event) → ValidationResult','Four validators','First failure short-circuits chain with specific error type','Valid event passes all validators and returns success'],
+       solid:'CoR for validation. Each validator has SRP — one validation concern each. Discuss: should validators return errors or raise exceptions?'},
+      {id:114, title:'Authentication handler chain',    diff:'med',  type:'micro',
+       desc:'An API tries multiple auth strategies in order: API key → JWT bearer → OAuth2. The first strategy that successfully authenticates returns a User. If all fail, return 401.',
+       reqs:['AuthHandler ABC: set_next(), authenticate(request) → User | None','Three auth handlers','Each handler: if can auth → return User; else pass_on()','Final handler returns None if none succeeded'],
+       solid:'CoR for strategy fallback. Discuss: how does this differ from Strategy pattern? Key: CoR tries sequentially, Strategy picks one.'},
+      {id:115, title:'Purchase approval with veto',     diff:'hard', type:'micro',
+       desc:'A purchase request passes through: budget check → compliance check → manager approval → finance approval. Any handler can veto (reject) regardless of order. Only manager and finance can approve. The chain must produce either APPROVED, REJECTED, or PENDING.',
+       reqs:['Handler ABC returning ApprovalDecision enum: APPROVED, REJECTED, PENDING','Budget and compliance can only REJECT or PASS_ON','Manager can APPROVE, REJECT, or PASS_ON','Finance is the final approver — must return APPROVED or REJECTED'],
+       solid:'Full audit. Three-way decision CoR. Discuss: how does a VETO from compliance propagate — does it skip remaining handlers or still flow through them?'},
+    ]
+  },
+  {
+    id:'template-method', name:'Template Method', phase:2, color:'var(--amber)',
+    problems:[
+      {id:116, title:'Data import pipeline',            diff:'easy', type:'micro',
+       desc:'An import system fetches, parses, validates, and persists data. CSV and JSON importers differ only in fetch() and parse(). Everything else is shared.',
+       reqs:['DataImporter ABC with run() template method','Abstract: fetch(source), parse(raw)','Concrete shared: validate(data), persist(data), report(count)','Hook: on_before_persist() — default no-op, CSV importer overrides to deduplicate'],
+       solid:'Template Method eliminates duplicate sequence logic. SRP: base class owns the sequence, subclass owns format-specific steps.'},
+      {id:117, title:'Report generation pipeline',      diff:'easy', type:'micro',
+       desc:'PDF, HTML, and CSV reports follow the same pipeline: fetch data → aggregate → format → render → deliver. Fetch and aggregate are shared. Format and render differ.',
+       reqs:['ReportGenerator ABC with generate() template','Abstract: format_data(), render()','Shared: fetch_data(), aggregate(), deliver()','Hook: on_after_render() — PDF subclass uses it to add watermark'],
+       solid:'Hook vs abstract: on_after_render() is a hook (optional). format_data() is abstract (required). Know the difference and justify.'},
+      {id:118, title:'Game AI turn sequence',           diff:'easy', type:'micro',
+       desc:'Different AI opponents (Easy, Medium, Hard) follow the same turn sequence: assess board → select move → execute move → update state. Only select_move() differs.',
+       reqs:['GameAI ABC with take_turn() template','Abstract: select_move() → Move','Shared: assess_board(), execute_move(move), update_state()','EasyAI picks randomly, HardAI uses minimax'],
+       solid:'Template Method for algorithm variation. The sequence (assess → select → execute → update) is invariant — subclasses can\'t reorder.'},
+      {id:119, title:'Build system pipeline',           diff:'med',  type:'micro',
+       desc:'A build system compiles, tests, packages, and deploys code. Python and Java builds differ in compile() and package() — test() and deploy() are identical.',
+       reqs:['BuildPipeline ABC with build() template','Abstract: compile(), package()','Shared: run_tests(), deploy()','Hook: on_test_failure() — Java build fails hard, Python build warns and continues'],
+       solid:'Hooks encode diverging behaviour without breaking the template. on_test_failure() default raises — Java overrides to match, Python overrides to warn.'},
+      {id:120, title:'OAuth login flow',                diff:'med',  type:'micro',
+       desc:'OAuth login with Google, GitHub, and Facebook follows: redirect → exchange_code → fetch_user_profile → create_or_update_user. The redirect URL and user profile schema differ per provider.',
+       reqs:['OAuthHandler ABC with login() template','Abstract: auth_url(), exchange_code(code) → token, fetch_profile(token) → dict','Shared: create_or_update_user(profile)','Hook: on_first_login(user) — sends welcome email only for new users'],
+       solid:'Template Method for third-party integration. The shared create_or_update_user() is the key — it normalises all providers into one User model.'},
+      {id:121, title:'ETL pipeline',                    diff:'med',  type:'micro',
+       desc:'An ETL pipeline extracts from source, transforms data, and loads to destination. Multiple pipelines (CSV→DB, API→Warehouse, DB→DB) share transform logic but differ in extract and load.',
+       reqs:['ETLPipeline ABC with run() template: extract → transform → load → report','Abstract: extract() → raw_data, load(data)','Shared: transform(raw) with concrete default (can be overridden)','Hook: on_error(step, error) — default logs, subclass can alert'],
+       solid:'OCP: new pipeline = new subclass. The shared transform() is concrete with a default — subclasses can override when they need custom transformation.'},
+      {id:122, title:'Document processing with hooks',  diff:'hard', type:'micro',
+       desc:'A document processor (PDF, DOCX, HTML) reads, extracts text, classifies, indexes, and archives. All steps are shared except read() and extract_text(). Three hook points for optional enrichment.',
+       reqs:['DocumentProcessor ABC with process() template (5 steps)','Abstract: read(path), extract_text(raw)','Three hooks: on_after_extract(), on_after_classify(), on_before_archive()','PDFProcessor overrides on_after_extract() to run OCR on image-heavy pages'],
+       solid:'Full audit. Multiple hooks. Discuss: at what point does a Template Method with 3+ hooks become a liability — and when should you switch to Strategy?'},
+    ]
+  },
+  {
+    id:'iterator', name:'Iterator', phase:2, color:'var(--amber)',
+    problems:[
+      {id:123, title:'Binary tree traversal',           diff:'easy', type:'micro',
+       desc:'A binary search tree needs in-order, pre-order, and post-order traversal. Callers use a plain for-loop — they don\'t know which traversal they\'re getting.',
+       reqs:['TreeNode with value, left, right','InOrderIterator, PreOrderIterator, PostOrderIterator','All implement __iter__ and __next__','Client code: `for val in InOrderIterator(root):` — identical call for all three'],
+       solid:'OCP: new traversal = new Iterator class. Tree structure unchanged. Same interface, different traversal state.'},
+      {id:124, title:'Paginated API iterator',          diff:'easy', type:'micro',
+       desc:'A REST API returns results in pages of 100. Callers iterate all results with a for-loop — page fetching is transparent.',
+       reqs:['PaginatedIterator: __iter__, __next__','Fetches next page when current page exhausted','StopIteration when next_page_token is None','Lazy: pages fetched on demand, not all upfront'],
+       solid:'Iterator hides I/O complexity. LSP: must raise StopIteration at exhaustion — not return None or raise a custom error.'},
+      {id:125, title:'File line iterator',              diff:'easy', type:'micro',
+       desc:'A log processor reads large files line by line without loading the entire file into memory. Each line is yielded as processed text.',
+       reqs:['LogFileIterator implementing __iter__ and __next__','Reads one line at a time (no readlines())','Strips whitespace, skips empty lines and comments (#)','StopIteration on EOF'],
+       solid:'Memory-efficient iteration. Generator alternative: show how this collapses to a generator function and discuss when class-based vs generator is preferred.'},
+      {id:126, title:'Range with step iterator',        diff:'med',  type:'micro',
+       desc:'Implement a custom range-like iterator supporting float steps: `FloatRange(0.0, 1.0, 0.1)` yields 0.0, 0.1, 0.2, ... 0.9. Must handle floating point precision correctly.',
+       reqs:['FloatRange: __iter__ returns self, __next__ yields current and advances','StopIteration when current >= stop','Floating point: use round() to avoid 0.30000000004 style issues','Supports use in list() and sum()'],
+       solid:'Iterator protocol implementation from scratch. LSP: must behave like any Python iterator — compatible with all builtins (list, sum, zip, etc.)'},
+      {id:127, title:'Graph BFS/DFS iterator',          diff:'med',  type:'micro',
+       desc:'A graph (adjacency list) supports BFS and DFS traversal. Callers pick traversal by choosing iterator type. Visited node tracking is internal to the iterator.',
+       reqs:['Graph class with add_edge()','BFSIterator and DFSIterator, both implementing Python iterator protocol','Visited set maintained inside iterator — not on Graph','Handles disconnected graphs (only traverses connected component from start node)'],
+       solid:'Multiple iterators on same data structure. Iterator owns traversal state — Graph is untouched. Two iterators on the same graph are independent.'},
+      {id:128, title:'Database cursor iterator',        diff:'med',  type:'micro',
+       desc:'Wrap a database cursor in a Python iterator. Rows are fetched in batches (fetchmany) for efficiency. Callers iterate rows with a for-loop.',
+       reqs:['DatabaseCursorIterator wrapping a raw cursor','fetchmany(batch_size=500) for efficiency','Yields individual rows — not batches — to callers','StopIteration when cursor exhausted','Context manager support (__enter__, __exit__) to close cursor'],
+       solid:'Iterator + context manager. Discuss: why is batch fetching internal to the iterator, not exposed to callers? What does this hide?'},
+      {id:129, title:'Infinite Fibonacci iterator',     diff:'hard', type:'micro',
+       desc:'An infinite Fibonacci sequence iterator. Callers use islice to consume as many terms as needed. The iterator itself never terminates.',
+       reqs:['FibonacciIterator: __iter__ returns self, __next__ yields next Fibonacci number','Never raises StopIteration — infinite','Callers use itertools.islice(fib, n) to get first n terms','Support take(n) convenience method returning list of n terms'],
+       solid:'Infinite iterator. Discuss: what invariant must __next__ maintain — and how does it compose safely with itertools.islice, zip, and map?'},
+    ]
+  },
+  {
+    id:'mediator', name:'Mediator', phase:2, color:'var(--amber)',
+    problems:[
+      {id:130, title:'Chat room',                       diff:'easy', type:'micro',
+       desc:'A chat room has multiple users. Users send messages to the room, which broadcasts to all others. Users have zero direct references to each other.',
+       reqs:['ChatMediator ABC: send(message, sender), add_user(user)','User holds only ChatMediator reference — never other users','ChatRoom broadcasts to all except sender','Adding a new user = one add_user() call — zero changes to existing users'],
+       solid:'DIP: User depends on ChatMediator abstraction. OCP: new user types (AdminUser) = new class, ChatRoom may need minor update for admin logic.'},
+      {id:131, title:'Air traffic control',             diff:'easy', type:'micro',
+       desc:'Aircraft communicate only through an ATC tower. The tower coordinates landing clearance, position reporting, and emergency handling. Aircraft never talk to each other.',
+       reqs:['ATCMediator ABC: request_landing(aircraft), report_position(aircraft, pos), declare_emergency(aircraft)','Aircraft holds only ATCMediator reference','ATCTower grants one landing at a time — others are told to hold','Emergency pre-empts current clearance'],
+       solid:'Mediator owns all coordination logic. Aircraft are decoupled — each only knows the mediator interface.'},
+      {id:132, title:'Form field dependencies',         diff:'easy', type:'micro',
+       desc:'A UI form has fields with interdependencies: selecting "Corporate" in Company Type enables the VAT Number field; selecting a Country enables a State dropdown with country-specific options.',
+       reqs:['FormMediator: field_changed(field, value)','Fields hold only FormMediator reference','Mediator decides which fields to enable/disable/populate based on changed field','Adding a new dependency = edit FormMediator only, not field classes'],
+       solid:'Mediator centralises UI coordination. Fields are dumb — they report changes and receive enable/disable commands. All dependency logic in FormMediator.'},
+      {id:133, title:'Stock trading system',            diff:'med',  type:'micro',
+       desc:'Buyers and sellers interact through an exchange (mediator). Buyers submit buy orders, sellers submit sell orders. The exchange matches compatible orders and notifies both parties.',
+       reqs:['Exchange mediator: submit_buy(buyer, price, qty), submit_sell(seller, price, qty)','Buyer and Seller hold only Exchange reference','Exchange matches best ask to best bid','Matched parties notified by Exchange — they don\'t find each other'],
+       solid:'Mediator as matchmaker. Buyer and Seller classes are simple — all matching logic in Exchange. OCP tension: new order types (limit vs market) require Exchange updates.'},
+      {id:134, title:'Multiplayer game event coordinator', diff:'med', type:'micro',
+       desc:'A game server coordinates events between players: player movement, combat, item pickup. Players report actions to the GameServer; the server validates, applies game rules, and notifies affected players.',
+       reqs:['GameServer mediator: player_moved(player, pos), player_attacked(attacker, target), item_picked_up(player, item)','Player holds only GameServer reference','GameServer applies rules: collision detection, combat resolution, item availability','Players receive only events relevant to them'],
+       solid:'Mediator with domain logic. Discuss: how much logic is appropriate in a mediator before it becomes a God Object?'},
+      {id:135, title:'CI/CD pipeline coordinator',      diff:'med',  type:'micro',
+       desc:'A CI/CD system coordinates between: VCS (code push events), BuildServer (triggers builds), TestRunner (runs tests), DeployService (deploys on success), NotificationService (alerts on failure).',
+       reqs:['PipelineMediator: on_code_pushed(), on_build_complete(result), on_tests_complete(result)','Each service holds only PipelineMediator reference','Mediator sequences: push → build → test → deploy (on success) or notify (on failure)','Each stage\'s completion triggers the next via mediator'],
+       solid:'Mediator as pipeline orchestrator vs Facade: both orchestrate. Key difference — Mediator responds to events from colleagues; Facade is called by external clients.'},
+      {id:136, title:'Smart home device coordinator',   diff:'hard', type:'micro',
+       desc:'A smart home hub coordinates: motion sensor, lights, thermostat, security camera, door lock. Events from one device trigger coordinated responses across others: motion detected → lights on + camera record + thermostat adjust.',
+       reqs:['SmartHomeHub mediator: device_event(device, event_type, data)','Each device holds only SmartHomeHub reference','Hub applies rules: motion+night → lights on; door_open → camera record','Rules are configurable — stored in a rules table, not hardcoded in hub'],
+       solid:'Full audit. Configurable mediator: rules stored externally. Discuss: does moving rules out of the hub violate SRP — or fulfil it?'},
+    ]
+  },
+
+  // ── MODERN PATTERNS ──────────────────────────────────────────
+  {
+    id:'repository', name:'Repository', phase:5, color:'var(--teal)',
+    problems:[
+      {id:137, title:'In-memory user repository',      diff:'easy', type:'micro',
+       desc:'A user service needs to save, find, and delete users. Start with an in-memory implementation. The service must not know whether it\'s talking to memory or Postgres.',
+       reqs:['UserRepository ABC: save(), find_by_id(), find_by_email(), find_all(), delete()','InMemoryUserRepository backed by a dict','UserService takes UserRepository — never constructs it','find_by_id returns None for missing IDs — never raises'],
+       solid:'DIP in its purest form: UserService imports only UserRepository ABC. No psycopg2, no SQLAlchemy, no DB driver anywhere in the service layer.'},
+      {id:138, title:'Product repository with filtering',  diff:'easy', type:'micro',
+       desc:'A product catalogue needs querying by category, price range, and availability. Three named query methods — no generic filter dict.',
+       reqs:['ProductRepository ABC: save(), find_by_id(), find_by_category(), find_in_price_range(min,max), find_available()','InMemoryProductRepository','Named methods not generic find(filters={}) — type safety matters','All find methods return empty list, never None, when no results'],
+       solid:'ISP: each query method is named for its business intent. A generic find(dict) trades type safety for flexibility — argue why named methods win here.'},
+      {id:139, title:'Dual-write migration repository',  diff:'med',  type:'micro',
+       desc:'A system is mid-migration from MySQL to MongoDB. A DualWriteRepository writes to both databases, reads from MySQL until cutover. Implements the same Repository interface.',
+       reqs:['DualWriteProductRepository implements ProductRepository','Writes to both MySQL and Mongo repos on save/delete','Reads from MySQL (primary) until cutover flag set','Cutover: set_primary("mongo") switches reads to Mongo'],
+       solid:'Proxy + Repository: DualWriteRepository wraps two repositories. Discuss: is this a Proxy, a Decorator, or something new — and does it matter?'},
+      {id:140, title:'Cached repository decorator',      diff:'med',  type:'micro',
+       desc:'A read-heavy product service calls the database on every find_by_id. Add a caching layer without modifying the Postgres repository or the service.',
+       reqs:['CachedProductRepository wraps any ProductRepository','find_by_id: check cache first, delegate on miss, cache result','save/delete: invalidate cache for that ID','TTL: cached entries expire after 60s'],
+       solid:'Proxy + Repository: CachingRepo implements ProductRepository, wraps ProductRepository. Same pattern as Proxy — caching here is controlling access to the real repo.'},
+      {id:141, title:'Read-only reporting repository',   diff:'med',  type:'micro',
+       desc:'A reporting service only reads data — it never writes. Exposing a full read-write repository to it is dangerous. Design a narrower read-only interface.',
+       reqs:['ReadOnlyProductRepository ABC with only find_* methods — no save/delete','PostgresReadOnlyProductRepository implementation','ReportingService depends on ReadOnlyProductRepository','Postgres implementation uses a read-replica connection string'],
+       solid:'ISP: a reporting service forced to depend on save() and delete() it will never use is an ISP violation. ReadOnlyRepository fixes this.'},
+      {id:142, title:'Repository with Unit of Work',     diff:'hard', type:'micro',
+       desc:'Multiple repository operations in one business transaction must either all succeed or all rollback. A UnitOfWork coordinates repositories sharing one DB transaction.',
+       reqs:['UnitOfWork context manager: __enter__ begins transaction, __exit__ commits or rolls back','OrderRepository and InventoryRepository share the same UnitOfWork','place_order() uses UoW: reserve inventory + create order atomically','Rollback if either operation fails'],
+       solid:'SRP: repositories handle persistence, UoW handles transaction boundaries. Neither bleeds into the other. DIP: services depend on abstract UoW interface.'},
+      {id:143, title:'Event-publishing repository',      diff:'hard', type:'micro',
+       desc:'After saving a domain object, the repository must publish a domain event to an event bus. The service must not publish events itself — that\'s the repository\'s responsibility when using Event Sourcing light.',
+       reqs:['EventPublishingRepository wraps any Repository and an EventBus','After save(), publishes domain events from the saved object','Domain objects accumulate uncommitted events — repo drains them post-save','If publish fails, log but do not rollback save (at-least-once semantics)'],
+       solid:'Observer + Repository: the repo acts as a publisher post-save. Discuss: is publishing events in the repo an SRP violation — and what\'s the alternative?'},
+    ]
+  },
+  {
+    id:'cqrs', name:'CQRS', phase:5, color:'var(--teal)',
+    problems:[
+      {id:144, title:'Simple command/query split',       diff:'easy', type:'micro',
+       desc:'An order service currently has one OrderService class with both read and write methods. Split it into a command side and a query side without changing any business logic.',
+       reqs:['CreateOrderCommand, CancelOrderCommand frozen dataclasses','CreateOrderHandler, CancelOrderHandler','OrderQueryHandler with get_order() and list_user_orders()','CommandBus routing commands to handlers'],
+       solid:'SRP: write model changes state. Read model returns data. They evolve independently. Show concretely how the write model schema can change without breaking the read model.'},
+      {id:145, title:'Command with validation',          diff:'easy', type:'micro',
+       desc:'Commands must be validated before execution. Invalid commands should fail fast with a clear error, before any state change occurs.',
+       reqs:['RegisterUserCommand with email, name, password fields','RegisterUserCommandValidator: validate() → list[ValidationError]','Handler validates before executing — never executes invalid commands','Validation errors returned to caller, not raised as exceptions'],
+       solid:'Validator as a separate class (SRP). Handler depends on Validator interface (DIP). Validator has one job: check command validity. Handler has one job: execute valid commands.'},
+      {id:146, title:'Read model projection',            diff:'med',  type:'micro',
+       desc:'After commands execute and publish events, a read model must be kept in sync. An event handler listens to events and updates a denormalised read store for fast queries.',
+       reqs:['OrderCreatedEvent, OrderCancelledEvent, OrderShippedEvent','OrderReadModelProjection: handles each event type, updates read store','Read store: dict keyed by order_id with denormalised order data','Query returns from read store directly — no joins, no aggregation'],
+       solid:'CQRS + Observer: projection is an observer of domain events. Write side publishes, projection subscribes. They are decoupled — projection can be rebuilt by replaying events.'},
+      {id:147, title:'Inventory CQRS system',            diff:'med',  type:'micro',
+       desc:'A warehouse inventory system with 50:1 read-to-write ratio. Write operations: receive_stock, reserve_stock, release_stock. Read operations: get_stock_level, list_low_stock (< threshold), get_stock_history.',
+       reqs:['Three command classes + three handlers — validate then update write store + publish event','Read model pre-aggregates stock levels — no computation at query time','StockProjection listens to events and updates read model','list_low_stock queries read model directly — sub-millisecond'],
+       solid:'The read model pre-computes what queries need. Discuss: what happens to the read model when a receive_stock event fails to publish — and how do you detect and recover from divergence?'},
+      {id:148, title:'CQRS with optimistic concurrency', diff:'med',  type:'micro',
+       desc:'Two users simultaneously try to update the same product\'s price. Without concurrency control, one update silently overwrites the other. Optimistic concurrency detects this conflict.',
+       reqs:['UpdateProductPriceCommand includes expected_version field','Handler loads product, checks version matches expected_version','If mismatch: raise ConcurrencyConflictError — caller retries','Product version incremented on every successful write'],
+       solid:'Concurrency control in the handler, not in the repository. Version check + increment must be atomic. Discuss: where does the version live — in the command, the aggregate, or both?'},
+      {id:149, title:'CQRS command audit trail',          diff:'med',  type:'micro',
+       desc:'Every command dispatched must be logged with timestamp, command type, payload, and outcome (success/failure). The audit log is append-only and queryable.',
+       reqs:['AuditingCommandBus wraps CommandBus — logs before and after dispatch','AuditLog: append(entry) and query_by_type(), query_by_time_range()','Audit entries include: id, timestamp, command_type, payload_hash, success, error_msg','AuditLog is itself append-only — no update, no delete'],
+       solid:'Decorator + CQRS: AuditingCommandBus decorates CommandBus. The real bus is unchanged. Audit concern is fully isolated.'},
+      {id:150, title:'Full CQRS order system',            diff:'hard', type:'micro',
+       desc:'A complete CQRS order system: commands (place, cancel, ship, deliver), queries (get order, list by user, list by status, analytics summary), read model synced via events, audit log, optimistic concurrency.',
+       reqs:['Four command classes + handlers with validation and version checking','Four query methods hitting pre-computed read model','OrderProjection syncing read model from events','AuditingCommandBus wrapping the real bus','InMemory implementations for all stores'],
+       solid:'Full SOLID audit across the entire system. Identify every pattern used (CQRS, Observer, Decorator, Repository, Command) and justify each relationship. This is a full interview-level design.'},
+    ]
+  },
+  {
+    id:'event-sourcing', name:'Event Sourcing', phase:5, color:'var(--teal)',
+    problems:[
+      {id:151, title:'Bank account event log',           diff:'easy', type:'micro',
+       desc:'A bank account stores its state as a sequence of events. Current balance is always computed by replaying from the beginning. No current-state column.',
+       reqs:['AccountOpened, MoneyDeposited, MoneyWithdrawn frozen dataclasses','BankAccount.open(), deposit(), withdraw() — validate then emit event + _apply','BankAccount.rebuild(events) class method','InMemoryEventStore: append(stream_id, events), load(stream_id)'],
+       solid:'Immutability is the core invariant: events are frozen. _apply() is side-effect free on the event — it only mutates the aggregate. Discuss why frozen=True on events is non-negotiable.'},
+      {id:152, title:'Shopping cart event sourcing',     diff:'easy', type:'micro',
+       desc:'A shopping cart records every state change as an event. The current cart is always rebuilt from events. Marketing replays events to analyse abandonment.',
+       reqs:['ItemAdded, ItemRemoved, QuantityChanged, CouponApplied, CartAbandoned events','ShoppingCart aggregate with _apply() for each event','CartSummaryProjection: replays events → {items, total, status} dict','EventStore append-only — no cart row is ever updated'],
+       solid:'Projection vs aggregate: aggregate is used for writes (validate + emit), projection is used for reads (replay → read model). They serve different purposes from the same event log.'},
+      {id:153, title:'Event versioning and migration',   diff:'med',  type:'micro',
+       desc:'An event schema changes: MoneyDeposited v1 had amount:int, v2 has amount:float and currency:str. Old events in the store are v1. The aggregate must handle both.',
+       reqs:['MoneyDepositedV1 and MoneyDepositedV2 event classes','Upcaster: converts v1 events to v2 on load','EventStore.load() runs events through upcaster before returning','BankAccount._apply() only handles v2 — never sees v1'],
+       solid:'OCP: upcaster is a new class — existing event classes and aggregate untouched. Discuss: where should upcasting happen — in the store, in the repository, or in the aggregate?'},
+      {id:154, title:'Snapshot optimisation',            diff:'med',  type:'micro',
+       desc:'Replaying 1 million events to get current state is too slow. Snapshots periodically capture the aggregate state. Rebuild = load latest snapshot + replay only events after it.',
+       reqs:['Snapshot dataclass: aggregate_id, version, state_dict, taken_at','SnapshotStore: save(snapshot), load_latest(aggregate_id)','AccountRepository: load() uses snapshot + trailing events','Snapshot taken every 100 events — configurable threshold'],
+       solid:'SRP: snapshot responsibility belongs in the repository, not in the aggregate. The aggregate should not know about snapshots. Repository orchestrates: snapshot + trailing events = current state.'},
+      {id:155, title:'Temporal query: state at time T',  diff:'med',  type:'micro',
+       desc:'A compliance system needs the account balance at any point in time. Given an account ID and a timestamp, return the exact balance the account held at that moment.',
+       reqs:['EventStore.load_until(stream_id, before_timestamp) method','BankAccount.balance_at(timestamp) using rebuild with filtered events','No current-state table — answer derived entirely from event log','Accurate to millisecond precision'],
+       solid:'Temporal queries are impossible with a current-state model. This is the core value proposition of Event Sourcing. Discuss: what happens to temporal query performance as the event log grows to 10M events?'},
+      {id:156, title:'Process manager (saga) with events', diff:'hard', type:'micro',
+       desc:'An order fulfilment saga coordinates: payment service, inventory service, and shipping service. Each step emits events. The saga listens, decides next steps, and handles failures with compensating events.',
+       reqs:['OrderFulfilmentSaga: handles PaymentCompleted, InventoryReserved, ShipmentCreated events','On PaymentFailed: emit OrderCancelled compensating event','Saga state stored as events in its own stream','Idempotent: receiving the same event twice must not double-process'],
+       solid:'Event Sourcing + Chain of Responsibility (saga steps) + Observer (event subscriptions). Identify all patterns. Discuss: why is idempotency critical in event-driven systems and how do you enforce it?'},
+      {id:157, title:'Full event-sourced order system',  diff:'hard', type:'micro',
+       desc:'A complete event-sourced order system: Order aggregate with full lifecycle events, EventStore, Snapshots at every 50 events, OrderProjection for reads, event versioning with upcaster, and temporal query support.',
+       reqs:['Order aggregate: OrderPlaced, OrderConfirmed, OrderShipped, OrderDelivered, OrderCancelled events','EventStore with snapshot integration','OrderProjection syncing a read model from the event stream','Upcaster for any schema migrations','balance_at(timestamp) equivalent: order_state_at(order_id, timestamp)'],
+       solid:'Full SOLID + pattern audit. This is interview-level complexity: Event Sourcing + CQRS + Repository + Snapshot + Projection + Observer. Map every pattern, justify every relationship.'},
+    ]
+  },
+
+  // ── PHASE 3: FULL SYSTEM DESIGNS ─────────────────────────────
+  {
+    id:'sys-beginner', name:'Systems — Beginner', phase:3, color:'var(--blue)',
+    problems:[
+      {id:55, title:'Parking Lot',                    diff:'easy', type:'system',
+       desc:'Design a parking lot system for a multi-floor lot with different vehicle types (motorcycle, car, bus) and spot sizes. Support entry/exit, spot allocation, and fee calculation.',
+       reqs:['ParkingLot, ParkingFloor, ParkingSpot hierarchy', 'Vehicle types and spot size matching', 'Ticket issued on entry with timestamp', 'FeeCalculator strategy (hourly, flat, weekend rate)'],
+       solid:'Factory: spot allocation. Strategy: fee calculation. Composition: lot contains floors contains spots. Full SOLID audit required.'},
+      {id:56, title:'Library Management System',       diff:'easy', type:'system',
+       desc:'Design a library system: members borrow and return books, librarians manage inventory, fines are levied for late returns. Support book search by title, author, ISBN.',
+       reqs:['Book, Member, Librarian, Loan classes', 'Search by multiple criteria', 'Fine calculation on return', 'Member borrow limit enforced'],
+       solid:'Observer: fine notification on due-date breach. Strategy: search algorithm. Identify all patterns used and justify each.'},
+      {id:57, title:'ATM Machine',                    diff:'easy', type:'system',
+       desc:'Design an ATM supporting cash withdrawal, balance check, PIN change, and mini statement. Handle invalid PIN, insufficient funds, and card blocked states.',
+       reqs:['Card, Account, ATMSession', 'State machine: Idle → CardInserted → PINEntered → Authenticated → Transaction', 'Dispensing strategy (minimize notes)', 'Three wrong PINs → card blocked'],
+       solid:'State: ATM session lifecycle. Strategy: note dispensing. Command: each transaction type. Map all three patterns in your design.'},
+      {id:58, title:'Vending Machine (full)',          diff:'med',  type:'system',
+       desc:'Design a vending machine with item inventory, coin acceptance (multiple denominations), change dispensing, and refund. Handle out-of-stock, insufficient funds, exact-change-only mode.',
+       reqs:['Item inventory with quantity tracking', 'CoinAcceptor, ChangeDispenser', 'State machine: Idle → CoinInserted → ItemSelected → Dispensing', 'Change-optimal algorithm'],
+       solid:'State + Strategy + Factory. Full system — identify every pattern, justify every relationship.'},
+    ]
+  },
+  {
+    id:'sys-intermediate', name:'Systems — Intermediate', phase:3, color:'var(--blue)',
+    problems:[
+      {id:59, title:'Chess Game',                     diff:'med',  type:'system',
+       desc:'Design a two-player chess game. Pieces move according to rules, turns alternate, check and checkmate are detected.',
+       reqs:['Board, Cell, Piece hierarchy', 'Move validation per piece type', 'Turn management', 'Check/checkmate detection'],
+       solid:'Factory: piece creation. Strategy: move validation per piece. Observer: checkmate notification. No god class — Board does not validate moves.'},
+      {id:60, title:'Hotel Booking System',            diff:'med',  type:'system',
+       desc:'Design a hotel booking platform. Users search available rooms by date range and type, make bookings, and cancel. Pricing varies by season and room type.',
+       reqs:['Room, Booking, Guest, Hotel classes', 'Availability check for date range', 'Booking lifecycle: Reserved → Confirmed → CheckedIn → CheckedOut / Cancelled', 'Dynamic pricing strategy'],
+       solid:'State: booking lifecycle. Strategy: pricing. Observer: notify housekeeping on checkout. Full pattern inventory required.'},
+      {id:61, title:'Movie Ticket Booking',            diff:'med',  type:'system',
+       desc:'Design a cinema booking system. Users search shows, select seats, book tickets, and receive confirmation. Seats are locked for 10 minutes during selection to prevent double booking.',
+       reqs:['Movie, Show, Screen, Seat, Booking classes', 'Seat lock with expiry (10 min timeout)', 'Payment flow: lock → pay → confirm or expire → release', 'Confirmation via notification (Observer)'],
+       solid:'State: seat state (Available → Locked → Booked). Observer: confirmation notification. Command: booking flow steps. Justify each.'},
+      {id:62, title:'Snake and Ladder Game',           diff:'med',  type:'system',
+       desc:'Design a configurable Snake and Ladder game for 2-6 players with a custom board (variable snakes and ladders), dice rolling, and win condition detection.',
+       reqs:['Board, Cell, Snake, Ladder, Player, Dice classes', 'Board factory from config', 'Turn order management', 'Win: first to exactly 100'],
+       solid:'Factory: board from config. Observer: turn change events. Strategy: dice rolling (fair, loaded for testing). Identify where composition beats inheritance.'},
+    ]
+  },
+  {
+    id:'sys-advanced', name:'Systems — Advanced', phase:4, color:'var(--purple)',
+    problems:[
+      {id:63, title:'Ride-Sharing System (Uber)',      diff:'hard', type:'system',
+       desc:'Design a simplified ride-sharing platform. Riders request rides, drivers accept, pricing is dynamic, rides have a full lifecycle.',
+       reqs:['Rider, Driver, Ride, Location classes', 'Ride state machine: Requested → Matched → InProgress → Completed / Cancelled', 'Dynamic surge pricing strategy', 'Driver matching algorithm (nearest available)', 'Observer: ride status updates to rider'],
+       solid:'State + Strategy + Observer + Factory all appear. Full pattern map required. Justify every design decision.'},
+      {id:64, title:'LRU Cache',                       diff:'hard', type:'system',
+       desc:'Design a thread-safe LRU cache with configurable capacity, TTL per entry, and statistics (hit rate, eviction count). Support generic key-value types.',
+       reqs:['O(1) get and put operations', 'TTL eviction on access (lazy) and background (eager)', 'Thread-safe for concurrent reads and writes', 'CacheStats: hit_rate, evictions, size'],
+       solid:'Decorator: add TTL layer on top of base LRU. Singleton: optional shared cache instance. Strategy: eviction policy (LRU vs LFU). Design for all three.'},
+      {id:65, title:'Pub-Sub Messaging System',        diff:'hard', type:'system',
+       desc:'Design an in-process pub-sub system. Publishers post to topics, subscribers receive messages. Support at-least-once delivery, dead-letter queues, and message filtering.',
+       reqs:['Publisher, Subscriber, Topic, Message classes', 'At-least-once: retry on subscriber failure', 'Dead-letter queue after N retries', 'Filter: subscriber only receives messages matching a predicate'],
+       solid:'Observer at scale. Command: each message is a command to the subscriber. Strategy: delivery retry policy. Thread safety throughout.'},
+      {id:66, title:'Splitwise Clone',                 diff:'hard', type:'system',
+       desc:'Design a bill-splitting service. Users add expenses, split them (equally, by percentage, by exact amount), and track balances. Simplify debts to minimum transactions.',
+       reqs:['User, Group, Expense, Split classes', 'Split strategies: equal, percentage, exact, share-based', 'Balance calculation per user', 'Debt simplification algorithm (minimum transactions)'],
+       solid:'Strategy: split type. Command: add/settle expense with undo. Observer: notify users of new expenses. Pattern map + full SOLID audit.'},
+      {id:158, title:'Event-Sourced Bank Account',      diff:'hard', type:'system',
+       desc:'Design a bank account system where every state change is an event. Support current balance, balance at any past timestamp, full transaction history, and fraud detection by replaying event streams.',
+       reqs:['BankAccount aggregate: AccountOpened, MoneyDeposited, MoneyWithdrawn, TransferInitiated events','EventStore + SnapshotStore','CQRS: command side writes events, query side reads from projection','Temporal query: balance_at(account_id, timestamp)','FraudDetectionProjection: flags suspicious patterns from event stream'],
+       solid:'Event Sourcing + CQRS + Repository + Snapshot + Projection. Full pattern map required. This is the canonical Event Sourcing system design.'},
+      {id:159, title:'E-Commerce Platform (Full)',       diff:'hard', type:'system',
+       desc:'Design a full e-commerce backend: product catalogue, shopping cart, order placement, inventory, payment, and notification. Use appropriate patterns for each subsystem.',
+       reqs:['ProductRepository + CachedProductRepository (Proxy)','ShoppingCart with event-sourced state (ItemAdded, ItemRemoved, CheckoutStarted)','Order placement: CQRS command side + event-driven inventory sync','PaymentGateway: Factory + Adapter for multiple providers','NotificationService: Observer pattern on order events'],
+       solid:'This is the capstone system. Map every pattern across all subsystems. Justify every design choice. Identify where patterns combine (CQRS + Repository, Observer + Facade, Factory + Adapter).'},
+    ]
+  },
+];
+
+const ALL = GROUPS.flatMap(g => g.problems.map(p => ({...p, groupId:g.id, groupName:g.name, phase:g.phase})));
+
+// ─────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────
+let statuses  = JSON.parse(localStorage.getItem('lld-s')  || '{}');
+let notes     = JSON.parse(localStorage.getItem('lld-n')  || '{}');
+let patLevel  = JSON.parse(localStorage.getItem('lld-pl') || '{}');
+let patAudit  = JSON.parse(localStorage.getItem('lld-pa') || '{}');
+let filter = 'all', activeId = null, isDark = true, currentView = 'problems';
+
+function save(){
+  localStorage.setItem('lld-s',  JSON.stringify(statuses));
+  localStorage.setItem('lld-n',  JSON.stringify(notes));
+  localStorage.setItem('lld-pl', JSON.stringify(patLevel));
+  localStorage.setItem('lld-pa', JSON.stringify(patAudit));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────
+function render(){
+  renderPhaseProgress();
+  renderFilters();
+  renderPatLevels();
+  renderNextUp();
+  renderProblems();
+  renderStats();
+}
+
+function renderPhaseProgress(){
+  const phases = [
+    {label:'Phase 1 — Core patterns',   key:1, color:'var(--accent)',  locked:false},
+    {label:'Phase 2 — Behavioural',     key:2, color:'var(--amber)',   locked:false},
+    {label:'Phase 3 — Full systems',    key:3, color:'var(--blue)',    locked:true},
+    {label:'Phase 4 — Advanced systems',key:4, color:'var(--purple)',  locked:true},
+    {label:'Modern — Repo · CQRS · ES', key:5, color:'var(--teal)',    locked:false},
+  ];
+  const el = document.getElementById('phase-progress');
+  el.innerHTML = phases.map(ph => {
+    const probs = ALL.filter(p => p.phase === ph.key);
+    const done  = probs.filter(p => ['solved','audited'].includes(statuses[p.id])).length;
+    const pct   = probs.length ? Math.round(done/probs.length*100) : 0;
+    return `<div class="pb ${ph.locked?'locked':''}" style="border-left-color:${ph.color}" onclick="${ph.locked?'':'setFilter(\'phase'+ph.key+'\')'}">
+      <div class="pb-hdr"><span class="pb-name" style="color:${ph.color}">${ph.label}</span><span class="pb-cnt">${probs.length?done+'/'+probs.length:'locked'}</span></div>
+      <div class="pb-bar"><div class="pb-fill" style="width:${pct}%;background:${ph.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderFilters(){
+  const patGroups = GROUPS.filter(g => !g.id.startsWith('sys-'));
+  let h = `<button class="fbtn ${filter==='all'?'sel':''}" onclick="setFilter('all')">
+    <span class="fdot" style="background:var(--muted)"></span>All
+    <span class="fbadge">${ALL.filter(p=>['solved','audited'].includes(statuses[p.id])).length}/${ALL.length}</span>
+  </button>
+  <button class="fbtn ${filter==='micro'?'sel':''}" onclick="setFilter('micro')">
+    <span class="fdot" style="background:var(--blue)"></span>Micro-problems only
+    <span class="fbadge">${ALL.filter(p=>p.type==='micro'&&['solved','audited'].includes(statuses[p.id])).length}/${ALL.filter(p=>p.type==='micro').length}</span>
+  </button>
+  <button class="fbtn ${filter==='system'?'sel':''}" onclick="setFilter('system')">
+    <span class="fdot" style="background:var(--purple)"></span>Full systems only
+    <span class="fbadge">${ALL.filter(p=>p.type==='system'&&['solved','audited'].includes(statuses[p.id])).length}/${ALL.filter(p=>p.type==='system').length}</span>
+  </button>`;
+  patGroups.forEach(g => {
+    const done = g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
+    h += `<button class="fbtn ${filter===g.id?'sel':''}" onclick="setFilter('${g.id}')">
+      <span class="fdot" style="background:${g.color}"></span>${g.name}
+      <span class="fbadge">${done}/${g.problems.length}</span>
+    </button>`;
+  });
+  document.getElementById('fnav').innerHTML = h;
+}
+
+function renderPatLevels(){
+  const patGroups = GROUPS.filter(g => !g.id.startsWith('sys-'));
+  const auditClass = {pending:'at-pending',done:'at-done',due:'at-due'};
+  const auditLabel = {pending:'pending',done:'audited',due:'re-audit'};
+  let h = '';
+  patGroups.forEach(g => {
+    const lv = patLevel[g.id]||0;
+    const at = patAudit[g.id]||'';
+    const pips = [1,2,3,4].map(i=>`<div class="pip ${i<=lv?'l'+i:''}" title="L${i}"></div>`).join('');
+    const atag = at ? `<span class="audit-tag ${auditClass[at]||''}">${auditLabel[at]||''}</span>` : '';
+    h += `<div class="pat-row" onclick="promptPatLevel('${g.id}')">
+      <span class="pat-name-s">${g.name}</span>
+      <div class="level-pips">${pips}</div>${atag}
+    </div>`;
+  });
+  document.getElementById('pat-levels').innerHTML = h;
+}
+
+function promptPatLevel(patId){
+  const g = GROUPS.find(x=>x.id===patId); if(!g) return;
+  const lv = prompt(`Internalization level for "${g.name}" (1–4):\n1 = Recognition\n2 = Recall\n3 = Transfer ← interview-ready\n4 = Teaching\nCurrent: ${patLevel[patId]||'not set'}`);
+  if(lv && ['1','2','3','4'].includes(lv.trim())){
+    patLevel[patId] = parseInt(lv);
+    const at = prompt('Audit status:\n1 = pending\n2 = done\n3 = re-audit due\nCurrent: '+(patAudit[patId]||'none'));
+    const m = {'1':'pending','2':'done','3':'due'};
+    if(at && m[at.trim()]) patAudit[patId] = m[at.trim()];
+    save(); render();
+  }
+}
+
+function renderNextUp(){
+  for(const g of GROUPS){
+    for(const p of g.problems){
+      if(!statuses[p.id] || statuses[p.id]==='todo'){
+        const el = document.getElementById('next-up');
+        el.style.display = 'flex';
+        document.getElementById('nu-title').textContent = `#${p.id} — ${p.title}`;
+        document.getElementById('nu-meta').textContent  = `${g.name} · ${p.type} · ${p.diff}`;
+        return;
+      }
+    }
+  }
+  document.getElementById('next-up').style.display = 'none';
+}
+
+function openNextClaude(){
+  for(const g of GROUPS){
+    for(const p of g.problems){
+      if(!statuses[p.id]||statuses[p.id]==='todo'){
+        window.open(buildPromptUrl({...p,groupName:g.name}),'_blank');
+        return;
+      }
+    }
+  }
+}
+
+function renderProblems(){
+  let groups = GROUPS;
+  if(filter === 'micro')   groups = GROUPS.map(g=>({...g,problems:g.problems.filter(p=>p.type==='micro')})).filter(g=>g.problems.length);
+  if(filter === 'system')  groups = GROUPS.map(g=>({...g,problems:g.problems.filter(p=>p.type==='system')})).filter(g=>g.problems.length);
+  if(filter.startsWith('phase')) {
+    const ph = parseInt(filter.replace('phase',''));
+    groups = GROUPS.filter(g=>g.phase===ph);
+  }
+  const singleGroup = GROUPS.find(g=>g.id===filter);
+  if(singleGroup) groups = [singleGroup];
+
+  const phaseColors = {1:'var(--accent)',2:'var(--amber)',3:'var(--blue)',4:'var(--purple)',5:'var(--teal)'};
+
+  let h = '';
+  groups.forEach(g => {
+    if(!g.problems.length) return;
+    const done = g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
+    const col  = phaseColors[g.phase] || 'var(--muted2)';
+    const phaseLabel = `Phase ${g.phase}`;
+    h += `<div class="pgroup">
+      <div class="phdr">
+        <span class="pname">${g.name}</span>
+        <span class="pcnt">${done}/${g.problems.length}</span>
+        <span class="ptag" style="color:${col};background:${col}18;border:1px solid ${col}30">${phaseLabel}</span>
+      </div>
+      <div class="pcols">
+        <div class="ch">#</div>
+        <div class="ch">Problem</div>
+        <div class="ch">Patterns</div>
+        <div class="ch c">Type</div>
+        <div class="ch c">Diff</div>
+        <div class="ch c">Status</div>
+        <div class="ch"></div>
+      </div>`;
+    g.problems.forEach(p => {
+      const st = statuses[p.id]||'todo';
+      const sd = st==='solved'  ? `<div class="sdot sd-solved"  title="Solved">✓</div>`
+               : st==='audited' ? `<div class="sdot sd-audited" title="Audited">★</div>`
+               : st==='review'  ? `<div class="sdot sd-review"  title="Review">↻</div>`
+               :                  `<div class="sdot sd-todo"    title="Todo">·</div>`;
+      const hn = notes[p.id]&&notes[p.id].trim();
+      const patStr = (p.solid||'').match(/^[A-Z][^:]+(?=:)/g)?.[0] || g.name;
+      const typeTag = p.type==='micro'
+        ? `<span class="ptype-tag tag-micro">micro</span>`
+        : `<span class="ptype-tag tag-system">system</span>`;
+      h += `<div class="prow" onclick="openModal(${p.id})">
+        <div class="pr-num">${p.id}</div>
+        <div class="pr-title">${p.title}${hn?'<span class="pr-note">📝</span>':''}</div>
+        <div class="pr-patterns">${g.name}</div>
+        <div style="text-align:center">${typeTag}</div>
+        <div><span class="dbadge d-${p.diff}">${p.diff}</span></div>
+        <div>${sd}</div>
+        <div><button class="row-open" onclick="event.stopPropagation();openByIdClaude(${p.id})">→</button></div>
+      </div>`;
+    });
+    h += '</div>';
+  });
+  document.getElementById('prob-container').innerHTML = h;
+}
+
+function renderStats(){
+  const micro  = ALL.filter(p=>p.type==='micro');
+  const system = ALL.filter(p=>p.type==='system');
+  const done   = p => ['solved','audited'].includes(statuses[p.id]);
+  const rev    = ALL.filter(p=>statuses[p.id]==='review').length;
+  const aud    = ALL.filter(p=>statuses[p.id]==='audited').length;
+  document.getElementById('stats-strip').innerHTML = `
+    <div class="stat-row"><span class="stat-key">total solved</span><span class="stat-val">${ALL.filter(done).length}/${ALL.length}</span></div>
+    <div class="stat-row"><span class="stat-key">micro solved</span><span class="stat-val">${micro.filter(done).length}/${micro.length}</span></div>
+    <div class="stat-row"><span class="stat-key">systems solved</span><span class="stat-val">${system.filter(done).length}/${system.length}</span></div>
+    <div class="stat-row"><span class="stat-key">audited</span><span class="stat-val">${aud}</span></div>
+    <div class="stat-row"><span class="stat-key">needs review</span><span class="stat-val">${rev}</span></div>
+    <div class="stat-row"><span class="stat-key">cycle</span><span class="stat-val" style="font-size:10px">DSA→LLD→HLD</span></div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// FILTER / VIEW
+// ─────────────────────────────────────────────────────────────────
+function setFilter(f){
+  filter = f;
+  const labels = {
+    all:'All problems', micro:'Micro-problems', system:'Full systems',
+    factory:'Factory Method', strategy:'Strategy', observer:'Observer',
+    decorator:'Decorator', singleton:'Singleton', command:'Command', state:'State',
+    builder:'Builder', 'abstract-factory':'Abstract Factory',
+    adapter:'Adapter', proxy:'Proxy', facade:'Facade',
+    composite:'Composite', 'chain-of-responsibility':'Chain of Responsibility',
+    'template-method':'Template Method', iterator:'Iterator', mediator:'Mediator',
+    repository:'Repository', cqrs:'CQRS', 'event-sourcing':'Event Sourcing',
+    'sys-beginner':'Systems — Beginner','sys-intermediate':'Systems — Intermediate','sys-advanced':'Systems — Advanced',
+    phase1:'Phase 1 — Core patterns', phase2:'Phase 2 — Behavioural',
+    phase3:'Phase 3 — Full systems', phase4:'Phase 4 — Advanced',
+    phase5:'Modern — Repository · CQRS · Event Sourcing',
+  };
+  document.getElementById('main-title').textContent = labels[f] || f;
+  render();
+}
+
+function setView(v, btn){
+  currentView = v;
+  ['problems','timer','debug'].forEach(x => {
+    document.getElementById('view-'+x).style.display = x===v ? 'block' : 'none';
+  });
+  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('sel'));
+  if(btn) btn.classList.add('sel');
+}
+
+// ─────────────────────────────────────────────────────────────────
+// CLAUDE PROMPTS
+// ─────────────────────────────────────────────────────────────────
+function buildPromptUrl(p){
+  const prompt = buildPrompt(p);
+  return `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
+}
+
+function buildPrompt(p){
+  const reqs = (p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
+  const solidFocus = p.solid ? `\nSOLID focus for this problem:\n${p.solid}\n` : '';
+  const type = p.type === 'system' ? 'full system design' : `micro-problem drilling the ${p.groupName} pattern`;
+
+  return `You are my LLD mentor. I am a senior software engineer learning low-level design for interviews. I code in Python.
+
+Problem #${p.id}: ${p.title}
+Type: ${type}
+Difficulty: ${p.diff}
+
+${p.desc}
+
+Requirements:
+${reqs}
+${solidFocus}
+Open with the brief only:
+- Restate the problem cleanly
+- Pattern(s) that fit and the trigger that signals them
+- The single most important structural decision I need to make
+
+Then ask me this one question and wait for my attempt:
+"Before you write any code — ${p.type==='micro' ? 'what is the minimum interface the core abstraction needs, and why should the caller never instantiate a concrete class directly?' : 'what are the top 2 patterns this problem uses, and what is the relationship between the classes that use each pattern?'}"
+
+After my attempt:
+1. Identify conceptual mistakes first, code mistakes second
+2. Map my design against SOLID — call out every violation by principle name
+3. Call out wrong relationships (composition vs inheritance) with consequences
+4. Flag un-Pythonic patterns (missing ABCs, wrong use of dataclasses, no type hints)
+5. Do NOT rewrite my solution — correct the mental model only`;
+}
+
+function openByIdClaude(id){
+  const p = ALL.find(x=>x.id===id); if(!p) return;
+  window.open(buildPromptUrl(p),'_blank');
+}
+
+function openModalClaude(){
+  const p = ALL.find(x=>x.id===activeId); if(!p) return;
+  window.open(buildPromptUrl(p),'_blank');
+}
+
+function copyModalPrompt(){
+  const p = ALL.find(x=>x.id===activeId); if(!p) return;
+  navigator.clipboard.writeText(buildPrompt(p)).then(()=>{
+    const btns = document.querySelectorAll('.mlbtn');
+    btns.forEach(b=>{
+      if(b.textContent.includes('Copy')){
+        const o=b.textContent; b.textContent='✓ Copied';
+        setTimeout(()=>b.textContent=o,1800);
+      }
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────────────────────────
+function openModal(id){
+  const p = ALL.find(x=>x.id===id); if(!p) return;
+  activeId = id;
+  const stLabel = {solved:'✓ Solved',review:'↻ Needs review',audited:'★ Audited',todo:'Todo'};
+  const typeTag = p.type==='micro'
+    ? `<span class="ptype-tag tag-micro">micro-problem</span>`
+    : `<span class="ptype-tag tag-system">full system</span>`;
+  document.getElementById('m-id').textContent       = `#${p.id}`;
+  document.getElementById('m-title').textContent    = p.title;
+  document.getElementById('m-type').innerHTML       = typeTag;
+  document.getElementById('m-pat').textContent      = p.groupName;
+  document.getElementById('m-diff').textContent     = p.diff;
+  document.getElementById('m-phase').textContent    = p.phase === 5 ? 'Modern' : `Phase ${p.phase}`;
+  document.getElementById('m-status').textContent   = stLabel[statuses[id]||'todo'];
+  document.getElementById('m-desc').textContent     = p.desc;
+  document.getElementById('m-reqs').innerHTML       = (p.reqs||[]).map(r=>`<div class="m-req">${r}</div>`).join('');
+  document.getElementById('m-solid').innerHTML      = p.solid ? `<strong>SOLID focus:</strong> ${p.solid}` : '';
+  document.getElementById('m-notes').value          = notes[id]||'';
+  // Cross-link: deep-link to this pattern in the Pattern Lab
+  const learnLink = document.getElementById('m-learn-link');
+  if(learnLink) learnLink.href = `pattern-lab.html#${p.groupId}`;
+  document.getElementById('moverlay').classList.add('open');
+}
+
+function closeModal(){
+  if(activeId!==null){ notes[activeId]=document.getElementById('m-notes').value; save(); }
+  document.getElementById('moverlay').classList.remove('open');
+  activeId=null; render();
+}
+
+function closeIfOutside(e){ if(e.target===document.getElementById('moverlay')) closeModal(); }
+
+function markStatus(st){
+  if(activeId===null) return;
+  statuses[activeId]=st; save();
+  document.getElementById('m-status').textContent={solved:'✓ Solved',review:'↻ Needs review',audited:'★ Audited',todo:'Todo'}[st];
+  render();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────────────────────────
+let timerInterval=null, timerSeconds=0, timerLimit=0, timerRunning=false, timerPhase=0;
+function startTimer(phase){
+  clearInterval(timerInterval);
+  timerPhase=phase; timerLimit=phase===1?300:1200; timerSeconds=0; timerRunning=true;
+  document.querySelectorAll('.tp-phase').forEach((el,i)=>{el.classList.toggle('active-phase',i===phase-1);el.classList.remove('done-phase');});
+  document.getElementById('timer-status').textContent=`Phase ${phase} running — ${phase===1?'5':'20'} min limit`;
+  timerInterval=setInterval(tickTimer,1000);
+  updateTimerDisplay();
+}
+function tickTimer(){
+  timerSeconds++;
+  updateTimerDisplay();
+  if(timerSeconds>=timerLimit){
+    clearInterval(timerInterval); timerRunning=false;
+    document.getElementById('timer-status').textContent = timerPhase===1
+      ? '5 min up — name the pattern or go to mentor now'
+      : '20 min up — "Pattern: X. My structure: Y. Stuck specifically at: Z."';
+    document.querySelectorAll('.tp-phase')[timerPhase-1].classList.replace('active-phase','done-phase');
+  }
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
+  const el=document.getElementById('timer-display');
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='timer-display'+(timerSeconds>=timerLimit?' over':timerSeconds>=timerLimit*.8?' warn':'');
+}
+function pauseTimer(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-status').textContent='Paused';}
+  else if(timerPhase>0){timerRunning=true;timerInterval=setInterval(tickTimer,1000);document.getElementById('timer-status').textContent='Resumed';}
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerSeconds=0;timerRunning=false;timerPhase=0;
+  document.getElementById('timer-display').textContent='00:00';
+  document.getElementById('timer-display').className='timer-display';
+  document.getElementById('timer-status').textContent='Select a phase to start';
+  document.querySelectorAll('.tp-phase').forEach(el=>el.classList.remove('active-phase','done-phase'));
+}
+
+function copyHint(){
+  const text=`I've been on this 20 min.\nPattern: [what you identified + the trigger that told you]\nMy structure: [classes you have, relationships between them]\nStuck specifically at: [one sentence — the exact decision point]`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('copy-hint-btn');
+    const o=b.textContent; b.textContent='✓ Copied';
+    setTimeout(()=>b.textContent=o,1800);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// DEBUG
+// ─────────────────────────────────────────────────────────────────
+function initDebugDropdown(){
+  const sel = document.getElementById('dbg-problem');
+  sel.innerHTML = '<option value="">— select problem —</option>';
+  GROUPS.forEach(g=>{
+    const grp=document.createElement('optgroup');
+    grp.label=`${g.name}`;
+    g.problems.forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=p.id;
+      opt.textContent=`#${p.id} — ${p.title}`;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  });
+}
+
+function openDebugClaude(){
+  const selVal  = document.getElementById('dbg-problem').value;
+  const pattern = document.getElementById('dbg-pattern').value;
+  const classes = document.getElementById('dbg-classes').value.trim();
+  const issue   = document.getElementById('dbg-issue').value;
+  const solid   = document.getElementById('dbg-solid').value;
+  const thinking= document.getElementById('dbg-thinking').value.trim();
+
+  if(!classes){ alert('Your class structure is required.'); return; }
+
+  let probLabel = '';
+  if(selVal){ const p=ALL.find(x=>x.id===parseInt(selVal)); if(p) probLabel=`#${p.id} — ${p.title}`; }
+
+  const lines = [
+    probLabel ? `LLD Debug — ${probLabel}` : 'LLD Debug session',
+    '',
+    'You are my LLD mentor. Diagnose my design thinking, not just my code.',
+    '',
+    pattern ? `Pattern I identified: ${pattern}` : 'Pattern: I am not sure',
+    '',
+    'My class structure:',
+    classes,
+    '',
+    issue   ? `What broke: ${issue}` : '',
+    solid   ? `SOLID violation I suspect: ${solid}` : '',
+    '',
+    thinking ? `What I thought my design would achieve:\n${thinking}` : '',
+    '',
+    'Do NOT rewrite my design. Identify exactly where my mental model is wrong.',
+    'Then ask me one question that leads me to the fix myself.',
+    'If there is a SOLID violation, name the principle and show the consequence — do not fix it.',
+  ].filter(l=>l!==null&&l!=='').join('\n');
+
+  window.open(`https://claude.ai/new?q=${encodeURIComponent(lines)}`,'_blank');
+}
+
+function resetDebug(){
+  ['dbg-problem','dbg-pattern','dbg-issue','dbg-solid'].forEach(id=>{document.getElementById(id).value='';});
+  ['dbg-classes','dbg-thinking'].forEach(id=>{document.getElementById(id).value='';});
+}
+
+// ─────────────────────────────────────────────────────────────────
+// THEME
+// ─────────────────────────────────────────────────────────────────
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent=isDark?'🌙 theme':'☀️ theme';
+}
+
+// ─────────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────────
+render();
+initDebugDropdown();
+</script>
+</body>
+</html>

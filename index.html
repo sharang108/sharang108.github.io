@@ -3,983 +3,324 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DSA Index</title>
+<title>prep-index</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
-    --accent:#4ade80; --accent2:#22c55e; --amber:#fbbf24; --blue:#60a5fa;
-    --coral:#f87171; --purple:#a78bfa; --tr:0.18s ease;
-  }
-  [data-theme="dark"]  { --bg:#0d0f11; --bg2:#13161a; --bg3:#1a1e23; --bg4:#1f242b; --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13); --text:#e2e4e7; --muted:#4e5666; --muted2:#7a8090; }
-  [data-theme="light"] { --bg:#f5f4f0; --bg2:#ffffff; --bg3:#f0ede8; --bg4:#e8e5df; --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15); --text:#1a1c20; --muted:#9a9fa8; --muted2:#6b7280; }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;transition:background var(--tr),color var(--tr);}
-  .app{width:100%;min-height:100vh;}
-  .app.max{position:fixed;inset:0;z-index:9999;overflow:auto;background:var(--bg);}
-  .shell{display:grid;grid-template-columns:268px 1fr;grid-template-rows:52px 1fr;min-height:100vh;}
-  .app.max .shell{height:100vh;overflow:hidden;}
-  .app.max .sidebar,.app.max .main{overflow-y:auto;height:calc(100vh - 52px);}
+:root {
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --accent:#4ade80; --accent2:#22c55e;
+  --amber:#fbbf24; --blue:#60a5fa;
+  --coral:#f87171; --purple:#a78bfa;
+  --teal:#2dd4bf;
+  --tr:0.18s ease;
+}
+[data-theme="dark"] {
+  --bg:#0d0f11; --bg2:#13161a; --bg3:#1a1e23; --bg4:#1f242b;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e2e4e7; --muted:#4e5666; --muted2:#7a8090;
+}
+[data-theme="light"] {
+  --bg:#f5f4f0; --bg2:#ffffff; --bg3:#f0ede8; --bg4:#e8e5df;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15);
+  --text:#1a1c20; --muted:#9a9fa8; --muted2:#6b7280;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;transition:background var(--tr),color var(--tr);}
 
-  /* topbar */
-  .topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;transition:background var(--tr);}
-  .tb-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent2);flex-shrink:0;}
-  .tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
-  .tb-sep,.tb-sub{font-family:var(--mono);color:var(--muted2);font-size:11px;}
-  .tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
-  .phase-pill{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;}
-  .pill-done  {background:rgba(74,222,128,.1);color:var(--accent);border:1px solid rgba(74,222,128,.2);}
-  .pill-active{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25);}
-  .pill-locked{background:var(--border);color:var(--muted2);border:1px solid var(--border2);}
-  .icon-btn{width:30px;height:30px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .12s;color:var(--muted2);flex-shrink:0;}
-  .icon-btn:hover{background:var(--bg4);color:var(--text);}
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;height:52px;gap:10px;}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent2);flex-shrink:0;}
+.tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
+.tb-sep{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-sub{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);}
 
-  /* sidebar */
-  .sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:18px 0 32px;overflow-y:auto;transition:background var(--tr);}
-  .s-sec{margin-bottom:24px;}
-  .s-lbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 16px;margin-bottom:7px;}
-  .pb{padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;}
-  .pb:hover:not(.locked){background:var(--bg3);}
-  .pb.locked{opacity:.4;cursor:default;}
-  .pb-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-  .pb-name{font-family:var(--mono);font-size:11px;font-weight:500;}
-  .pb-cnt{font-family:var(--mono);font-size:10px;color:var(--muted2);}
-  .pb-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
-  .pb-fill{height:100%;border-radius:2px;transition:width .5s ease;}
-  .f-done{background:var(--accent);}.f-act{background:var(--amber);}.f-lock{background:var(--muted);}
+/* HERO */
+.hero{padding:64px 24px 40px;max-width:860px;margin:0 auto;}
+.hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px;}
+.hero-title{font-family:var(--mono);font-size:28px;font-weight:600;line-height:1.2;margin-bottom:12px;}
+.hero-title span.acc{color:var(--accent);}
+.hero-title span.amb{color:var(--amber);}
+.hero-title span.pur{color:var(--purple);}
+.hero-sub{font-size:13px;color:var(--muted2);max-width:520px;line-height:1.7;margin-bottom:8px;}
+.hero-cycle{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:8px;}
+.cycle-arrow{color:var(--muted);}
 
-  .fnav{padding:0 8px;display:flex;flex-direction:column;gap:1px;}
-  .fbtn{font-family:var(--mono);font-size:11px;color:var(--muted2);padding:5px 8px;border-radius:4px;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .1s;display:flex;align-items:center;gap:6px;}
-  .fbtn:hover{background:var(--bg3);color:var(--text);}
-  .fbtn.sel{background:var(--bg3);color:var(--text);}
-  .fdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-  .fbadge{margin-left:auto;font-size:9px;opacity:.5;}
+/* CARDS */
+.cards{max-width:860px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.cards{grid-template-columns:1fr;}}
 
-  /* pattern internalization in sidebar */
-  .pat-levels{padding:0 16px;display:flex;flex-direction:column;gap:6px;}
-  .pat-row{display:flex;align-items:center;gap:8px;}
-  .pat-name-s{font-family:var(--mono);font-size:10px;color:var(--muted2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .level-pips{display:flex;gap:3px;}
-  .pip{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .2s;}
-  .pip.l1{background:var(--muted2);}
-  .pip.l2{background:var(--blue);}
-  .pip.l3{background:var(--amber);}
-  .pip.l4{background:var(--accent);}
-  .audit-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;white-space:nowrap;}
-  .at-pending{color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);}
-  .at-done   {color:var(--accent);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);}
-  .at-due    {color:var(--coral);background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:0;transition:border-color .15s,background .15s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.card.dsa::before{background:var(--accent);}
+.card.lld::before{background:var(--purple);}
+.card.hld::before{background:var(--amber);}
+.card:hover{background:var(--bg3);}
+.card.locked{opacity:.55;cursor:default;}
+.card.locked:hover{background:var(--bg2);}
 
-  .stats-strip{padding:0 16px;display:flex;flex-direction:column;gap:6px;}
-  .stat-row{display:flex;justify-content:space-between;align-items:center;}
-  .stat-key{font-family:var(--mono);font-size:10px;color:var(--muted);}
-  .stat-val{font-family:var(--mono);font-size:11px;font-weight:500;}
+.card-icon{font-size:22px;margin-bottom:14px;}
+.card-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px;}
+.card.dsa .card-label{color:var(--accent);}
+.card.lld .card-label{color:var(--purple);}
+.card.hld .card-label{color:var(--amber);}
+.card-title{font-family:var(--mono);font-size:15px;font-weight:600;margin-bottom:8px;}
+.card-desc{font-size:12px;color:var(--muted2);line-height:1.7;flex:1;margin-bottom:18px;}
 
-  /* main */
-  .main{padding:22px 26px;overflow-y:auto;background:var(--bg);transition:background var(--tr);}
-  .mhdr{margin-bottom:16px;display:flex;align-items:center;gap:12px;}
-  .mhdr h1{font-family:var(--mono);font-size:16px;font-weight:500;flex:1;}
-  .view-tabs{display:flex;gap:4px;}
-  .vtab{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .1s;}
-  .vtab:hover{color:var(--text);border-color:var(--border2);}
-  .vtab.sel{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+/* progress bars on cards */
+.card-progress{margin-bottom:16px;}
+.cp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.cp-label{font-family:var(--mono);font-size:9px;color:var(--muted2);}
+.cp-val{font-family:var(--mono);font-size:9px;color:var(--muted2);}
+.cp-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px;}
+.cp-fill{height:100%;border-radius:2px;transition:width .6s ease;}
 
-  /* next up */
-  .next-up{background:var(--bg3);border:1px solid rgba(251,191,36,.18);border-left:3px solid var(--amber);border-radius:6px;padding:11px 14px;margin-bottom:20px;display:flex;align-items:center;gap:14px;transition:background var(--tr);}
-  .nu-lbl{font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
-  .nu-title{font-family:var(--mono);font-size:13px;font-weight:500;}
-  .nu-meta{font-size:11px;color:var(--muted2);margin-top:1px;font-family:var(--mono);}
-  .nu-actions{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
-  .nbtn{font-family:var(--mono);font-size:11px;font-weight:500;white-space:nowrap;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;transition:all .12s;display:inline-flex;align-items:center;gap:4px;}
-  .btn-amber{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
-  .btn-amber:hover{background:rgba(251,191,36,.18);}
-  .btn-blue{background:rgba(96,165,250,.1);color:var(--blue);border-color:rgba(96,165,250,.25);}
-  .btn-blue:hover{background:rgba(96,165,250,.17);}
+/* tags */
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;}
+.tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid var(--border);color:var(--muted2);}
 
-  /* struggle timer panel */
-  .timer-panel{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:20px;}
-  .tp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-  .tp-title{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);}
-  .tp-sub{font-family:var(--mono);font-size:10px;color:var(--muted2);}
-  .tp-phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-  .tp-phase{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:10px 12px;position:relative;}
-  .tp-phase.active-phase{border-color:var(--amber);background:rgba(251,191,36,.05);}
-  .tp-phase.done-phase{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04);}
-  .tp-num{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-  .tp-name{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:2px;}
-  .tp-limit{font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;}
-  .tp-desc{font-size:11px;color:var(--muted2);line-height:1.5;}
-  .timer-display{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);text-align:center;margin:8px 0 4px;}
-  .timer-display.warn{color:var(--amber);}
-  .timer-display.over{color:var(--coral);}
-  .timer-controls{display:flex;gap:6px;margin-top:8px;}
-  .tc-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);transition:all .1s;flex:1;text-align:center;}
-  .tc-btn:hover{color:var(--text);border-color:var(--text);}
-  .tc-btn.primary{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
-  .tc-btn.primary:hover{background:rgba(251,191,36,.18);}
+/* action buttons */
+.card-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;}
+.cbtn{font-family:var(--mono);font-size:11px;font-weight:500;padding:7px 13px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .12s;white-space:nowrap;}
+.cbtn-primary-green{background:rgba(74,222,128,.1);color:var(--accent);border-color:rgba(74,222,128,.3);}
+.cbtn-primary-green:hover{background:rgba(74,222,128,.18);}
+.cbtn-primary-purple{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.cbtn-primary-purple:hover{background:rgba(167,139,250,.18);}
+.cbtn-primary-amber{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.cbtn-primary-amber:hover{background:rgba(251,191,36,.18);}
+.cbtn-ghost{background:none;color:var(--muted2);border-color:var(--border);}
+.cbtn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.locked-tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);padding:6px 12px;border-radius:4px;display:inline-flex;align-items:center;gap:5px;}
 
-  /* pattern groups */
-  .pgroup{margin-bottom:24px;}
-  .phdr{display:flex;align-items:center;gap:10px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border);}
-  .pname{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;}
-  .pcnt{font-family:var(--mono);font-size:10px;color:var(--muted);}
-  .ptag{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em;margin-left:auto;}
+/* STATUS STRIP */
+.status-strip{max-width:860px;margin:0 auto;padding:0 24px 24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+@media(max-width:700px){.status-strip{grid-template-columns:1fr;}}
+.ss-item{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.ss-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ss-body{flex:1;min-width:0;}
+.ss-label{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.ss-val{font-family:var(--mono);font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  .pcols{display:grid;grid-template-columns:52px 1fr 94px 70px 28px 80px 38px;padding:3px 9px 5px;}
-  .ch{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
-  .ch.c{text-align:center;}
+/* DIVIDER */
+.section-divider{max-width:860px;margin:0 auto 20px;padding:0 24px;}
+.sd-line{border:none;border-top:1px solid var(--border);}
+.sd-label{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:20px;margin-bottom:12px;}
 
-  .prow{display:grid;grid-template-columns:52px 1fr 94px 70px 28px 80px 38px;align-items:center;padding:8px 9px;border-radius:5px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all .1s;}
-  .prow:hover{background:var(--bg3);border-color:var(--border);}
-  .prow.review{border-left:2px solid rgba(251,191,36,.5);}
-  .pr-num{font-family:var(--mono);font-size:10px;color:var(--muted2);}
-  .pr-title{font-family:var(--sans);font-size:13px;}
-  .pr-note{font-size:10px;margin-left:4px;opacity:.6;}
-  .pr-cx{font-family:var(--mono);font-size:10px;color:var(--muted2);text-align:center;line-height:1.5;}
-  .dbadge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;text-align:center;width:fit-content;margin:0 auto;}
-  .d-easy{color:var(--accent);background:rgba(74,222,128,.08);}
-  .d-med{color:var(--amber);background:rgba(251,191,36,.08);}
-  .d-hard{color:var(--coral);background:rgba(248,113,113,.08);}
-
-  /* status — now 4 states */
-  .sdot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;margin:0 auto;font-family:var(--mono);}
-  .sd-solved {background:rgba(74,222,128,.15);color:var(--accent);}
-  .sd-review {background:rgba(251,191,36,.15);color:var(--amber);}
-  .sd-audited{background:rgba(167,139,250,.15);color:var(--purple);}
-  .sd-todo   {background:var(--border);color:var(--muted);}
-
-  .lc-link{font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;display:flex;align-items:center;justify-content:center;width:26px;height:20px;border-radius:3px;border:1px solid var(--border);transition:all .1s;margin:0 auto;}
-  .lc-link:hover{border-color:var(--amber);color:var(--amber);}
-  .row-open{font-family:var(--mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 7px;border-radius:3px;cursor:pointer;transition:all .1s;white-space:nowrap;}
-  .row-open:hover{border-color:var(--blue);color:var(--blue);}
-
-  /* decision points view */
-  .dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .dp-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;}
-  .dp-pat{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;}
-  .dp-phase-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:6px;vertical-align:middle;}
-  .dp-points{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:8px;flex:1;}
-  .dp-point{font-size:12px;color:var(--muted2);padding-left:12px;position:relative;line-height:1.5;}
-  .dp-point::before{content:'·';position:absolute;left:0;color:var(--muted);}
-  .dp-point strong{color:var(--text);font-weight:500;}
-  .dp-footer{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
-  .dp-btn{font-family:var(--mono);font-size:10px;font-weight:500;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .1s;white-space:nowrap;}
-  .dp-btn-learn{background:rgba(96,165,250,.1);color:var(--blue);border-color:rgba(96,165,250,.25);}
-  .dp-btn-learn:hover{background:rgba(96,165,250,.17);}
-  .dp-btn-copy{background:none;color:var(--muted2);border-color:var(--border);}
-  .dp-btn-copy:hover{color:var(--text);border-color:var(--border2);}
-
-  /* debug view */
-  .dbg-form{display:flex;flex-direction:column;gap:12px;}
-  .dbg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .dbg-field{display:flex;flex-direction:column;gap:5px;}
-  .dbg-field.full{grid-column:1/-1;}
-  .dbg-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
-  .dbg-label span{color:var(--coral);margin-left:2px;}
-  .dbg-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;transition:border-color .1s,background var(--tr);width:100%;}
-  .dbg-input:focus{border-color:var(--border2);}
-  .dbg-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;resize:vertical;outline:none;transition:border-color .1s,background var(--tr);width:100%;line-height:1.6;}
-  .dbg-textarea:focus{border-color:var(--border2);}
-  .dbg-actions{display:flex;gap:8px;align-items:center;padding-top:4px;}
-  .dbg-submit{font-family:var(--mono);font-size:11px;font-weight:500;padding:8px 18px;border-radius:4px;cursor:pointer;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.1);color:var(--coral);transition:all .12s;}
-  .dbg-submit:hover{background:rgba(248,113,113,.18);}
-  .dbg-reset{font-family:var(--mono);font-size:11px;padding:8px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .12s;}
-  .dbg-reset:hover{color:var(--text);border-color:var(--border2);}
-  .dbg-hint{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;}
-  .dbg-banner{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.18);border-left:3px solid var(--coral);border-radius:6px;padding:11px 14px;margin-bottom:16px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.6;}
-  .dbg-banner strong{color:var(--text);}
-  .dbg-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;outline:none;width:100%;cursor:pointer;transition:border-color .1s;}
-
-  /* modal */
-  .moverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .15s;}
-  .moverlay.open{opacity:1;pointer-events:all;}
-  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;width:560px;max-width:96vw;padding:24px;position:relative;transform:translateY(8px);transition:transform .15s,background var(--tr);max-height:90vh;overflow-y:auto;}
-  .moverlay.open .modal{transform:translateY(0);}
-  .mclose{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--muted2);background:none;border:1px solid var(--border);padding:3px 7px;border-radius:3px;cursor:pointer;transition:all .1s;}
-  .mclose:hover{color:var(--text);border-color:var(--border2);}
-  .m-lcnum{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-bottom:3px;}
-  .m-title{font-family:var(--mono);font-size:15px;font-weight:500;margin-bottom:12px;}
-  .mmeta{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;}
-  .mfield{display:flex;flex-direction:column;gap:2px;}
-  .mlabel{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
-  .mval{font-family:var(--mono);font-size:12px;}
-  .mlinks{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
-  .mlbtn{font-family:var(--mono);font-size:10px;font-weight:500;padding:5px 10px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .1s;}
-  .divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
-  .note-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;resize:none;line-height:1.7;outline:none;transition:border-color .1s,background var(--tr);}
-  .note-area:focus{border-color:var(--border2);}
-  .mactions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
-  .mbtn{font-family:var(--mono);font-size:11px;font-weight:500;padding:6px 13px;border-radius:4px;cursor:pointer;border:1px solid;transition:all .1s;}
-  .mb-solve  {background:rgba(74,222,128,.1);color:var(--accent);border-color:rgba(74,222,128,.3);}
-  .mb-solve:hover{background:rgba(74,222,128,.18);}
-  .mb-review {background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
-  .mb-review:hover{background:rgba(251,191,36,.18);}
-  .mb-audit  {background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
-  .mb-audit:hover{background:rgba(167,139,250,.18);}
-  .mb-ghost  {background:none;color:var(--muted2);border-color:var(--border);}
-  .mb-ghost:hover{color:var(--text);border-color:var(--border2);}
-
-  ::-webkit-scrollbar{width:4px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
-<div class="app" id="app">
-<div class="shell">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="tb-dot"></div>
-    <span class="tb-title">dsa-prep</span>
-    <span class="tb-sep"> / </span>
-    <span class="tb-sub">index</span>
-    <div class="tb-right">
-      <span class="phase-pill pill-done">Phase 1 ✓</span>
-      <span class="phase-pill pill-active">Phase 2 active</span>
-      <span class="phase-pill pill-locked">Phase 3–5 🔒</span>
-      <button class="icon-btn" onclick="exportXLSX()" title="Export to Excel" style="width:auto;padding:0 10px;font-family:var(--mono);font-size:10px;gap:5px;">⬇ Export</button>
-      <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-      <button class="icon-btn" id="max-btn"   onclick="toggleMax()"   title="Maximize">⛶</button>
+<div class="topbar">
+  <div class="tb-dot"></div>
+  <span class="tb-title">prep-index</span>
+  <span class="tb-sep"> / </span>
+  <span class="tb-sub">home</span>
+  <div class="tb-right">
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Interview preparation system</div>
+  <div class="hero-title">
+    <span class="acc">DSA</span> · <span class="pur">LLD</span> · <span class="amb">HLD</span>
+  </div>
+  <div class="hero-sub">Three tracks. One system. Track problems, learn patterns, debug your thinking, and open any problem directly in Claude with a pre-loaded mentor prompt.</div>
+  <div class="hero-cycle">
+    <span style="color:var(--accent)">DSA</span>
+    <span class="cycle-arrow">→</span>
+    <span style="color:var(--purple)">LLD</span>
+    <span class="cycle-arrow">→</span>
+    <span style="color:var(--amber)">HLD</span>
+    <span class="cycle-arrow">→</span>
+    <span style="color:var(--muted2)">repeat</span>
+  </div>
+</div>
+
+<div class="status-strip" id="status-strip">
+  <div class="ss-item">
+    <div class="ss-dot" style="background:var(--accent)"></div>
+    <div class="ss-body">
+      <div class="ss-label">DSA solved</div>
+      <div class="ss-val" id="ss-dsa">loading...</div>
     </div>
   </div>
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="s-sec">
-      <div class="s-lbl">Progress</div>
-      <div class="pb" style="border-left-color:var(--accent)" onclick="setFilter('all')">
-        <div class="pb-hdr"><span class="pb-name" style="color:var(--accent)">Phase 1</span><span class="pb-cnt">27/27</span></div>
-        <div class="pb-bar"><div class="pb-fill f-done" style="width:100%"></div></div>
-      </div>
-      <div class="pb" style="border-left-color:var(--amber)" onclick="setFilter('phase2')">
-        <div class="pb-hdr"><span class="pb-name" style="color:var(--amber)">Phase 2</span><span class="pb-cnt" id="p2-cnt">0/18</span></div>
-        <div class="pb-bar"><div class="pb-fill f-act" id="p2-bar" style="width:0%"></div></div>
-      </div>
-      <div class="pb locked">
-        <div class="pb-hdr"><span class="pb-name">Phase 3–5</span><span class="pb-cnt">locked</span></div>
-        <div class="pb-bar"><div class="pb-fill f-lock" style="width:0%"></div></div>
-      </div>
-    </div>
-
-    <div class="s-sec">
-      <div class="s-lbl">Filter by pattern</div>
-      <div class="fnav" id="fnav"></div>
-    </div>
-
-    <div class="s-sec">
-      <div class="s-lbl">Internalization</div>
-      <div class="pat-levels" id="pat-levels"></div>
-    </div>
-
-    <div class="s-sec">
-      <div class="s-lbl">Stats</div>
-      <div class="stats-strip">
-        <div class="stat-row"><span class="stat-key">total solved</span><span class="stat-val" id="st-total">27</span></div>
-        <div class="stat-row"><span class="stat-key">audited</span><span class="stat-val" id="st-audit">0</span></div>
-        <div class="stat-row"><span class="stat-key">needs review</span><span class="stat-val" id="st-review">0</span></div>
-        <div class="stat-row"><span class="stat-key">phase 2 done</span><span class="stat-val" id="st-p2">0/18</span></div>
-        <div class="stat-row"><span class="stat-key">cycle</span><span class="stat-val" style="font-size:10px">DSA→LLD→HLD</span></div>
-      </div>
+  <div class="ss-item">
+    <div class="ss-dot" style="background:var(--purple)"></div>
+    <div class="ss-body">
+      <div class="ss-label">LLD solved</div>
+      <div class="ss-val" id="ss-lld">loading...</div>
     </div>
   </div>
-
-  <!-- MAIN -->
-  <div class="main" id="main">
-    <div class="mhdr">
-      <h1 id="main-title">All problems</h1>
-      <div class="view-tabs">
-        <button class="vtab sel" onclick="setView('problems',this)">Problems</button>
-        <button class="vtab"     onclick="setView('timer',this)">Timer</button>
-        <button class="vtab"     onclick="setView('patterns',this)">Decision points</button>
-        <button class="vtab"     onclick="setView('debug',this)">Debug</button>
-      </div>
-    </div>
-
-    <!-- PROBLEMS VIEW -->
-    <div id="view-problems">
-      <div class="next-up" id="next-up">
-        <div>
-          <div class="nu-lbl">↳ next up</div>
-          <div class="nu-title" id="nu-title">—</div>
-          <div class="nu-meta"  id="nu-meta">—</div>
-        </div>
-        <div class="nu-actions">
-          <a class="nbtn btn-amber" id="nu-lc" href="#" target="_blank" rel="noopener">↗ LC</a>
-          <button class="nbtn btn-blue" onclick="openNextClaude()">→ Claude</button>
-        </div>
-      </div>
-      <div id="prob-container"></div>
-    </div>
-
-    <!-- TIMER VIEW -->
-    <div id="view-timer" style="display:none">
-      <div class="timer-panel">
-        <div class="tp-header">
-          <span class="tp-title">Struggle timer</span>
-          <span class="tp-sub" id="timer-phase-label">Start phase 1</span>
-        </div>
-        <div class="tp-phases">
-          <div class="tp-phase" id="tp1">
-            <div class="tp-num">Phase 1</div>
-            <div class="tp-name">Pattern recognition</div>
-            <div class="tp-limit">5 min max</div>
-            <div class="tp-desc">Read. Don't code. Name the pattern. If you can't — come to mentor immediately.</div>
-          </div>
-          <div class="tp-phase" id="tp2">
-            <div class="tp-num">Phase 2</div>
-            <div class="tp-name">Directed struggle</div>
-            <div class="tp-limit">15 min max</div>
-            <div class="tp-desc">Implement. Timer running. Wrestling with invariant and boundaries is the learning.</div>
-          </div>
-          <div class="tp-phase" id="tp3">
-            <div class="tp-num">Phase 3</div>
-            <div class="tp-name">Targeted hint</div>
-            <div class="tp-limit">On request</div>
-            <div class="tp-desc">Tell mentor: "Pattern: X. Approach: Y. Stuck at: Z." Get minimum nudge only.</div>
-          </div>
-        </div>
-        <div class="timer-display" id="timer-display">00:00</div>
-        <div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted2);margin-bottom:8px" id="timer-status">Select a phase to start</div>
-        <div class="timer-controls">
-          <button class="tc-btn primary" onclick="startTimer(1)">Phase 1 (5 min)</button>
-          <button class="tc-btn primary" onclick="startTimer(2)">Phase 2 (15 min)</button>
-          <button class="tc-btn" onclick="pauseTimer()">Pause</button>
-          <button class="tc-btn" onclick="resetTimer()">Reset</button>
-        </div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;">
-        <div style="font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:10px;">Hint format — copy this when stuck</div>
-        <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.8;background:var(--bg4);padding:10px 12px;border-radius:4px;border:1px solid var(--border);">
-          "I've been on this 15 min.<br/>
-          Pattern: [what you identified]<br/>
-          Approach: [your plan]<br/>
-          Stuck specifically at: [exact decision point]"
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);">If you can't fill in "stuck at" → pattern recognition failed. Come to mentor before restarting.</div>
-          <button id="copy-hint-btn" class="tc-btn" style="flex:none;width:auto;padding:4px 12px;" onclick="copyHintPrompt()">⎘ Copy prompt</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DECISION POINTS VIEW -->
-    <div id="view-patterns" style="display:none">
-      <div class="dp-grid" id="dp-grid"></div>
-    </div>
-
-    <!-- DEBUG VIEW -->
-    <div id="view-debug" style="display:none">
-      <div class="dbg-banner">
-        <strong>Debug = diagnose your thinking, not fix your code.</strong><br/>
-        Fill in what you know, hit "Debug in Claude". I'll identify exactly where your mental model broke and ask you one question that leads you to the fix yourself. I won't rewrite your solution.
-      </div>
-      <div class="dbg-form">
-        <div class="dbg-row">
-          <div class="dbg-field">
-            <div class="dbg-label">Problem <span>*</span></div>
-            <select class="dbg-select" id="dbg-problem" onchange="dbgFillMeta()">
-              <option value="">— select problem —</option>
-            </select>
-          </div>
-          <div class="dbg-field">
-            <div class="dbg-label">Or enter LC number manually</div>
-            <input class="dbg-input" id="dbg-lc-manual" placeholder="e.g. 704" type="number" oninput="dbgManualLc()"/>
-          </div>
-        </div>
-        <div class="dbg-row">
-          <div class="dbg-field">
-            <div class="dbg-label">Input <span>*</span></div>
-            <input class="dbg-input" id="dbg-input" placeholder='e.g. nums=[-1,0,3,5,9,12], target=9'/>
-          </div>
-          <div class="dbg-field">
-            <div class="dbg-label">Expected output <span>*</span></div>
-            <input class="dbg-input" id="dbg-expected" placeholder="e.g. 4"/>
-          </div>
-        </div>
-        <div class="dbg-row">
-          <div class="dbg-field">
-            <div class="dbg-label">What your code returned</div>
-            <input class="dbg-input" id="dbg-got" placeholder="e.g. -1"/>
-          </div>
-          <div class="dbg-field">
-            <div class="dbg-label">Error type (if any)</div>
-            <select class="dbg-select" id="dbg-error-type">
-              <option value="">— none / unknown —</option>
-              <option value="Wrong answer">Wrong answer</option>
-              <option value="Index out of bounds">Index out of bounds</option>
-              <option value="Infinite loop / TLE">Infinite loop / TLE</option>
-              <option value="NullPointerException">NullPointerException</option>
-              <option value="Stack overflow">Stack overflow</option>
-              <option value="Off by one">Off by one</option>
-            </select>
-          </div>
-        </div>
-        <div class="dbg-field full">
-          <div class="dbg-label">Your code <span>*</span></div>
-          <textarea class="dbg-textarea" id="dbg-code" rows="8" placeholder="Paste your failing solution here..."></textarea>
-        </div>
-        <div class="dbg-field full">
-          <div class="dbg-label">What you thought your code would do at the failing step</div>
-          <textarea class="dbg-textarea" id="dbg-thinking" rows="3" placeholder="e.g. I expected left to converge on index 4 but it seems to overshoot — I think my mid calculation is wrong when the array has even length..."></textarea>
-        </div>
-        <div class="dbg-actions">
-          <button class="dbg-submit" onclick="openDebugInClaude()">→ Debug in Claude</button>
-          <button class="dbg-reset"  onclick="resetDebugForm()">Clear</button>
-          <span class="dbg-hint">Opens a new Claude chat with your debug prompt pre-filled</span>
-        </div>
-      </div>
+  <div class="ss-item">
+    <div class="ss-dot" style="background:var(--amber)"></div>
+    <div class="ss-body">
+      <div class="ss-label">HLD</div>
+      <div class="ss-val" style="color:var(--muted)">coming soon</div>
     </div>
   </div>
 </div>
+
+<div class="section-divider">
+  <hr class="sd-line"/>
+  <div class="sd-label">Tracks</div>
 </div>
 
-<!-- MODAL -->
-<div class="moverlay" id="moverlay" onclick="closeIfOutside(event)">
-  <div class="modal">
-    <button class="mclose" onclick="closeModal()">✕ close</button>
-    <div class="m-lcnum" id="m-lcnum"></div>
-    <div class="m-title"  id="m-title"></div>
-    <div class="mmeta">
-      <div class="mfield"><div class="mlabel">Pattern</div>   <div class="mval" id="m-pat"></div></div>
-      <div class="mfield"><div class="mlabel">Difficulty</div><div class="mval" id="m-diff"></div></div>
-      <div class="mfield"><div class="mlabel">Time</div>      <div class="mval" id="m-time"></div></div>
-      <div class="mfield"><div class="mlabel">Space</div>     <div class="mval" id="m-space"></div></div>
-      <div class="mfield"><div class="mlabel">Status</div>    <div class="mval" id="m-status"></div></div>
+<div class="cards">
+
+  <!-- DSA -->
+  <div class="card dsa">
+    <div class="card-icon">⚡</div>
+    <div class="card-label">Track 1</div>
+    <div class="card-title">Data Structures & Algorithms</div>
+    <div class="card-desc">45 problems across two pointers, sliding window, hashing, binary search, linked lists, and stacks & queues. Struggle timer, debug view, pattern decision points.</div>
+    <div class="card-progress" id="dsa-progress">
+      <div class="cp-row"><span class="cp-label">Phase 1</span><span class="cp-val" id="dsa-p1-cnt">27/27</span></div>
+      <div class="cp-bar"><div class="cp-fill" id="dsa-p1-bar" style="width:100%;background:var(--accent)"></div></div>
+      <div class="cp-row"><span class="cp-label">Phase 2</span><span class="cp-val" id="dsa-p2-cnt">—/18</span></div>
+      <div class="cp-bar"><div class="cp-fill" id="dsa-p2-bar" style="width:0%;background:var(--amber)"></div></div>
     </div>
-    <div class="mlinks">
-      <a class="mlbtn btn-amber" id="m-lc-link" href="#" target="_blank" rel="noopener">↗ Open on LeetCode</a>
-      <button class="mlbtn btn-blue" onclick="openInClaude()">→ Open in Claude</button>
+    <div class="card-tags">
+      <span class="tag">Two pointers</span>
+      <span class="tag">Sliding window</span>
+      <span class="tag">Hashing</span>
+      <span class="tag">Binary search</span>
+      <span class="tag">Linked lists</span>
+      <span class="tag">Stacks & queues</span>
     </div>
-    <hr class="divider"/>
-    <div class="mlabel" style="margin-bottom:6px">Notes / insights</div>
-    <textarea class="note-area" id="m-notes" rows="3" placeholder="Approach · bugs hit · key insight · what broke in audit..."></textarea>
-    <div class="mactions">
-      <button class="mbtn mb-solve"  onclick="markStatus('solved')">✓ Solved</button>
-      <button class="mbtn mb-review" onclick="markStatus('review')">↻ Review</button>
-      <button class="mbtn mb-audit"  onclick="markStatus('audited')">★ Audited</button>
-      <button class="mbtn mb-ghost"  onclick="markStatus('todo')">Reset</button>
+    <div class="card-actions">
+      <a href="dsa/index.html" class="cbtn cbtn-primary-green">→ Problems</a>
     </div>
   </div>
+
+  <!-- LLD -->
+  <div class="card lld">
+    <div class="card-icon">🏛</div>
+    <div class="card-label">Track 2</div>
+    <div class="card-title">Low Level Design</div>
+    <div class="card-desc">20 patterns (17 GoF + 3 modern). 159 problems: micro-drills per pattern + full system designs. Pattern Lab teaches each pattern before you practice it.</div>
+    <div class="card-progress" id="lld-progress">
+      <div class="cp-row"><span class="cp-label">Micro-problems</span><span class="cp-val" id="lld-micro-cnt">—/136</span></div>
+      <div class="cp-bar"><div class="cp-fill" id="lld-micro-bar" style="width:0%;background:var(--purple)"></div></div>
+      <div class="cp-row"><span class="cp-label">System designs</span><span class="cp-val" id="lld-sys-cnt">—/23</span></div>
+      <div class="cp-bar"><div class="cp-fill" id="lld-sys-bar" style="width:0%;background:rgba(167,139,250,.5)"></div></div>
+    </div>
+    <div class="card-tags">
+      <span class="tag">GoF patterns</span>
+      <span class="tag">SOLID</span>
+      <span class="tag">Repository</span>
+      <span class="tag">CQRS</span>
+      <span class="tag">Event Sourcing</span>
+      <span class="tag">Python</span>
+    </div>
+    <div class="card-actions">
+      <a href="lld/index.html" class="cbtn cbtn-primary-purple">→ Problems</a>
+      <a href="lld/pattern-lab.html" class="cbtn cbtn-ghost">⇄ Pattern Lab</a>
+    </div>
+  </div>
+
+  <!-- HLD -->
+  <div class="card hld">
+    <div class="card-icon">🌐</div>
+    <div class="card-label">Track 3</div>
+    <div class="card-title">High Level Design</div>
+    <div class="card-desc">System design fundamentals: scalability, databases, caching, message queues, CAP theorem, and full system walkthroughs. Coming after DSA + LLD are complete.</div>
+    <div class="card-tags">
+      <span class="tag">Scalability</span>
+      <span class="tag">Databases</span>
+      <span class="tag">Caching</span>
+      <span class="tag">Message queues</span>
+      <span class="tag">CAP theorem</span>
+      <span class="tag">Load balancing</span>
+    </div>
+    <div class="card-actions">
+      <a href="hld/index.html" class="cbtn cbtn-primary-amber">→ View track</a>
+    </div>
+  </div>
+
 </div>
 
 <script>
-const PATTERNS=[
-  {id:'two-pointers',name:'Two pointers',phase:1,phaseLabel:'Phase 1',
-   decisionPoints:['Loop invariant — what do left/right represent at all times?','Movement logic — which pointer moves, and when?','Termination — why does crossing guarantee the answer?','Sorted input check — is sorted a precondition here?'],
-   problems:[
-    {id:1,lc:167,title:'Two Sum II',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:2,lc:15,title:'3Sum',diff:'med',time:'O(n²)',space:'O(1)'},
-    {id:3,lc:11,title:'Container With Most Water',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:4,lc:42,title:'Trapping Rain Water',diff:'hard',time:'O(n)',space:'O(1)'},
-    {id:5,lc:75,title:'Sort Colors',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:6,lc:125,title:'Valid Palindrome',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:7,lc:977,title:'Squares of a Sorted Array',diff:'easy',time:'O(n)',space:'O(n)'},
-  ]},
-  {id:'sliding-window',name:'Sliding window',phase:1,phaseLabel:'Phase 1',
-   decisionPoints:['Fixed vs variable — does window size change?','Shrink condition — when and how does left advance?','Window invariant — what property does the window always maintain?','Right-edge — what happens when right hits the end?'],
-   problems:[
-    {id:8,lc:121,title:'Best Time to Buy and Sell Stock',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:9,lc:3,title:'Longest Substring Without Repeating Chars',diff:'med',time:'O(n)',space:'O(k)'},
-    {id:10,lc:424,title:'Longest Repeating Character Replacement',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:11,lc:76,title:'Minimum Window Substring',diff:'hard',time:'O(n)',space:'O(k)'},
-    {id:12,lc:567,title:'Permutation in String',diff:'med',time:'O(n)',space:'O(1)'},
-  ]},
-  {id:'hashing',name:'Hashing',phase:1,phaseLabel:'Phase 1',
-   decisionPoints:['Key choice — what do you key on to encode the relationship?','Set vs map — is existence enough, or do you need a value?','Complement pattern — does the answer pair live in the map already?','Frequency pattern — are you counting occurrences?'],
-   problems:[
-    {id:13,lc:1,title:'Two Sum',diff:'easy',time:'O(n)',space:'O(n)'},
-    {id:14,lc:49,title:'Group Anagrams',diff:'med',time:'O(nk)',space:'O(n)'},
-    {id:15,lc:128,title:'Longest Consecutive Sequence',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:16,lc:347,title:'Top K Frequent Elements',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:17,lc:238,title:'Product of Array Except Self',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:18,lc:271,title:'Encode and Decode Strings',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:19,lc:36,title:'Valid Sudoku',diff:'med',time:'O(1)',space:'O(1)'},
-  ]},
-  {id:'binary-search',name:'Binary search',phase:2,phaseLabel:'Phase 2',
-   decisionPoints:['The invariant — left/right always bracket the answer. Never violate this.','Mid movement — does left=mid+1 or right=mid? Depends on what mid eliminates.','Loop condition — left<=right vs left<right and why each terminates correctly.','Search space — are you searching values, not indices? (Koko, capacity problems)'],
-   problems:[
-    {id:20,lc:704,title:'Binary Search',diff:'easy',time:'O(log n)',space:'O(1)'},
-    {id:21,lc:74,title:'Search a 2D Matrix',diff:'med',time:'O(log mn)',space:'O(1)'},
-    {id:22,lc:875,title:'Koko Eating Bananas',diff:'med',time:'O(n log m)',space:'O(1)'},
-    {id:23,lc:153,title:'Find Minimum in Rotated Sorted Array',diff:'med',time:'O(log n)',space:'O(1)'},
-    {id:24,lc:33,title:'Search in Rotated Sorted Array',diff:'med',time:'O(log n)',space:'O(1)'},
-    {id:25,lc:981,title:'Time Based Key-Value Store',diff:'med',time:'O(log n)',space:'O(n)'},
-  ]},
-  {id:'linked-list',name:'Linked lists',phase:2,phaseLabel:'Phase 2',
-   decisionPoints:['Reversal order — prev/curr/next must be saved before you move next.','Dummy node — use when head might change; eliminates edge case code.','Fast/slow pointer — invariant: fast moves 2x, they meet at cycle entry.','Off-by-one — draw 3-node examples before coding any list manipulation.'],
-   problems:[
-    {id:26,lc:206,title:'Reverse Linked List',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:27,lc:21,title:'Merge Two Sorted Lists',diff:'easy',time:'O(n+m)',space:'O(1)'},
-    {id:28,lc:143,title:'Reorder List',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:29,lc:19,title:'Remove Nth Node From End',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:30,lc:141,title:'Linked List Cycle',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:31,lc:23,title:'Merge K Sorted Lists',diff:'hard',time:'O(nk log k)',space:'O(k)'},
-  ]},
-  {id:'stack-queue',name:'Stacks & queues',phase:2,phaseLabel:'Phase 2',
-   decisionPoints:['Stack invariant — what property does every element in the stack maintain?','Monotonic trigger — decreasing stack for next-greater, increasing for next-smaller.','When deque — need both ends? Sliding window max/min problems.','Pop condition — before pushing, pop everything that violates the invariant.'],
-   problems:[
-    {id:32,lc:20,title:'Valid Parentheses',diff:'easy',time:'O(n)',space:'O(n)'},
-    {id:33,lc:155,title:'Min Stack',diff:'med',time:'O(1)',space:'O(n)'},
-    {id:34,lc:150,title:'Evaluate Reverse Polish Notation',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:35,lc:739,title:'Daily Temperatures',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:36,lc:853,title:'Car Fleet',diff:'med',time:'O(n log n)',space:'O(n)'},
-    {id:37,lc:84,title:'Largest Rectangle in Histogram',diff:'hard',time:'O(n)',space:'O(n)'},
-  ]},
-];
-
-const SLUGS={1:'two-sum',3:'longest-substring-without-repeating-characters',11:'container-with-most-water',15:'3sum',19:'remove-nth-node-from-end-of-list',20:'valid-parentheses',21:'merge-two-sorted-lists',23:'merge-k-sorted-lists',33:'search-in-rotated-sorted-array',36:'valid-sudoku',42:'trapping-rain-water',49:'group-anagrams',74:'search-a-2d-matrix',75:'sort-colors',76:'minimum-window-substring',84:'largest-rectangle-in-histogram',121:'best-time-to-buy-and-sell-stock',125:'valid-palindrome',128:'longest-consecutive-sequence',141:'linked-list-cycle',143:'reorder-list',150:'evaluate-reverse-polish-notation',153:'find-minimum-in-rotated-sorted-array',155:'min-stack',167:'two-sum-ii-input-array-is-sorted',206:'reverse-linked-list',238:'product-of-array-except-self',271:'encode-and-decode-strings',347:'top-k-frequent-elements',424:'longest-repeating-character-replacement',567:'permutation-in-string',704:'binary-search',739:'daily-temperatures',853:'car-fleet',875:'koko-eating-bananas',977:'squares-of-a-sorted-array',981:'time-based-key-value-store'};
-
-// pat level stored separately per pattern id
-const ALL=PATTERNS.flatMap(g=>g.problems.map(p=>({...p,patternId:g.id,patternName:g.name,phaseLabel:g.phaseLabel,phase:g.phase})));
-const lcUrl=lc=>`https://leetcode.com/problems/${SLUGS[lc]||lc}/`;
-
-let statuses=JSON.parse(localStorage.getItem('dsa-s')||'{}');
-let notes   =JSON.parse(localStorage.getItem('dsa-n')||'{}');
-let patLevel=JSON.parse(localStorage.getItem('dsa-pl')||'{}'); // {patternId: 1-4}
-let patAudit=JSON.parse(localStorage.getItem('dsa-pa')||'{}'); // {patternId: 'pending'|'done'|'due'}
-let filter='all', activeId=null, isDark=true, isMax=false, currentView='problems';
-
-// seed
-PATTERNS.filter(g=>g.phase===1).forEach(g=>g.problems.forEach(p=>{if(!statuses[p.id])statuses[p.id]='solved';}));
-PATTERNS.filter(g=>g.phase===1).forEach(g=>{if(!patLevel[g.id])patLevel[g.id]=2;if(!patAudit[g.id])patAudit[g.id]='pending';});
-save();
-
-function save(){
-  localStorage.setItem('dsa-s',JSON.stringify(statuses));
-  localStorage.setItem('dsa-n',JSON.stringify(notes));
-  localStorage.setItem('dsa-pl',JSON.stringify(patLevel));
-  localStorage.setItem('dsa-pa',JSON.stringify(patAudit));
+// ── THEME ─────────────────────────────────────
+let isDark = true;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isDark ? '🌙 theme' : '☀️ theme';
 }
 
-function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';}
-function toggleMax(){isMax=!isMax;document.getElementById('app').classList.toggle('max',isMax);document.getElementById('max-btn').textContent=isMax?'⊠':'⛶';}
+// ── READ DSA PROGRESS FROM localStorage ───────
+// DSA dashboard stores statuses under key 'dsa-s'
+function loadDSAProgress(){
+  try {
+    const statuses = JSON.parse(localStorage.getItem('dsa-s') || '{}');
+    const solved = s => s === 'solved' || s === 'audited';
 
-function setView(v, btn){
-  currentView=v;
-  ['problems','timer','patterns','debug'].forEach(x=>{document.getElementById('view-'+x).style.display=x===v?'block':'none';});
-  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('sel'));
-  if(btn)btn.classList.add('sel');
-}
+    // Phase 1: IDs 1–19 (27 problems seeded as solved by default in DSA dashboard)
+    // Phase 2: IDs 20–37 (18 problems)
+    const p1total = 27;
+    const p2total = 18;
 
-function setFilter(f){
-  filter=f;
-  const L={all:'All problems','binary-search':'Binary search','linked-list':'Linked lists','stack-queue':'Stacks & queues','two-pointers':'Two pointers','sliding-window':'Sliding window','hashing':'Hashing',phase2:'Phase 2 — active'};
-  document.getElementById('main-title').textContent=L[f]||f;
-  render();
-}
+    // Count phase 2 solved (ids 20–37)
+    let p2solved = 0;
+    for(let i = 20; i <= 37; i++){
+      if(solved(statuses[i])) p2solved++;
+    }
 
-// ── NEXT UP
-function getNext(){for(const g of PATTERNS){if(g.phase<2)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
-function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Real-world analogy (intuition only, no implementation)\n- Optimal time and space complexity — the target to hit\n\nNothing else. No pattern name, no decision points, no bugs, no hints.\nStop after the brief and wait for my attempt.\n\nWhen I share my attempt, then identify: what pattern I used, where my thinking was right or wrong, and what to correct.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
-function openNextClaude(){const n=getNext();if(n)window.open(claudeUrl(n),'_blank');}
-function openInClaude(){const p=ALL.find(x=>x.id===activeId);if(p)window.open(claudeUrl(p),'_blank');}
-function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)window.open(claudeUrl(p),'_blank');}
+    const p2pct = Math.round(p2solved / p2total * 100);
+    document.getElementById('dsa-p2-cnt').textContent = `${p2solved}/${p2total}`;
+    document.getElementById('dsa-p2-bar').style.width = p2pct + '%';
 
-// ── RENDER
-function render(){renderFilters();renderPatLevels();renderNextUp();renderProblems();renderStats();renderDecisionPoints();}
-
-function renderFilters(){
-  const dc={1:'var(--accent)',2:'var(--amber)'};
-  let h=`<button class="fbtn ${filter==='all'?'sel':''}" onclick="setFilter('all')"><span class="fdot" style="background:var(--muted)"></span>All<span class="fbadge">${ALL.filter(p=>statuses[p.id]==='solved'||statuses[p.id]==='audited').length}/${ALL.length}</span></button>`;
-  PATTERNS.forEach(g=>{
-    const d=g.problems.filter(p=>statuses[p.id]==='solved'||statuses[p.id]==='audited').length;
-    h+=`<button class="fbtn ${filter===g.id?'sel':''}" onclick="setFilter('${g.id}')"><span class="fdot" style="background:${dc[g.phase]||'var(--muted)'}"></span>${g.name}<span class="fbadge">${d}/${g.problems.length}</span></button>`;
-  });
-  document.getElementById('fnav').innerHTML=h;
-}
-
-function renderPatLevels(){
-  const levelLabel=['','L1','L2','L3','L4'];
-  const auditClass={'pending':'at-pending','done':'at-done','due':'at-due'};
-  const auditLabel={'pending':'audit pending','done':'audited','due':'re-audit due'};
-  let h='';
-  PATTERNS.forEach(g=>{
-    const lv=patLevel[g.id]||0;
-    const at=patAudit[g.id]||'';
-    const pips=[1,2,3,4].map(i=>`<div class="pip ${i<=lv?'l'+i:''}" title="Level ${i}"></div>`).join('');
-    const atag=at?`<span class="audit-tag ${auditClass[at]||''}">${auditLabel[at]||''}</span>`:'';
-    h+=`<div class="pat-row" style="cursor:pointer" onclick="promptPatLevel('${g.id}')">
-      <span class="pat-name-s">${g.name}</span>
-      <div class="level-pips">${pips}</div>
-      ${atag}
-    </div>`;
-  });
-  document.getElementById('pat-levels').innerHTML=h;
-}
-
-function promptPatLevel(patId){
-  const g=PATTERNS.find(x=>x.id===patId);if(!g)return;
-  const lv=prompt(`Set internalization level for "${g.name}" (1-4):\n1 = Recognition\n2 = Recall\n3 = Transfer ← interview ready\n4 = Teaching\n\nCurrent: ${patLevel[patId]||'not set'}`);
-  if(lv&&['1','2','3','4'].includes(lv.trim())){
-    patLevel[patId]=parseInt(lv);
-    const at=prompt('Set audit status:\n1 = pending\n2 = done\n3 = re-audit due\n\nCurrent: '+(patAudit[patId]||'none'));
-    const atMap={'1':'pending','2':'done','3':'due'};
-    if(at&&atMap[at.trim()])patAudit[patId]=atMap[at.trim()];
-    save();render();
+    // Status strip — total solved across both phases
+    // Phase 1 always 27 (seeded), phase 2 variable
+    document.getElementById('ss-dsa').textContent = `${27 + p2solved} / 45 solved`;
+  } catch(e){
+    document.getElementById('ss-dsa').textContent = 'open dashboard to load';
   }
 }
 
-function renderNextUp(){
-  const n=getNext();const el=document.getElementById('next-up');
-  if(!n){el.style.display='none';return;}
-  el.style.display='flex';
-  document.getElementById('nu-title').textContent=`LC ${n.lc} — ${n.title}`;
-  document.getElementById('nu-meta').textContent=`${n.patternName} · ${n.diff} · ${n.time} / ${n.space}`;
-  document.getElementById('nu-lc').href=lcUrl(n.lc);
-}
+// ── READ LLD PROGRESS FROM localStorage ───────
+// LLD dashboard stores statuses under key 'lld-s'
+function loadLLDProgress(){
+  try {
+    const statuses = JSON.parse(localStorage.getItem('lld-s') || '{}');
+    const solved = s => s === 'solved' || s === 'audited';
 
-function renderProblems(){
-  const groups=filter==='all'?PATTERNS:filter==='phase2'?PATTERNS.filter(g=>g.phase===2):PATTERNS.filter(g=>g.id===filter);
-  const ps={1:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,2:`color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)`};
-  let h='';
-  groups.forEach(g=>{
-    const sol=g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
-    h+=`<div class="pgroup"><div class="phdr"><span class="pname">${g.name}</span><span class="pcnt">${sol}/${g.problems.length}</span><span class="ptag" style="${ps[g.phase]||''}">${g.phaseLabel}</span></div>
-    <div class="pcols"><div class="ch"># LC</div><div class="ch">Problem</div><div class="ch c">Complexity</div><div class="ch c">Diff</div><div class="ch c">↗</div><div class="ch c">Status</div><div class="ch"></div></div>`;
-    g.problems.forEach(p=>{
-      const st=statuses[p.id]||'todo';
-      const sd=st==='solved'?`<div class="sdot sd-solved" title="Solved">✓</div>`
-               :st==='audited'?`<div class="sdot sd-audited" title="Audited">★</div>`
-               :st==='review'?`<div class="sdot sd-review" title="Needs review">↻</div>`
-               :`<div class="sdot sd-todo" title="Todo">·</div>`;
-      const hn=notes[p.id]&&notes[p.id].trim();
-      h+=`<div class="prow ${st}" onclick="openModal(${p.id})">
-        <div class="pr-num">${p.lc}</div>
-        <div class="pr-title">${p.title}${hn?'<span class="pr-note">📝</span>':''}</div>
-        <div class="pr-cx">${p.time}<br/><span style="opacity:.5">${p.space}</span></div>
-        <div><span class="dbadge d-${p.diff}">${p.diff}</span></div>
-        <div><a class="lc-link" href="${lcUrl(p.lc)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗</a></div>
-        <div>${sd}</div>
-        <div><button class="row-open" onclick="event.stopPropagation();openInClaudeById(${p.id})">→</button></div>
-      </div>`;
-    });
-    h+=`</div>`;
-  });
-  document.getElementById('prob-container').innerHTML=h;
-}
+    // Micro: ids 1–136, System: 55–66, 158–159 (approx — just count by type from stored data)
+    // Simpler: count any key in lld-s that is solved
+    const allSolved = Object.values(statuses).filter(solved).length;
+    const microTotal = 136;
+    const sysTotal   = 23;
+    const total      = 159;
 
-function renderStats(){
-  const p2=PATTERNS.filter(g=>g.phase===2).flatMap(g=>g.problems);
-  const p2s=p2.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
-  const rev=ALL.filter(p=>statuses[p.id]==='review').length;
-  const aud=ALL.filter(p=>statuses[p.id]==='audited').length;
-  document.getElementById('st-total').textContent=27+p2s;
-  document.getElementById('st-audit').textContent=aud;
-  document.getElementById('st-review').textContent=rev;
-  document.getElementById('st-p2').textContent=`${p2s}/${p2.length}`;
-  document.getElementById('p2-cnt').textContent=`${p2s}/${p2.length}`;
-  document.getElementById('p2-bar').style.width=`${Math.round(p2s/p2.length*100)}%`;
-}
+    // We don't have type info here — show total with breakdown estimate
+    const microSolved = Math.min(allSolved, microTotal);
+    const sysSolved   = Math.max(0, allSolved - microTotal);
 
-function learnPatternUrl(patternName){
-  const prompt=`I need to learn ${patternName} from scratch before attempting problems.\n\nTeach me in three parts:\n1. Mental model — what is this pattern doing, with a production system analogy\n2. Canonical skeleton — bare structure only, invariant in comments, no solution code\n3. Worked trace — walk one minimal example through the skeleton step by step\n\nAfter that, stop. I'll signal when I'm ready for the first problem.`;
-  return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
-}
+    const microPct = Math.round(microSolved / microTotal * 100);
+    const sysPct   = sysSolved > 0 ? Math.round(sysSolved / sysTotal * 100) : 0;
 
-function copyHintPrompt(){
-  const text=`I've been on this 15 min.\nPattern: [what you identified]\nApproach: [your plan at a high level]\nStuck specifically at: [the exact decision point — one sentence]`;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btn=document.getElementById('copy-hint-btn');
-    const orig=btn.textContent;btn.textContent='✓ Copied';
-    setTimeout(()=>{btn.textContent=orig;},1800);
-  });
-}
+    document.getElementById('lld-micro-cnt').textContent = `${microSolved}/${microTotal}`;
+    document.getElementById('lld-micro-bar').style.width  = microPct + '%';
+    document.getElementById('lld-sys-cnt').textContent   = `${sysSolved}/${sysTotal}`;
+    document.getElementById('lld-sys-bar').style.width   = sysPct + '%';
 
-function renderDecisionPoints(){
-  const ph={1:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,2:`color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)`};
-  let h='';
-  PATTERNS.forEach(g=>{
-    const pts=g.decisionPoints.map(dp=>{
-      const bold=dp.split('—');
-      return bold.length>1?`<li class="dp-point"><strong>${bold[0].trim()}</strong> —${bold[1]}</li>`:`<li class="dp-point">${dp}</li>`;
-    }).join('');
-    const learnUrl=learnPatternUrl(g.name);
-    h+=`<div class="dp-card">
-      <div class="dp-pat">${g.name}<span class="dp-phase-tag" style="${ph[g.phase]||''}">${g.phaseLabel}</span></div>
-      <ul class="dp-points">${pts}</ul>
-      <div class="dp-footer">
-        <a class="dp-btn dp-btn-learn" href="${learnUrl}" target="_blank" rel="noopener">→ Learn fresh in Claude</a>
-        <button class="dp-btn dp-btn-copy" onclick="copyPatternCard('${g.id}')">⎘ Copy prompt</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById('dp-grid').innerHTML=h;
-}
-
-function copyPatternCard(patId){
-  const g=PATTERNS.find(x=>x.id===patId);if(!g)return;
-  const text=`I need to learn ${g.name} from scratch before attempting problems.\n\nTeach me in three parts:\n1. Mental model — what is this pattern doing, with a production system analogy\n2. Canonical skeleton — bare structure only, invariant in comments, no solution code\n3. Worked trace — walk one minimal example through the skeleton step by step\n\nAfter that, stop. I'll signal when I'm ready for the first problem.`;
-  navigator.clipboard.writeText(text).then(()=>{
-    const btns=document.querySelectorAll('.dp-btn-copy');
-    const idx=PATTERNS.findIndex(x=>x.id===patId);
-    if(btns[idx]){const orig=btns[idx].textContent;btns[idx].textContent='✓ Copied';setTimeout(()=>{btns[idx].textContent=orig;},1800);}
-  });
-}
-
-// ── MODAL
-function openModal(id){
-  const p=ALL.find(x=>x.id===id);if(!p)return;
-  activeId=id;
-  const stLabel={'solved':'✓ Solved','review':'↻ Needs review','audited':'★ Audited','todo':'Todo'};
-  document.getElementById('m-lcnum').textContent=`LC ${p.lc}`;
-  document.getElementById('m-title').textContent=p.title;
-  document.getElementById('m-pat').textContent=p.patternName;
-  document.getElementById('m-diff').textContent=p.diff;
-  document.getElementById('m-time').textContent=p.time;
-  document.getElementById('m-space').textContent=p.space;
-  document.getElementById('m-status').textContent=stLabel[statuses[id]||'todo'];
-  document.getElementById('m-lc-link').href=lcUrl(p.lc);
-  document.getElementById('m-notes').value=notes[id]||'';
-  document.getElementById('moverlay').classList.add('open');
-}
-function closeModal(){if(activeId!==null){notes[activeId]=document.getElementById('m-notes').value;save();}document.getElementById('moverlay').classList.remove('open');activeId=null;render();}
-function closeIfOutside(e){if(e.target===document.getElementById('moverlay'))closeModal();}
-function markStatus(st){if(activeId===null)return;statuses[activeId]=st;save();document.getElementById('m-status').textContent={'solved':'✓ Solved','review':'↻ Needs review','audited':'★ Audited','todo':'Todo'}[st];render();}
-
-// ── TIMER
-let timerInterval=null, timerSeconds=0, timerLimit=0, timerRunning=false, timerPhase=0;
-function startTimer(phase){
-  clearInterval(timerInterval);
-  timerPhase=phase;
-  timerLimit=phase===1?300:900;
-  timerSeconds=0;
-  timerRunning=true;
-  document.querySelectorAll('.tp-phase').forEach((el,i)=>{el.classList.toggle('active-phase',i===phase-1);el.classList.remove('done-phase');});
-  document.getElementById('timer-status').textContent=`Phase ${phase} running — ${phase===1?'5':'15'} min limit`;
-  timerInterval=setInterval(tickTimer,1000);
-  updateTimerDisplay();
-}
-function tickTimer(){
-  timerSeconds++;
-  updateTimerDisplay();
-  if(timerSeconds>=timerLimit){
-    clearInterval(timerInterval);timerRunning=false;
-    document.getElementById('timer-status').textContent=timerPhase===1?'5 min up — name the pattern or go to mentor now':'15 min up — articulate exactly where you\'re stuck, then ask for a hint';
-    document.querySelectorAll('.tp-phase')[timerPhase-1].classList.replace('active-phase','done-phase');
+    document.getElementById('ss-lld').textContent = `${allSolved} / ${total} solved`;
+  } catch(e){
+    document.getElementById('ss-lld').textContent = 'open dashboard to load';
   }
 }
-function updateTimerDisplay(){
-  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
-  const el=document.getElementById('timer-display');
-  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  el.className='timer-display'+(timerSeconds>=timerLimit?' over':timerSeconds>=timerLimit*0.8?' warn':'');
-}
-function pauseTimer(){
-  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-status').textContent='Paused';}
-  else if(timerPhase>0){timerRunning=true;timerInterval=setInterval(tickTimer,1000);document.getElementById('timer-status').textContent='Resumed';}
-}
-function resetTimer(){clearInterval(timerInterval);timerSeconds=0;timerRunning=false;timerPhase=0;document.getElementById('timer-display').textContent='00:00';document.getElementById('timer-display').className='timer-display';document.getElementById('timer-status').textContent='Select a phase to start';document.querySelectorAll('.tp-phase').forEach(el=>{el.classList.remove('active-phase','done-phase');});}
 
-// ── EXPORT ───────────────────────────────────────────────────────────────────
-function exportXLSX(){
-  if(typeof XLSX==='undefined'){
-    alert('SheetJS still loading — try again in a second.');return;
-  }
-  const wb=XLSX.utils.book_new();
-  const today=new Date().toISOString().slice(0,10);
-
-  // ── Sheet 1: Problems ─────────────────────────────────────────────────────
-  const STATUS_LABEL={'solved':'Solved','review':'Needs review','audited':'Audited','todo':'Todo'};
-  const LEVEL_LABEL={1:'L1 — Recognition',2:'L2 — Recall',3:'L3 — Transfer',4:'L4 — Teaching'};
-
-  const probRows=[['LC #','Title','Pattern','Phase','Difficulty','Time complexity','Space complexity','Status','Pattern level','Audit status','Notes','LeetCode URL']];
-  PATTERNS.forEach(g=>{
-    const lv=patLevel[g.id]||0;
-    const at=patAudit[g.id]||'';
-    g.problems.forEach(p=>{
-      const st=statuses[p.id]||'todo';
-      probRows.push([
-        p.lc,
-        p.title,
-        g.name,
-        g.phaseLabel,
-        p.diff,
-        p.time,
-        p.space,
-        STATUS_LABEL[st]||st,
-        LEVEL_LABEL[lv]||'Not set',
-        at?at.charAt(0).toUpperCase()+at.slice(1):'—',
-        notes[p.id]||'',
-        `https://leetcode.com/problems/${SLUGS[p.lc]||p.lc}/`
-      ]);
-    });
-  });
-
-  const wsProbs=XLSX.utils.aoa_to_sheet(probRows);
-
-  // column widths
-  wsProbs['!cols']=[
-    {wch:7},{wch:42},{wch:16},{wch:10},{wch:10},
-    {wch:18},{wch:18},{wch:14},{wch:22},{wch:16},{wch:40},{wch:54}
-  ];
-
-  // header style (SheetJS CE supports limited styling via cell metadata)
-  const hdrRange=XLSX.utils.decode_range(wsProbs['!ref']);
-  for(let c=hdrRange.s.c;c<=hdrRange.e.c;c++){
-    const addr=XLSX.utils.encode_cell({r:0,c});
-    if(!wsProbs[addr])continue;
-    wsProbs[addr].s={font:{bold:true},fill:{fgColor:{rgb:'1A3A2A'}},font:{bold:true,color:{rgb:'FFFFFF'}}};
-  }
-
-  // freeze header row
-  wsProbs['!freeze']={xSplit:0,ySplit:1};
-
-  XLSX.utils.book_append_sheet(wb,wsProbs,'Problems');
-
-  // ── Sheet 2: Summary ─────────────────────────────────────────────────────
-  const p1probs=PATTERNS.filter(g=>g.phase===1).flatMap(g=>g.problems);
-  const p2probs=PATTERNS.filter(g=>g.phase===2).flatMap(g=>g.problems);
-  const allProbs=PATTERNS.flatMap(g=>g.problems);
-
-  const countBy=(arr,val)=>arr.filter(p=>(statuses[p.id]||'todo')===val).length;
-  const solvedOrAudited=p=>['solved','audited'].includes(statuses[p.id]||'todo');
-
-  const summaryRows=[
-    ['DSA Prep — Export Summary',''],
-    ['Exported on',today],
-    ['',''],
-    ['── Overall ──',''],
-    ['Total problems',allProbs.length],
-    ['Solved',allProbs.filter(solvedOrAudited).length],
-    ['Audited',countBy(allProbs,'audited')],
-    ['Needs review',countBy(allProbs,'review')],
-    ['Todo',allProbs.filter(p=>!statuses[p.id]||statuses[p.id]==='todo').length],
-    ['',''],
-    ['── Phase 1 (complete) ──',''],
-    ['Total',p1probs.length],
-    ['Solved',p1probs.filter(solvedOrAudited).length],
-    ['',''],
-    ['── Phase 2 (active) ──',''],
-    ['Total',p2probs.length],
-    ['Solved',p2probs.filter(solvedOrAudited).length],
-    ['Remaining',p2probs.filter(p=>!solvedOrAudited(p)).length],
-    ['',''],
-    ['── Pattern internalization ──',''],
-    ...PATTERNS.map(g=>[g.name,LEVEL_LABEL[patLevel[g.id]]||'Not set']),
-    ['',''],
-    ['── Audit status ──',''],
-    ...PATTERNS.map(g=>{
-      const at=patAudit[g.id]||'';
-      return [g.name,at?at.charAt(0).toUpperCase()+at.slice(1):'—'];
-    }),
-  ];
-
-  const wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
-  wsSummary['!cols']=[{wch:32},{wch:28}];
-  XLSX.utils.book_append_sheet(wb,wsSummary,'Summary');
-
-  // ── Sheet 3: Per-pattern breakdown ───────────────────────────────────────
-  const patRows=[['Pattern','Phase','Problems total','Solved','Audited','Needs review','Todo','% complete','Internalization level','Audit status']];
-  PATTERNS.forEach(g=>{
-    const ps=g.problems;
-    const sol=ps.filter(solvedOrAudited).length;
-    const aud=countBy(ps,'audited');
-    const rev=countBy(ps,'review');
-    const todo=ps.filter(p=>!statuses[p.id]||statuses[p.id]==='todo').length;
-    const pct=ps.length?Math.round(sol/ps.length*100)+'%':'0%';
-    const at=patAudit[g.id]||'';
-    patRows.push([
-      g.name,g.phaseLabel,ps.length,sol,aud,rev,todo,pct,
-      LEVEL_LABEL[patLevel[g.id]]||'Not set',
-      at?at.charAt(0).toUpperCase()+at.slice(1):'—'
-    ]);
-  });
-  const wsPat=XLSX.utils.aoa_to_sheet(patRows);
-  wsPat['!cols']=[{wch:18},{wch:10},{wch:16},{wch:8},{wch:9},{wch:14},{wch:6},{wch:12},{wch:24},{wch:16}];
-  wsPat['!freeze']={xSplit:0,ySplit:1};
-  XLSX.utils.book_append_sheet(wb,wsPat,'By pattern');
-
-  // ── Write ─────────────────────────────────────────────────────────────────
-  XLSX.writeFile(wb,`dsa-progress-${today}.xlsx`);
-}
-
-// ── DEBUG ─────────────────────────────────────────────────────────────────
-function initDebugDropdown(){
-  const sel=document.getElementById('dbg-problem');
-  PATTERNS.forEach(g=>{
-    const grp=document.createElement('optgroup');
-    grp.label=`${g.phaseLabel} — ${g.name}`;
-    g.problems.forEach(p=>{
-      const opt=document.createElement('option');
-      opt.value=p.id;
-      opt.textContent=`LC ${p.lc} — ${p.title}`;
-      grp.appendChild(opt);
-    });
-    sel.appendChild(grp);
-  });
-}
-
-function dbgFillMeta(){
-  const id=parseInt(document.getElementById('dbg-problem').value);
-  if(!id)return;
-  document.getElementById('dbg-lc-manual').value='';
-}
-
-function dbgManualLc(){
-  document.getElementById('dbg-problem').value='';
-}
-
-function getDebugProblemLabel(){
-  const selVal=document.getElementById('dbg-problem').value;
-  const manual=document.getElementById('dbg-lc-manual').value.trim();
-  if(selVal){
-    const p=ALL.find(x=>x.id===parseInt(selVal));
-    return p?`LC ${p.lc} — ${p.title}`:'';
-  }
-  if(manual) return`LC ${manual}`;
-  return'';
-}
-
-function openDebugInClaude(){
-  const code    =document.getElementById('dbg-code').value.trim();
-  const inputVal=document.getElementById('dbg-input').value.trim();
-  const expected=document.getElementById('dbg-expected').value.trim();
-  const got     =document.getElementById('dbg-got').value.trim();
-  const thinking=document.getElementById('dbg-thinking').value.trim();
-  const errType =document.getElementById('dbg-error-type').value;
-  const probLabel=getDebugProblemLabel();
-
-  if(!code||!inputVal||!expected){
-    alert('Problem input, expected output, and your code are required.');return;
-  }
-
-  const lines=[
-    probLabel?`${probLabel} — Debug session`:'Debug session',
-    '',
-    'My solution is failing. Diagnose my thinking, not just my code.',
-    '',
-    'My code:',
-    '```',
-    code,
-    '```',
-    '',
-    'Failing test case:',
-    `  Input:    ${inputVal}`,
-    `  Expected: ${expected}`,
-    got   ?`  Got:      ${got}`:'',
-    errType?`  Error:    ${errType}`:'',
-    '',
-    thinking?`What I thought my code would do at the failing step:\n${thinking}`:
-             'I am not sure why it is failing.',
-    '',
-    'Do NOT rewrite my solution. Identify exactly where my mental model is wrong,',
-    'then ask me one question that leads me to the fix myself.',
-  ].filter(l=>l!==null).join('\n');
-
-  window.open(`https://claude.ai/new?q=${encodeURIComponent(lines)}`,'_blank');
-}
-
-function resetDebugForm(){
-  ['dbg-problem','dbg-error-type'].forEach(id=>{document.getElementById(id).value='';});
-  ['dbg-lc-manual','dbg-input','dbg-expected','dbg-got','dbg-code','dbg-thinking'].forEach(id=>{document.getElementById(id).value='';});
-}
-
-// ── INIT
-render();
-initDebugDropdown();
+// ── BOOT ──────────────────────────────────────
+loadDSAProgress();
+loadLLDProgress();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
