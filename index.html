@@ -122,6 +122,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     .topics{grid-template-columns:1fr!important;}
   }
 
+  * { -webkit-overflow-scrolling: touch; }
+  a, button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -240,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="card-icon">🌐</div>
     <div class="card-label">Track 3</div>
     <div class="card-title">High Level Design</div>
-    <div class="card-desc">System design fundamentals: scalability, databases, caching, message queues, CAP theorem, and full system walkthroughs. Coming after DSA + LLD are complete.</div>
+    <div class="card-desc">25 canonical system design problems across 4 phases. 6 concept groups with trade-off frameworks. From URL shortener to distributed tracing — with a structured interview mentor prompt for every problem.</div>
     <div class="card-tags">
       <span class="tag">Scalability</span>
       <span class="tag">Databases</span>
@@ -250,7 +252,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <span class="tag">Load balancing</span>
     </div>
     <div class="card-actions">
-      <a href="hld/index.html" class="cbtn cbtn-primary-amber">→ View track</a>
+      <a href="hld/index.html" class="cbtn cbtn-primary-amber">→ Problems</a>
+      <a href="hld/concepts.html" class="cbtn cbtn-ghost">⇄ Concept Lab</a>
     </div>
   </div>
 

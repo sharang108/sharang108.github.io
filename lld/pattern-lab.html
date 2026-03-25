@@ -208,8 +208,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   .hamburger.open span:nth-child(2){opacity:0;}
   .hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
 
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;}
-  .sidebar-overlay.open{opacity:1;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .sidebar-overlay.open{opacity:1;pointer-events:auto;}
+
+  /* iOS Safari tap fixes */
+  a, button, [onclick], .fbtn, .pbtn, .pat-btn, .prow, .pb, .vtab, .tab {
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  * { -webkit-overflow-scrolling: touch; }
+  .main, .sidebar { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
 
   @media(max-width:768px){
     .hamburger{display:flex;}
@@ -251,12 +260,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="tb-dot"></div>
+  <a href="../index.html" style="font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;">prep-index</a>
+  <span style="font-family:var(--mono);color:var(--muted2);font-size:11px;"> / </span>
   <span class="tb-title">lld-prep</span>
   <span class="tb-sep"> / </span>
   <span class="tb-sub">pattern-lab</span>
   <div class="tb-right">
       <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
-    <a class="icon-btn" href="lld-dashboard.html">⇄ Problems dashboard</a>
+    <a class="icon-btn" href="index.html">⇄ Problems dashboard</a>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
 </div>
@@ -2513,7 +2524,7 @@ function renderTab() {
       <div class="action-row">
         <button class="abtn btn-purple" onclick="openInClaude('${p.id}')">→ Open challenge in Claude</button>
         <button class="abtn btn-amber" onclick="copyChallengePrompt('${p.id}')">⎘ Copy mentor prompt</button>
-        <a class="abtn" href="lld-dashboard.html#${p.id}" target="_blank"
+        <a class="abtn" href="index.html#${p.id}" target="_blank"
            style="background:rgba(45,212,191,.08);color:var(--teal);border:1px solid rgba(45,212,191,.25);">
           ⇄ Practice problems
         </a>
@@ -2549,11 +2560,12 @@ After I answer and show you my design attempt:
 5. Flag any un-Pythonic patterns (missing ABCs, wrong use of dataclasses, etc.)`;
 }
 
+function iosOpen(url,blank){const a=document.createElement("a");a.href=url;if(blank)a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();document.body.removeChild(a);}
 function openInClaude(patId) {
   const p = PATTERNS.find(x => x.id === patId);
   if (!p) return;
   const prompt = buildClaudePrompt(p);
-  window.open(`https://claude.ai/new?q=${encodeURIComponent(prompt)}`, '_blank');
+  iosOpen(`https://claude.ai/new?q=${encodeURIComponent(prompt, false)}`, '_blank');
 }
 
 function copyChallengePrompt(patId) {

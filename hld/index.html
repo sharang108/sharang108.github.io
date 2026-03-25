@@ -3,186 +3,777 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>HLD Prep</title>
+<title>HLD · Problems</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-:root{--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--amber:#fbbf24;--tr:0.18s ease;}
-[data-theme="dark"]{--bg:#0d0f11;--bg2:#13161a;--bg3:#1a1e23;--bg4:#1f242b;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e2e4e7;--muted:#4e5666;--muted2:#7a8090;}
-[data-theme="light"]{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0ede8;--bg4:#e8e5df;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1a1c20;--muted:#9a9fa8;--muted2:#6b7280;}
+:root{--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --accent:#4ade80;--amber:#fbbf24;--blue:#60a5fa;--coral:#f87171;
+  --purple:#a78bfa;--teal:#2dd4bf;--orange:#fb923c;--tr:0.18s ease;}
+[data-theme="dark"]{--bg:#0d0f11;--bg2:#13161a;--bg3:#1a1e23;--bg4:#1f242b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e2e4e7;--muted:#4e5666;--muted2:#7a8090;}
+[data-theme="light"]{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0ede8;--bg4:#e8e5df;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --text:#1a1c20;--muted:#9a9fa8;--muted2:#6b7280;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;transition:background var(--tr),color var(--tr);}
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;height:52px;gap:10px;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;transition:background var(--tr),color var(--tr);}
+
+.shell{display:grid;grid-template-columns:268px 1fr;grid-template-rows:52px 1fr;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:52px;gap:10px;position:sticky;top:0;z-index:100;}
 .tb-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 7px var(--amber);flex-shrink:0;}
+.tb-link{font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;}
+.tb-link:hover{color:var(--text);}
+.tb-sep{font-family:var(--mono);color:var(--muted2);font-size:11px;}
 .tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
-.tb-sep,.tb-sub{font-family:var(--mono);color:var(--muted2);font-size:11px;}
-.tb-right{margin-left:auto;display:flex;gap:7px;}
-.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;text-decoration:none;}
+.tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;cursor:pointer;font-family:var(--mono);font-size:11px;transition:all .12s;color:var(--muted2);gap:5px;text-decoration:none;white-space:nowrap;}
 .icon-btn:hover{background:var(--bg4);color:var(--text);}
+.phase-pill{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;letter-spacing:.05em;text-transform:uppercase;}
+.pill-active{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25);}
+.pill-locked{background:var(--border);color:var(--muted2);border:1px solid var(--border2);}
 
-.content{max-width:640px;margin:80px auto;padding:0 24px;text-align:center;}
-.coming-icon{font-size:48px;margin-bottom:24px;}
-.coming-label{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px;}
-.coming-title{font-family:var(--mono);font-size:22px;font-weight:600;margin-bottom:14px;}
-.coming-desc{font-size:13px;color:var(--muted2);line-height:1.8;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto;}
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 32px;overflow-y:auto;}
+.s-sec{margin-bottom:22px;}
+.s-lbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 16px;margin-bottom:7px;}
+.pb{padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;}
+.pb:hover:not(.locked){background:var(--bg3);}
+.pb.locked{opacity:.4;cursor:default;}
+.pb-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.pb-name{font-family:var(--mono);font-size:11px;font-weight:500;}
+.pb-cnt{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.pb-bar{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.fnav{padding:0 8px;display:flex;flex-direction:column;gap:1px;}
+.fbtn{font-family:var(--mono);font-size:11px;color:var(--muted2);padding:5px 8px;border-radius:4px;cursor:pointer;border:none;background:none;text-align:left;width:100%;transition:all .1s;display:flex;align-items:center;gap:6px;}
+.fbtn:hover{background:var(--bg3);color:var(--text);}
+.fbtn.sel{background:var(--bg3);color:var(--text);}
+.fdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.fbadge{margin-left:auto;font-size:9px;opacity:.5;font-family:var(--mono);}
+.stats-strip{padding:0 16px;display:flex;flex-direction:column;gap:6px;}
+.stat-row{display:flex;justify-content:space-between;}
+.stat-key{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.stat-val{font-family:var(--mono);font-size:11px;font-weight:500;}
 
-.topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:32px;text-align:left;}
-.topic{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:10px 14px;}
-.t-title{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:3px;}
-.t-desc{font-size:11px;color:var(--muted2);}
+/* MAIN */
+.main{padding:22px 26px;overflow-y:auto;background:var(--bg);}
+.mhdr{margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.mhdr h1{font-family:var(--mono);font-size:16px;font-weight:500;flex:1;}
+.view-tabs{display:flex;gap:4px;}
+.vtab{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted2);transition:all .1s;}
+.vtab:hover{color:var(--text);border-color:var(--border2);}
+.vtab.sel{background:var(--bg3);color:var(--text);border-color:var(--border2);}
 
-.prereq{background:var(--bg3);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--amber);border-radius:5px;padding:12px 16px;font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.7;text-align:left;}
-.prereq strong{color:var(--text);}
+/* NEXT UP */
+.next-up{background:var(--bg3);border:1px solid rgba(251,191,36,.18);border-left:3px solid var(--amber);border-radius:6px;padding:11px 14px;margin-bottom:20px;display:flex;align-items:center;gap:14px;}
+.nu-lbl{font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.nu-title{font-family:var(--mono);font-size:13px;font-weight:500;}
+.nu-meta{font-size:11px;color:var(--muted2);margin-top:1px;font-family:var(--mono);}
+.nu-actions{margin-left:auto;display:flex;gap:7px;flex-shrink:0;}
+.nbtn{font-family:var(--mono);font-size:11px;font-weight:500;white-space:nowrap;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;transition:all .12s;display:inline-flex;align-items:center;gap:4px;}
+.btn-amber{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.btn-amber:hover{background:rgba(251,191,36,.18);}
+.btn-blue{background:rgba(96,165,250,.1);color:var(--blue);border-color:rgba(96,165,250,.25);}
+.btn-blue:hover{background:rgba(96,165,250,.17);}
 
-  /* ── MOBILE RESPONSIVE ── */
-  .hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:4px;background:none;border:1px solid var(--border2);transition:all .12s;}
-  .hamburger:hover{background:var(--bg4);}
-  .hamburger span{display:block;width:16px;height:1.5px;background:var(--muted2);border-radius:2px;transition:all .2s;}
-  .hamburger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
-  .hamburger.open span:nth-child(2){opacity:0;}
-  .hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+/* PROBLEM TABLE */
+.pgroup{margin-bottom:28px;}
+.phdr{display:flex;align-items:center;gap:10px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.pname{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;}
+.pcnt{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.ptag{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em;margin-left:auto;}
+.pcols{display:grid;grid-template-columns:36px 1fr 160px 70px 28px 42px;padding:3px 9px 5px;gap:4px;}
+.ch{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.ch.c{text-align:center;}
+.prow{display:grid;grid-template-columns:36px 1fr 160px 70px 28px 42px;align-items:center;padding:8px 9px;border-radius:5px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all .1s;gap:4px;}
+.prow:hover{background:var(--bg3);border-color:var(--border);}
+.pr-num{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.pr-title{font-family:var(--sans);font-size:13px;display:flex;align-items:center;gap:6px;}
+.pr-note{font-size:10px;opacity:.6;}
+.pr-concepts{font-family:var(--mono);font-size:9px;color:var(--muted2);line-height:1.5;}
+.dbadge{font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 5px;border-radius:3px;text-align:center;width:fit-content;margin:0 auto;}
+.d-easy{color:var(--accent);background:rgba(74,222,128,.08);}
+.d-med{color:var(--amber);background:rgba(251,191,36,.08);}
+.d-hard{color:var(--coral);background:rgba(248,113,113,.08);}
+.sdot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;margin:0 auto;font-family:var(--mono);}
+.sd-solved{background:rgba(74,222,128,.15);color:var(--accent);}
+.sd-review{background:rgba(251,191,36,.15);color:var(--amber);}
+.sd-audited{background:rgba(167,139,250,.15);color:var(--purple);}
+.sd-todo{background:var(--border);color:var(--muted);}
+.row-open{font-family:var(--mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 7px;border-radius:3px;cursor:pointer;transition:all .1s;white-space:nowrap;}
+.row-open:hover{border-color:var(--amber);color:var(--amber);}
 
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;}
-  .sidebar-overlay.open{opacity:1;}
+/* TIMER */
+.timer-panel{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:20px;}
+.tp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tp-title{font-family:var(--mono);font-size:11px;font-weight:600;}
+.tp-sub{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.tp-phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.tp-phase{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:10px 12px;}
+.tp-phase.active-phase{border-color:var(--amber);background:rgba(251,191,36,.05);}
+.tp-phase.done-phase{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04);}
+.tp-num{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.tp-name{font-family:var(--mono);font-size:11px;font-weight:500;margin-bottom:2px;}
+.tp-limit{font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:6px;}
+.tp-desc{font-size:11px;color:var(--muted2);line-height:1.5;}
+.timer-display{font-family:var(--mono);font-size:22px;font-weight:600;text-align:center;margin:8px 0 4px;}
+.timer-display.warn{color:var(--amber);}
+.timer-display.over{color:var(--coral);}
+.timer-controls{display:flex;gap:6px;margin-top:8px;}
+.tc-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);transition:all .1s;flex:1;text-align:center;}
+.tc-btn:hover{color:var(--text);border-color:var(--text);}
+.tc-btn.primary{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
 
-  @media(max-width:768px){
-    .hamburger{display:flex;}
-    .shell{grid-template-columns:1fr;grid-template-rows:52px 1fr;}
-    .sidebar{
-      position:fixed;top:52px;left:0;bottom:0;width:280px;
-      transform:translateX(-100%);transition:transform .25s ease;
-      z-index:999;border-right:1px solid var(--border2);
-    }
-    .sidebar.open{transform:translateX(0);}
-    .sidebar-overlay{display:block;}
-    .main{padding:14px 14px;}
-    .tp-phases{grid-template-columns:1fr!important;}
-    .dp-grid{grid-template-columns:1fr!important;}
-    .dbg-row{grid-template-columns:1fr!important;}
-    .solid-grid{grid-template-columns:1fr!important;}
-    .analogy-grid{grid-template-columns:1fr!important;}
-    /* problem table — hide less important cols on mobile */
-    .pcols{display:none!important;}
-    .prow{
-      grid-template-columns:1fr auto!important;
-      gap:6px!important;
-      padding:10px 10px!important;
-    }
-    .prow > *:not(.pr-title):not(:last-child){display:none!important;}
-    .prow > .pr-title{font-size:13px;}
-    .prow > :last-child{display:flex!important;}
-    .nu-actions{flex-direction:column;gap:5px;}
-    .analogy-item{grid-column:1/-1!important;}
-    .modal{width:100%!important;max-width:100%!important;margin:0!important;border-radius:0!important;max-height:85vh!important;position:fixed!important;bottom:0!important;left:0!important;transform:translateY(100%)!important;}
-    .moverlay.open .modal{transform:translateY(0)!important;}
-    .moverlay{align-items:flex-end!important;}
-  }
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;pointer-events:none;transition:opacity .15s;}
+.moverlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;width:640px;max-width:96vw;padding:24px;position:relative;transform:translateY(8px);transition:transform .15s,background var(--tr);max-height:90vh;overflow-y:auto;}
+.moverlay.open .modal{transform:translateY(0);}
+.mclose{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--muted2);background:none;border:1px solid var(--border);padding:3px 7px;border-radius:3px;cursor:pointer;}
+.mclose:hover{color:var(--text);border-color:var(--border2);}
+.m-id{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-bottom:3px;}
+.m-title{font-family:var(--mono);font-size:15px;font-weight:500;margin-bottom:10px;}
+.mmeta{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;}
+.mfield{display:flex;flex-direction:column;gap:2px;}
+.mlabel{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.mval{font-family:var(--mono);font-size:12px;}
+.m-desc{font-size:12px;color:var(--muted2);line-height:1.7;background:var(--bg3);border-radius:4px;padding:10px 12px;margin-bottom:10px;border:1px solid var(--border);}
+.m-reqs{margin-bottom:10px;}
+.m-req{display:flex;gap:8px;font-size:11px;color:var(--muted2);padding:3px 0;line-height:1.6;}
+.m-req::before{content:'·';color:var(--muted);flex-shrink:0;}
+.m-concepts-box{font-family:var(--mono);font-size:10px;color:var(--muted2);background:var(--bg3);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--amber);border-radius:4px;padding:8px 10px;margin-bottom:12px;line-height:1.8;}
+.m-concepts-box strong{color:var(--amber);}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.note-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 11px;resize:none;line-height:1.7;outline:none;}
+.note-area:focus{border-color:var(--border2);}
+.mlinks{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.mlbtn{font-family:var(--mono);font-size:10px;font-weight:500;padding:5px 10px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .1s;}
+.mactions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.mbtn{font-family:var(--mono);font-size:11px;font-weight:500;padding:6px 13px;border-radius:4px;cursor:pointer;border:1px solid;transition:all .1s;}
+.mb-solve{background:rgba(74,222,128,.1);color:var(--accent);border-color:rgba(74,222,128,.3);}
+.mb-solve:hover{background:rgba(74,222,128,.18);}
+.mb-review{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.mb-review:hover{background:rgba(251,191,36,.18);}
+.mb-audit{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3);}
+.mb-audit:hover{background:rgba(167,139,250,.18);}
+.mb-ghost{background:none;color:var(--muted2);border-color:var(--border);}
+.mb-ghost:hover{color:var(--text);border-color:var(--border2);}
 
+/* MOBILE */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:4px;background:none;border:1px solid var(--border2);}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--muted2);border-radius:2px;transition:all .2s;}
+.hamburger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;pointer-events:none;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .shell{grid-template-columns:1fr;grid-template-rows:52px 1fr;}
+  .sidebar{position:fixed;top:52px;left:0;bottom:0;width:280px;transform:translateX(-100%);transition:transform .25s ease;z-index:999;border-right:1px solid var(--border2);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{display:block;}
+  .main{padding:14px;}
+  .tp-phases{grid-template-columns:1fr!important;}
+  .pcols{display:none!important;}
+  .prow{grid-template-columns:1fr auto!important;gap:6px!important;padding:10px!important;}
+  .prow>*:not(.pr-title):not(:last-child){display:none!important;}
+  .prow>:last-child{display:flex!important;}
+  .nu-actions{flex-direction:column;gap:5px;}
+  .modal{width:100%!important;max-width:100%!important;border-radius:0!important;position:fixed!important;bottom:0!important;left:0!important;max-height:85vh!important;transform:translateY(100%)!important;}
+  .moverlay.open .modal{transform:translateY(0)!important;}
+  .moverlay{align-items:flex-end!important;}
+}
+a,button,[onclick],.prow,.pb,.fbtn{-webkit-tap-highlight-color:transparent;cursor:pointer;}
+*{-webkit-overflow-scrolling:touch;}
+.main,.sidebar{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
+<div class="sidebar-overlay"></div>
+<div class="shell">
 
 <div class="topbar">
   <div class="tb-dot"></div>
-  <a href="../index.html" style="font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;">prep-index</a>
+  <a href="../index.html" class="tb-link">prep-index</a>
   <span class="tb-sep"> / </span>
   <span class="tb-title">hld-prep</span>
   <span class="tb-sep"> / </span>
-  <span class="tb-sub">coming soon</span>
+  <span style="font-family:var(--mono);color:var(--muted2);font-size:11px;">problems</span>
   <div class="tb-right">
-      <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
-    <a href="../index.html" class="icon-btn">← Home</a>
+    <button class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></button>
+    <span class="phase-pill pill-active">Phase 1–2 active</span>
+    <span class="phase-pill pill-locked">Phase 3–4 🔒</span>
+    <a href="concepts.html" class="icon-btn">⇄ Concept lab</a>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
 </div>
 
-<div class="content">
-  <div class="coming-icon">🌐</div>
-  <div class="coming-label">Track 3 — Not started</div>
-  <div class="coming-title">High Level Design</div>
-  <div class="coming-desc">
-    This track covers system design fundamentals — the kind of problems asked in senior and staff-level interviews. It unlocks after DSA Phase 3+ and LLD Phase 2 are complete.
+<div class="sidebar">
+  <div class="s-sec">
+    <div class="s-lbl">Progress</div>
+    <div id="phase-progress"></div>
   </div>
+  <div class="s-sec">
+    <div class="s-lbl">Filter by concept</div>
+    <div class="fnav" id="fnav"></div>
+  </div>
+  <div class="s-sec">
+    <div class="s-lbl">Stats</div>
+    <div class="stats-strip" id="stats-strip"></div>
+  </div>
+</div>
 
-  <div class="topics">
-    <div class="topic">
-      <div class="t-title">Scalability fundamentals</div>
-      <div class="t-desc">Horizontal vs vertical, load balancing, stateless design</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">Database design</div>
-      <div class="t-desc">SQL vs NoSQL, sharding, replication, indexing</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">Caching</div>
-      <div class="t-desc">Cache strategies, eviction, Redis, CDN</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">Message queues</div>
-      <div class="t-desc">Kafka, SQS, async patterns, ordering guarantees</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">CAP theorem</div>
-      <div class="t-desc">Consistency vs availability tradeoffs, eventual consistency</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">System walkthroughs</div>
-      <div class="t-desc">URL shortener, Twitter feed, rate limiter, search</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">API design</div>
-      <div class="t-desc">REST vs GraphQL vs gRPC, pagination, versioning</div>
-    </div>
-    <div class="topic">
-      <div class="t-title">Reliability</div>
-      <div class="t-desc">Circuit breakers, retries, idempotency, SLOs</div>
+<div class="main" id="main">
+  <div class="mhdr">
+    <h1 id="main-title">All problems</h1>
+    <div class="view-tabs">
+      <button class="vtab sel" onclick="setView('problems',this)">Problems</button>
+      <button class="vtab"     onclick="setView('timer',this)">Timer</button>
     </div>
   </div>
 
-  <div class="prereq">
-    <strong>Recommended prerequisites before starting HLD:</strong><br/>
-    DSA Phase 2 complete · LLD Phases 1–2 complete · All core patterns at L3
+  <div id="view-problems">
+    <div class="next-up" id="next-up" style="display:none">
+      <div>
+        <div class="nu-lbl">↳ next up</div>
+        <div class="nu-title" id="nu-title">—</div>
+        <div class="nu-meta"  id="nu-meta">—</div>
+      </div>
+      <div class="nu-actions">
+        <button class="nbtn btn-amber" onclick="openNextClaude()">→ Open in Claude</button>
+      </div>
+    </div>
+    <div id="prob-container"></div>
+  </div>
+
+  <div id="view-timer" style="display:none">
+    <div class="timer-panel">
+      <div class="tp-header">
+        <span class="tp-title">HLD struggle timer</span>
+        <span class="tp-sub" id="timer-status">Select a phase to start</span>
+      </div>
+      <div class="tp-phases">
+        <div class="tp-phase" id="tp1">
+          <div class="tp-num">Phase 1</div>
+          <div class="tp-name">Requirements</div>
+          <div class="tp-limit">5 min</div>
+          <div class="tp-desc">Clarify functional + non-functional requirements. Estimate scale (DAU, QPS, storage). Never start designing before this.</div>
+        </div>
+        <div class="tp-phase" id="tp2">
+          <div class="tp-num">Phase 2</div>
+          <div class="tp-name">High-level design</div>
+          <div class="tp-limit">15 min</div>
+          <div class="tp-desc">Draw the boxes and arrows. Identify major components. Don't go deep yet — breadth first. Get interviewer alignment before deep-diving.</div>
+        </div>
+        <div class="tp-phase" id="tp3">
+          <div class="tp-num">Phase 3</div>
+          <div class="tp-name">Deep dive</div>
+          <div class="tp-limit">10 min</div>
+          <div class="tp-desc">Pick 1–2 hard components. Go deep on data model, bottlenecks, failure modes. Interviewer will guide which area to focus.</div>
+        </div>
+      </div>
+      <div class="timer-display" id="timer-display">00:00</div>
+      <div class="timer-controls">
+        <button class="tc-btn primary" onclick="startTimer(1)">Phase 1 (5 min)</button>
+        <button class="tc-btn primary" onclick="startTimer(2)">Phase 2 (15 min)</button>
+        <button class="tc-btn primary" onclick="startTimer(3)">Phase 3 (10 min)</button>
+        <button class="tc-btn" onclick="pauseTimer()">Pause</button>
+        <button class="tc-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px 16px;">
+      <div style="font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:10px;">HLD interview structure</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);background:var(--bg4);padding:10px 12px;border-radius:4px;border:1px solid var(--border);line-height:1.9;">
+        1. Clarify requirements (5 min) — functional + non-functional + scale estimates<br/>
+        2. High-level design (15 min) — components, data flow, API design<br/>
+        3. Deep dive (10 min) — DB schema, scaling bottlenecks, failure handling<br/>
+        4. Trade-off discussion — justify every choice, know the alternatives
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="moverlay" id="moverlay" onclick="closeIfOutside(event)">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()">✕ close</button>
+    <div class="m-id"    id="m-id"></div>
+    <div class="m-title" id="m-title"></div>
+    <div class="mmeta">
+      <div class="mfield"><div class="mlabel">Phase</div>     <div class="mval" id="m-phase"></div></div>
+      <div class="mfield"><div class="mlabel">Difficulty</div><div class="mval" id="m-diff"></div></div>
+      <div class="mfield"><div class="mlabel">Scale</div>     <div class="mval" id="m-scale"></div></div>
+      <div class="mfield"><div class="mlabel">Status</div>    <div class="mval" id="m-status"></div></div>
+    </div>
+    <div class="m-desc" id="m-desc"></div>
+    <div class="m-concepts-box" id="m-concepts"></div>
+    <div class="m-reqs" id="m-reqs"></div>
+    <div class="mlinks">
+      <button class="mlbtn btn-amber" onclick="openModalClaude()">→ Open in Claude</button>
+      <button class="mlbtn" onclick="copyModalPrompt()" style="background:none;color:var(--muted2);border:1px solid var(--border);">⎘ Copy prompt</button>
+    </div>
+    <hr class="divider"/>
+    <div class="mlabel" style="margin-bottom:6px">Notes / decisions / trade-offs</div>
+    <textarea class="note-area" id="m-notes" rows="3" placeholder="Why X over Y · bottlenecks identified · what the interviewer probed · what you missed..."></textarea>
+    <div class="mactions">
+      <button class="mbtn mb-solve"  onclick="markStatus('solved')">✓ Solved</button>
+      <button class="mbtn mb-review" onclick="markStatus('review')">↻ Review</button>
+      <button class="mbtn mb-audit"  onclick="markStatus('audited')">★ Audited</button>
+      <button class="mbtn mb-ghost"  onclick="markStatus('todo')">Reset</button>
+    </div>
   </div>
 </div>
 
 <script>
-let isDark = true;
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const GROUPS = [
+  {
+    id:'foundational', name:'Foundational Systems', phase:1, color:'var(--accent)',
+    problems:[
+      {id:1,  title:'URL Shortener',              diff:'easy', scale:'10M URLs/day',
+       desc:'Design a system like bit.ly or tinyurl.com. Users submit a long URL and receive a short alias. Clicking the short URL redirects to the original.',
+       concepts:['Hashing · Base62 encoding','Key-value store (Redis/DynamoDB)','Redirection (301 vs 302)','Rate limiting on creation'],
+       reqs:['Shorten URL in < 100ms · Redirect in < 10ms','Handle 100M URLs total, 10M new/day','Analytics: click count per URL','Custom aliases optional'],
+       keyDecision:'301 vs 302 redirect — 301 is cached by browser (less server load), 302 is not (accurate analytics). Which do you choose and why?'},
+      {id:2,  title:'Pastebin',                   diff:'easy', scale:'10M pastes/day',
+       desc:'Design a system where users can store and share plain text. Each paste gets a unique URL. Pastes expire after a configurable time.',
+       concepts:['Object storage (S3)','Metadata DB (Postgres)','TTL-based expiry','Content hashing for deduplication'],
+       reqs:['Store text up to 10MB per paste','Unique short URL per paste','Expiry: 1hr / 1day / 1week / never','Read:write ratio 5:1'],
+       keyDecision:'Store paste content in the database or in object storage? At what size does the answer change?'},
+      {id:3,  title:'Rate Limiter',                diff:'easy', scale:'100K req/sec',
+       desc:'Design a distributed rate limiter that limits API requests per user and per IP. Must work across multiple app server instances.',
+       concepts:['Token bucket · Sliding window · Fixed window','Redis INCR + EXPIRE','Distributed state sharing','Response headers (X-RateLimit-*)'],
+       reqs:['100 req/min per user, 1000 req/min per IP','Works across 50 app server instances','< 5ms overhead per request','Graceful degradation if Redis is down'],
+       keyDecision:'Token bucket vs sliding window — token bucket allows bursting, sliding window is smoother. Which is better for an API protecting a payment endpoint?'},
+      {id:4,  title:'Key-Value Store',             diff:'easy', scale:'1M ops/sec',
+       desc:'Design a distributed key-value store like Redis or DynamoDB. Support get, set, delete, and TTL. Handle node failures gracefully.',
+       concepts:['Consistent hashing','Replication factor','CAP theorem: CP vs AP','LSM tree vs B-tree storage'],
+       reqs:['< 1ms p99 for get/set','Data replication across 3 nodes','Automatic failover on node death','TTL with lazy + active expiry'],
+       keyDecision:'During a network partition, do you serve stale reads (AP) or reject reads until consistency is restored (CP)? Justify for a session cache use case vs a financial ledger.'},
+      {id:5,  title:'Web Crawler',                 diff:'med',  scale:'1B pages/month',
+       desc:'Design a distributed web crawler that discovers and indexes web pages. Handle deduplication, politeness (robots.txt), and re-crawl scheduling.',
+       concepts:['BFS with distributed queue (Kafka)','URL deduplication (Bloom filter)','DNS caching','Politeness: per-domain rate limiting'],
+       reqs:['Crawl 1B pages/month (400 pages/sec)','Respect robots.txt','Deduplicate: don\'t crawl same URL twice in 24h','Store raw HTML + extracted links'],
+       keyDecision:'How do you deduplicate 1B URLs efficiently? A HashSet in memory won\'t fit. A database lookup per URL is too slow. What data structure handles this at scale?'},
+      {id:6,  title:'Typeahead / Autocomplete',    diff:'med',  scale:'10M queries/day',
+       desc:'Design a search autocomplete system that returns the top 5 suggestions as a user types, with < 100ms latency.',
+       concepts:['Trie data structure','Prefix caching in Redis','Offline suggestion ranking','Debouncing on client'],
+       reqs:['Return top 5 suggestions in < 100ms','Suggestions ranked by historical query frequency','Update rankings daily from query logs','Handle 10M queries/day'],
+       keyDecision:'Should you serve suggestions from a Trie in memory, a prefix cache in Redis, or a full-text search engine? Argue the latency and freshness trade-off for each.'},
+      {id:7,  title:'Consistent Hashing',          diff:'med',  scale:'N/A — concept',
+       desc:'Implement and explain consistent hashing. Show how it solves the rehashing problem when nodes are added or removed from a distributed cache cluster.',
+       concepts:['Hash ring','Virtual nodes (vnodes)','Node addition / removal','Hot spot prevention'],
+       reqs:['When a node is added, only 1/N keys should migrate','Virtual nodes for even distribution','Support weighted nodes (different capacity)','Handle hot-spot keys that hit one node disproportionately'],
+       keyDecision:'Without virtual nodes, adding a node only relieves the adjacent node on the ring. How many virtual nodes per physical node is a reasonable default — and what\'s the trade-off of too many?'},
+      {id:8,  title:'Unique ID Generator',         diff:'easy', scale:'10K IDs/sec',
+       desc:'Design a distributed unique ID generator. IDs must be globally unique, roughly time-sortable, and not expose internal counters.',
+       concepts:['Twitter Snowflake format','UUID v4 vs Snowflake','Clock skew problem','Epoch + machine ID + sequence'],
+       reqs:['Globally unique across all instances','Roughly time-sortable (newer IDs > older IDs)','Generate 10K IDs/sec per node','64-bit integer preferred (fits in DB index)'],
+       keyDecision:'UUID v4 is truly random — no time ordering, 128 bits, can\'t index efficiently. Snowflake is time-sortable and 64-bit but requires a clock. When does UUID win and when does Snowflake win?'},
+    ]
+  },
+  {
+    id:'mid-scale', name:'Mid-Scale Systems', phase:2, color:'var(--amber)',
+    problems:[
+      {id:9,  title:'Twitter / Social Feed',       diff:'med',  scale:'300M DAU',
+       desc:'Design a social media feed where users follow others and see a merged timeline of their posts, ranked by recency.',
+       concepts:['Fan-out on write vs fan-out on read','Timeline cache (Redis sorted set)','Celebrity problem (hot users)','Hybrid approach'],
+       reqs:['Post tweet: < 500ms','Load feed: < 200ms, 20 tweets per page','Support 300M DAU, 500M tweets/day','Celebrities (10M+ followers) handled specially'],
+       keyDecision:'Fan-out on write: pre-compute timelines at tweet time (fast reads, expensive for celebrities). Fan-out on read: compute at read time (flexible, slow for active users). How do you decide which to use — and can you use both?'},
+      {id:10, title:'Instagram / Photo Sharing',   diff:'med',  scale:'1B photos',
+       desc:'Design a photo sharing platform. Users upload photos, follow others, see a feed of followed users\' photos. Photos must be served globally with low latency.',
+       concepts:['CDN for media delivery','Object storage (S3)','Photo processing pipeline (resize, compress)','Feed generation (similar to Twitter)'],
+       reqs:['Upload photo: < 2s for processing','Serve photo: < 100ms globally','1B photos, 100M DAU','Feed shows latest 50 photos from followed users'],
+       keyDecision:'Photo upload involves: receive raw file → validate → resize to 3 resolutions → store in S3 → update feed. Which of these steps must be synchronous (user waits) and which can be async?'},
+      {id:11, title:'Notification System',         diff:'med',  scale:'10B notifs/day',
+       desc:'Design a notification delivery system that sends push notifications, emails, and SMS triggered by platform events across 500M users.',
+       concepts:['Fan-out via message queue','Provider abstraction (APNs, FCM, Twilio, SendGrid)','Retry with dead-letter queue','User preference filtering'],
+       reqs:['Deliver push notification in < 5 seconds','Support email, SMS, in-app, push','User can configure preferences per notification type','10B notifications/day across all channels'],
+       keyDecision:'If a user\'s device is offline when a push notification is sent, the push provider queues it. But if 10 notifications arrive while offline, do you deliver all 10 or only the most recent? How does your data model support this choice?'},
+      {id:12, title:'Chat System (WhatsApp)',       diff:'med',  scale:'100B msgs/day',
+       desc:'Design a 1-to-1 and group chat system with message delivery guarantees, online presence, and message history.',
+       concepts:['WebSocket for real-time delivery','Message queue for offline delivery','Read receipts (delivered vs read)','Presence service'],
+       reqs:['Message delivery < 500ms when online','Offline message queuing — deliver when reconnected','Group chats up to 500 members','Message history: last 30 days searchable'],
+       keyDecision:'Each user\'s messages are stored in their own chat history. For group chats with 500 members, do you store 500 copies of each message (fan-out on write) or one copy with a delivery tracking table (fan-out on read)? Calculate the storage difference at 1B groups.'},
+      {id:13, title:'Google Drive / File Storage', diff:'med',  scale:'1B files',
+       desc:'Design a cloud file storage system with upload, download, sync across devices, sharing, and collaborative edit detection.',
+       concepts:['Chunked upload for large files','Delta sync (only changed chunks)','Conflict resolution','Metadata service vs storage service'],
+       reqs:['Upload files up to 50GB','Sync changes across devices in < 30 seconds','Share files with permissions (view/edit)','Offline edits synced on reconnect'],
+       keyDecision:'A user edits a 1GB file by changing 3 sentences. Do you re-upload the entire 1GB or only the changed chunks? How do you detect which chunks changed?'},
+      {id:14, title:'YouTube / Video Platform',    diff:'hard', scale:'500hrs video/min',
+       desc:'Design a video upload, processing, and streaming platform. Users upload raw video; platform transcodes and streams to millions of viewers.',
+       concepts:['Video transcoding pipeline (async)','Adaptive bitrate streaming (HLS/DASH)','CDN for video delivery','View count (approximate counters)'],
+       reqs:['Support uploads up to 12 hours / 100GB raw','Transcode to 4 qualities: 360p, 720p, 1080p, 4K','Stream globally with < 200ms start time','View count: approximate is fine, eventual consistency OK'],
+       keyDecision:'Video transcoding is CPU-intensive and takes 10 minutes for a 1-hour video. Does the uploader wait for transcoding to complete, or is it async? If async, what do you show viewers before transcoding is done?'},
+      {id:15, title:'Ride-Sharing (Uber)',          diff:'hard', scale:'20M rides/day',
+       desc:'Design the core of a ride-sharing platform: rider requests a ride, system matches them with the nearest available driver, tracks the trip in real-time.',
+       concepts:['Geospatial indexing (QuadTree or S2)','Real-time location updates (WebSocket + Redis)','Driver matching algorithm','Surge pricing'],
+       reqs:['Match rider to driver in < 5 seconds','Driver location updated every 4 seconds','Track active trip in real-time','Handle 20M rides/day, 1M concurrent drivers'],
+       keyDecision:'Driver location updates every 4 seconds from 1M active drivers = 250K writes/second. You can\'t write each update to Postgres. What storage handles this — and how long do you retain historical location data?'},
+      {id:16, title:'Search Autocomplete at Scale', diff:'hard', scale:'10B queries/day',
+       desc:'Design Google-scale search autocomplete. Suggestions must reflect real-time trending queries, personalisation, and regional variation.',
+       concepts:['Distributed Trie','Kafka + streaming aggregation for trend detection','Personalisation layer','A/B testing framework for suggestion ranking'],
+       reqs:['< 50ms globally for any prefix','Suggestions update within 1 hour of trend change','Personalised: "app" shows "Apple Music" for iPhone users','Support 50 languages'],
+       keyDecision:'A single Trie for 10B queries/day won\'t fit in one machine. How do you shard the Trie — by prefix, by first character, by hash? What happens to a query that spans multiple shards?'},
+    ]
+  },
+  {
+    id:'complex-distributed', name:'Complex Distributed', phase:3, color:'var(--blue)',
+    problems:[
+      {id:17, title:'Distributed Cache (Redis-like)',diff:'hard', scale:'1M ops/sec',
+       desc:'Design a distributed in-memory cache from scratch. Support get/set/delete/TTL, data replication, cluster membership, and automatic resharding.',
+       concepts:['Consistent hashing with vnodes','Replication: primary-replica','Gossip protocol for cluster membership','LRU eviction + memory management'],
+       reqs:['Sub-millisecond p99 reads','3x replication for durability','Automatic failover in < 30 seconds','Online resharding when nodes added/removed'],
+       keyDecision:'During a failover, there\'s a window where the primary is dead and the replica hasn\'t been promoted yet. Reads during this window fail. Do you accept this (CP) or serve potentially stale reads from the replica immediately (AP)?'},
+      {id:18, title:'Payment System',               diff:'hard', scale:'10K TPS',
+       desc:'Design a payment processing system that handles money transfers with exactly-once semantics, fraud detection, and regulatory compliance.',
+       concepts:['Idempotency keys','Two-phase commit vs saga pattern','Event sourcing for audit trail','Fraud detection pipeline'],
+       reqs:['Exactly-once payment processing (no double charges)','< 2 second p99 end-to-end','Immutable audit log of every state change','Fraud check: < 200ms, must not block payment if service is down'],
+       keyDecision:'Exactly-once is expensive in distributed systems. Idempotency keys solve the client-retry case. But what happens if your own internal retry logic fires twice due to a timeout? Walk through the failure scenario.'},
+      {id:19, title:'Distributed Message Queue',    diff:'hard', scale:'1M msgs/sec',
+       desc:'Design a distributed message queue (Kafka-like). Producers publish messages to topics, consumers read from partitions with offset tracking.',
+       concepts:['Log-structured storage','Partition + replication','Consumer group offset management','Retention policy'],
+       reqs:['1M messages/second throughput','Messages retained for 7 days','Consumer groups: multiple groups read same topic independently','At-least-once delivery with consumer-managed offsets'],
+       keyDecision:'A consumer reads a message, processes it, then crashes before committing the offset. At-least-once means it will be reprocessed. How do you design the consumer to be idempotent — and what does that mean for a consumer that inserts rows into a database?'},
+      {id:20, title:'Location-Based Service',       diff:'hard', scale:'100M queries/day',
+       desc:'Design a proximity search service (like Yelp or Google Maps Points of Interest). Given a location and radius, return all relevant places sorted by distance.',
+       concepts:['Geospatial indexing: QuadTree, GeoHash, S2','Indexing for range queries on lat/lng','Caching popular queries (city-centre searches)','Handling dynamic data (hours, availability)'],
+       reqs:['< 200ms for proximity search in any region','Support 50M places globally','Radius queries from 100m to 50km','Results filterable by category, rating, open-now'],
+       keyDecision:'A naive SQL query `WHERE lat BETWEEN x AND y AND lng BETWEEN a AND b` doesn\'t use an index efficiently for circular radius queries. What geospatial index solves this — and what are the trade-offs between GeoHash and S2?'},
+    ]
+  },
+  {
+    id:'staff-level', name:'Staff-Level Problems', phase:4, color:'var(--purple)',
+    problems:[
+      {id:21, title:'ML Feature Store',             diff:'hard', scale:'100M features/day',
+       desc:'Design a feature store that serves pre-computed ML features to models in real-time (< 10ms) and supports offline training data generation.',
+       concepts:['Online store (Redis) vs offline store (Parquet/S3)','Feature computation pipeline (streaming + batch)','Point-in-time correctness for training data','Feature versioning'],
+       reqs:['Online serving: < 10ms p99','Offline: generate training datasets with point-in-time correct features','Support 10K feature definitions','Feature values updated from Kafka stream in near-real-time'],
+       keyDecision:'A model trained on features computed as of "today" learns patterns. But if you serve it features computed "yesterday", predictions degrade. How do you ensure the training and serving feature pipelines compute features identically?'},
+      {id:22, title:'Ad Click Aggregation',         diff:'hard', scale:'10B clicks/day',
+       desc:'Design a system that tracks ad impressions and clicks, aggregates them in near-real-time, and serves dashboards with < 1 minute lag. Resist click fraud.',
+       concepts:['Lambda architecture: speed layer + batch layer','Approximate counting (HyperLogLog, Count-Min Sketch)','Click fraud detection','Time-windowed aggregations'],
+       reqs:['Count clicks per ad per minute, with < 1 min lag','Detect and discard duplicate clicks (same user, same ad, < 1 minute)','Store raw events for 90 days for audit','Dashboard queries: clicks by region, device, time range'],
+       keyDecision:'Exact deduplication at 10B clicks/day requires a set of all click IDs — too large for memory. HyperLogLog estimates unique counts with ~2% error. Is 2% error acceptable for billing an advertiser? What\'s the business consequence of over-counting vs under-counting?'},
+      {id:23, title:'Distributed Tracing System',   diff:'hard', scale:'1B spans/day',
+       desc:'Design a distributed tracing system (like Jaeger or Zipkin). Services emit trace spans; the system aggregates them into complete request traces and enables latency analysis.',
+       concepts:['Trace context propagation (W3C TraceContext)','Sampling strategies (head-based vs tail-based)','Columnar storage for spans (ClickHouse)','Trace reconstruction from spans'],
+       reqs:['Ingest 1B spans/day from 1000 services','P99 query latency < 3 seconds for trace lookup by ID','Tail-based sampling: keep 100% of traces with errors, 1% of normal traces','Retention: 7 days full fidelity, 30 days sampled'],
+       keyDecision:'Head-based sampling decides at the start of a request whether to trace it (simple, loses error traces). Tail-based sampling keeps the full trace in a buffer, then decides after seeing the result (catches errors, complex). What infrastructure does tail-based sampling require that head-based doesn\'t?'},
+      {id:24, title:'Global CDN',                   diff:'hard', scale:'10Tbps throughput',
+       desc:'Design a global CDN (like Cloudflare or Fastly). Serve content from edge nodes close to users, with cache invalidation, origin shielding, and DDoS protection.',
+       concepts:['Anycast routing','Origin shielding','Cache invalidation at global scale','Tiered caching (edge → regional → origin)'],
+       reqs:['Serve requests from the nearest edge node globally','Propagate cache invalidation globally in < 30 seconds','Handle 10Tbps peak traffic','DDoS mitigation: absorb 1Tbps attack without origin impact'],
+       keyDecision:'Cache invalidation globally in < 30 seconds across 200 edge nodes means you must push invalidation events, not wait for TTL expiry. How do you propagate invalidation efficiently — broadcast to all nodes, or use a hierarchical tree? What\'s the worst-case propagation time for each?'},
+      {id:25, title:'Real-Time Collaborative Editor',diff:'hard', scale:'1M concurrent',
+       desc:'Design a collaborative document editor (Google Docs-like). Multiple users edit the same document simultaneously, see each other\'s changes in real-time, with conflict resolution.',
+       concepts:['Operational Transformation (OT) vs CRDT','WebSocket for real-time sync','Conflict resolution','Cursor presence broadcasting'],
+       reqs:['Changes visible to all collaborators in < 500ms','Support 100 concurrent editors per document','Offline edits sync correctly on reconnect','Document history: undo to any previous state'],
+       keyDecision:'If two users insert text at the same position simultaneously, OT requires a central server to linearise operations. CRDTs don\'t need a central server but have higher memory overhead. For a 100-user document with 10K edits/minute, which approach scales better and why?'},
+    ]
+  },
+];
+
+const ALL = GROUPS.flatMap(g => g.problems.map(p => ({...p, groupId:g.id, groupName:g.name, phase:g.phase})));
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let statuses = JSON.parse(localStorage.getItem('hld-s') || '{}');
+let notes    = JSON.parse(localStorage.getItem('hld-n') || '{}');
+let filter = 'all', activeId = null, isDark = true, currentView = 'problems';
+
+function save(){
+  localStorage.setItem('hld-s', JSON.stringify(statuses));
+  localStorage.setItem('hld-n', JSON.stringify(notes));
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){ renderPhaseProgress(); renderFilters(); renderNextUp(); renderProblems(); renderStats(); }
+
+function renderPhaseProgress(){
+  const phases = [
+    {label:'Phase 1 — Foundational', key:1, color:'var(--accent)',  locked:false},
+    {label:'Phase 2 — Mid-scale',    key:2, color:'var(--amber)',   locked:false},
+    {label:'Phase 3 — Distributed',  key:3, color:'var(--blue)',    locked:true},
+    {label:'Phase 4 — Staff-level',  key:4, color:'var(--purple)',  locked:true},
+  ];
+  document.getElementById('phase-progress').innerHTML = phases.map(ph => {
+    const probs = ALL.filter(p => p.phase === ph.key);
+    const done  = probs.filter(p => ['solved','audited'].includes(statuses[p.id])).length;
+    const pct   = Math.round(done/probs.length*100);
+    return `<div class="pb ${ph.locked?'locked':''}" style="border-left-color:${ph.color}" onclick="${ph.locked?'':'setFilter(\'phase'+ph.key+'\')'}">
+      <div class="pb-hdr"><span class="pb-name" style="color:${ph.color}">${ph.label}</span><span class="pb-cnt">${done}/${probs.length}</span></div>
+      <div class="pb-bar"><div class="pb-fill" style="width:${pct}%;background:${ph.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderFilters(){
+  let h = `<button class="fbtn ${filter==='all'?'sel':''}" onclick="setFilter('all')">
+    <span class="fdot" style="background:var(--muted)"></span>All
+    <span class="fbadge">${ALL.filter(p=>['solved','audited'].includes(statuses[p.id])).length}/${ALL.length}</span>
+  </button>`;
+  const phColors = {1:'var(--accent)',2:'var(--amber)',3:'var(--blue)',4:'var(--purple)'};
+  GROUPS.forEach(g => {
+    const done = g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
+    h += `<button class="fbtn ${filter===g.id?'sel':''}" onclick="setFilter('${g.id}')">
+      <span class="fdot" style="background:${phColors[g.phase]}"></span>${g.name}
+      <span class="fbadge">${done}/${g.problems.length}</span>
+    </button>`;
+  });
+  document.getElementById('fnav').innerHTML = h;
+}
+
+function renderNextUp(){
+  for(const g of GROUPS){
+    for(const p of g.problems){
+      if(!statuses[p.id]||statuses[p.id]==='todo'){
+        const el = document.getElementById('next-up');
+        el.style.display = 'flex';
+        document.getElementById('nu-title').textContent = `#${p.id} — ${p.title}`;
+        document.getElementById('nu-meta').textContent  = `${g.name} · ${p.diff} · ${p.scale}`;
+        return;
+      }
+    }
+  }
+  document.getElementById('next-up').style.display = 'none';
+}
+
+function openNextClaude(){
+  for(const g of GROUPS){
+    for(const p of g.problems){
+      if(!statuses[p.id]||statuses[p.id]==='todo'){
+        iosOpen(buildPromptUrl({...p,groupName:g.name}), true);
+        return;
+      }
+    }
+  }
+}
+
+function renderProblems(){
+  const groups = filter==='all' ? GROUPS
+    : filter.startsWith('phase') ? GROUPS.filter(g=>g.phase===parseInt(filter.replace('phase','')))
+    : GROUPS.filter(g=>g.id===filter);
+  const phColors = {1:'var(--accent)',2:'var(--amber)',3:'var(--blue)',4:'var(--purple)'};
+  let h = '';
+  groups.forEach(g => {
+    if(!g.problems.length) return;
+    const done = g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
+    const col  = phColors[g.phase];
+    h += `<div class="pgroup">
+      <div class="phdr">
+        <span class="pname">${g.name}</span>
+        <span class="pcnt">${done}/${g.problems.length}</span>
+        <span class="ptag" style="color:${col};background:${col}18;border:1px solid ${col}30">Phase ${g.phase}</span>
+      </div>
+      <div class="pcols">
+        <div class="ch">#</div><div class="ch">Problem</div>
+        <div class="ch">Key concepts</div>
+        <div class="ch c">Diff</div><div class="ch c">Status</div><div class="ch"></div>
+      </div>`;
+    g.problems.forEach(p => {
+      const st = statuses[p.id]||'todo';
+      const sd = st==='solved'?`<div class="sdot sd-solved">✓</div>`
+               : st==='audited'?`<div class="sdot sd-audited">★</div>`
+               : st==='review'?`<div class="sdot sd-review">↻</div>`
+               :`<div class="sdot sd-todo">·</div>`;
+      const hn = notes[p.id]&&notes[p.id].trim();
+      const conceptStr = (p.concepts||[]).slice(0,2).join(' · ');
+      h += `<div class="prow" onclick="openModal(${p.id})">
+        <div class="pr-num">${p.id}</div>
+        <div class="pr-title">${p.title}${hn?'<span class="pr-note">📝</span>':''}</div>
+        <div class="pr-concepts">${conceptStr}</div>
+        <div><span class="dbadge d-${p.diff}">${p.diff}</span></div>
+        <div>${sd}</div>
+        <div><button class="row-open" onclick="event.stopPropagation();iosOpen(buildPromptUrl(ALL.find(x=>x.id===${p.id})), true)">→</button></div>
+      </div>`;
+    });
+    h += '</div>';
+  });
+  document.getElementById('prob-container').innerHTML = h;
+}
+
+function renderStats(){
+  const done = p => ['solved','audited'].includes(statuses[p.id]);
+  document.getElementById('stats-strip').innerHTML = `
+    <div class="stat-row"><span class="stat-key">total solved</span><span class="stat-val">${ALL.filter(done).length}/${ALL.length}</span></div>
+    <div class="stat-row"><span class="stat-key">phase 1 done</span><span class="stat-val">${GROUPS[0].problems.filter(done).length}/${GROUPS[0].problems.length}</span></div>
+    <div class="stat-row"><span class="stat-key">phase 2 done</span><span class="stat-val">${GROUPS[1].problems.filter(done).length}/${GROUPS[1].problems.length}</span></div>
+    <div class="stat-row"><span class="stat-key">needs review</span><span class="stat-val">${ALL.filter(p=>statuses[p.id]==='review').length}</span></div>
+    <div class="stat-row"><span class="stat-key">cycle</span><span class="stat-val" style="font-size:10px">DSA → LLD → HLD</span></div>`;
+}
+
+// ── PROMPT ────────────────────────────────────────────────────────────────────
+function buildPromptUrl(p){ return 'https://claude.ai/new?q='+encodeURIComponent(buildPrompt(p)); }
+
+function buildPrompt(p){
+  const reqs = (p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
+  const concepts = (p.concepts||[]).join(', ');
+  return `You are my HLD (High Level Design) mentor. I am a senior software engineer preparing for system design interviews.
+
+Problem: ${p.title}
+Scale: ${p.scale}
+Key concepts to cover: ${concepts}
+
+${p.desc}
+
+Requirements:
+${reqs}
+
+Run this as a real interview. Start with:
+"Before we design, I have a few clarifying questions..."
+
+After I answer, guide me through:
+1. High-level design — components, data flow, APIs
+2. Data model — schemas, storage choices with justification
+3. Scale deep-dive — bottlenecks and how to address them
+4. Key decision: ${p.keyDecision}
+
+When I make a choice, push back: "Why X over Y? What happens at 10x scale? What's the failure mode?"
+Do NOT give me the answer. Make me earn it.`;
+}
+
+// ── FILTER / VIEW ─────────────────────────────────────────────────────────────
+function setFilter(f){
+  filter = f;
+  const labels = {
+    all:'All problems',
+    foundational:'Foundational Systems',
+    'mid-scale':'Mid-Scale Systems',
+    'complex-distributed':'Complex Distributed',
+    'staff-level':'Staff-Level Problems',
+    phase1:'Phase 1 — Foundational',
+    phase2:'Phase 2 — Mid-scale',
+    phase3:'Phase 3 — Distributed',
+    phase4:'Phase 4 — Staff-level',
+  };
+  document.getElementById('main-title').textContent = labels[f]||f;
+  render();
+}
+
+function setView(v, btn){
+  currentView = v;
+  ['problems','timer'].forEach(x => document.getElementById('view-'+x).style.display = x===v?'block':'none');
+  document.querySelectorAll('.vtab').forEach(b=>b.classList.remove('sel'));
+  if(btn) btn.classList.add('sel');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id){
+  const p = ALL.find(x=>x.id===id); if(!p) return;
+  activeId = id;
+  const stLabel = {solved:'✓ Solved',review:'↻ Needs review',audited:'★ Audited',todo:'Todo'};
+  document.getElementById('m-id').textContent     = `#${p.id}`;
+  document.getElementById('m-title').textContent  = p.title;
+  document.getElementById('m-phase').textContent  = `Phase ${p.phase}`;
+  document.getElementById('m-diff').textContent   = p.diff;
+  document.getElementById('m-scale').textContent  = p.scale;
+  document.getElementById('m-status').textContent = stLabel[statuses[id]||'todo'];
+  document.getElementById('m-desc').textContent   = p.desc;
+  document.getElementById('m-concepts').innerHTML = `<strong>Key concepts:</strong> ${(p.concepts||[]).join(' · ')}`;
+  document.getElementById('m-reqs').innerHTML     = (p.reqs||[]).map(r=>`<div class="m-req">${r}</div>`).join('');
+  document.getElementById('m-notes').value        = notes[id]||'';
+  document.getElementById('moverlay').classList.add('open');
+}
+function closeModal(){
+  if(activeId!==null){notes[activeId]=document.getElementById('m-notes').value;save();}
+  document.getElementById('moverlay').classList.remove('open');
+  activeId=null; render();
+}
+function closeIfOutside(e){ if(e.target===document.getElementById('moverlay')) closeModal(); }
+function markStatus(st){
+  if(activeId===null) return;
+  statuses[activeId]=st; save();
+  document.getElementById('m-status').textContent={solved:'✓ Solved',review:'↻ Needs review',audited:'★ Audited',todo:'Todo'}[st];
+  render();
+}
+function openModalClaude(){
+  const p=ALL.find(x=>x.id===activeId); if(!p) return;
+  iosOpen(buildPromptUrl(p), true);
+}
+function copyModalPrompt(){
+  const p=ALL.find(x=>x.id===activeId); if(!p) return;
+  navigator.clipboard.writeText(buildPrompt(p)).then(()=>{
+    const btns=document.querySelectorAll('.mlbtn');
+    btns.forEach(b=>{if(b.textContent.includes('Copy')){const o=b.textContent;b.textContent='✓ Copied';setTimeout(()=>b.textContent=o,1800);}});
+  });
+}
+
+// ── TIMER ─────────────────────────────────────────────────────────────────────
+let timerInterval=null,timerSeconds=0,timerLimit=0,timerRunning=false,timerPhase=0;
+const phaseLimits = {1:300, 2:900, 3:600};
+function startTimer(phase){
+  clearInterval(timerInterval);
+  timerPhase=phase; timerLimit=phaseLimits[phase]; timerSeconds=0; timerRunning=true;
+  document.querySelectorAll('.tp-phase').forEach((el,i)=>{el.classList.toggle('active-phase',i===phase-1);el.classList.remove('done-phase');});
+  document.getElementById('timer-status').textContent=`Phase ${phase} running`;
+  timerInterval=setInterval(tickTimer,1000);
+  updateTimerDisplay();
+}
+function tickTimer(){
+  timerSeconds++;
+  updateTimerDisplay();
+  if(timerSeconds>=timerLimit){
+    clearInterval(timerInterval);timerRunning=false;
+    const msgs={1:'5 min up — requirements locked. Move to high-level design.',2:'15 min up — align with interviewer before deep-diving.',3:'10 min up — wrap up and summarise trade-offs.'};
+    document.getElementById('timer-status').textContent=msgs[timerPhase]||'Time up';
+    document.querySelectorAll('.tp-phase')[timerPhase-1].classList.replace('active-phase','done-phase');
+  }
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+  const el=document.getElementById('timer-display');
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='timer-display'+(timerSeconds>=timerLimit?' over':timerSeconds>=timerLimit*.8?' warn':'');
+}
+function pauseTimer(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-status').textContent='Paused';}
+  else if(timerPhase>0){timerRunning=true;timerInterval=setInterval(tickTimer,1000);document.getElementById('timer-status').textContent='Resumed';}
+}
+function resetTimer(){
+  clearInterval(timerInterval);timerSeconds=0;timerRunning=false;timerPhase=0;
+  document.getElementById('timer-display').textContent='00:00';
+  document.getElementById('timer-display').className='timer-display';
+  document.getElementById('timer-status').textContent='Select a phase to start';
+  document.querySelectorAll('.tp-phase').forEach(el=>el.classList.remove('active-phase','done-phase'));
+}
+
+// ── IOS OPEN ──────────────────────────────────────────────────────────────────
+function iosOpen(url, blank){
+  const a=document.createElement('a');
+  a.href=url; if(blank) a.target='_blank'; a.rel='noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
 function toggleTheme(){
-  isDark = !isDark;
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('theme-btn').textContent = isDark ? '🌙 theme' : '☀️ theme';
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent=isDark?'🌙 theme':'☀️ theme';
 }
 
 // ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
 function initMobileSidebar(){
-  const sidebar = document.querySelector('.sidebar');
-  const overlay = document.querySelector('.sidebar-overlay');
-  if(!sidebar || !overlay) return;
-
-  const btn = document.getElementById('hamburger-btn');
-  if(!btn) return;
-
-  function openSidebar(){
-    sidebar.classList.add('open');
-    overlay.classList.add('open');
-    btn.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeSidebar(){
-    sidebar.classList.remove('open');
-    overlay.classList.remove('open');
-    btn.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  btn.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
-  overlay.addEventListener('click', closeSidebar);
-  // Close on nav item click (mobile UX)
-  sidebar.querySelectorAll('button,a').forEach(el => {
-    el.addEventListener('click', () => { if(window.innerWidth <= 768) closeSidebar(); });
-  });
+  const sidebar=document.querySelector('.sidebar');
+  const overlay=document.querySelector('.sidebar-overlay');
+  const btn=document.getElementById('hamburger-btn');
+  if(!sidebar||!overlay||!btn) return;
+  function open(){sidebar.classList.add('open');overlay.classList.add('open');btn.classList.add('open');document.body.style.overflow='hidden';}
+  function close(){sidebar.classList.remove('open');overlay.classList.remove('open');btn.classList.remove('open');document.body.style.overflow='';}
+  btn.addEventListener('click',()=>sidebar.classList.contains('open')?close():open());
+  overlay.addEventListener('click',close);
+  sidebar.querySelectorAll('button,a').forEach(el=>el.addEventListener('click',()=>{if(window.innerWidth<=768)close();}));
 }
-initMobileSidebar();
 
+render();
+initMobileSidebar();
 </script>
 </body>
 </html>

@@ -232,8 +232,17 @@
   .hamburger.open span:nth-child(2){opacity:0;}
   .hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
 
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;}
-  .sidebar-overlay.open{opacity:1;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .sidebar-overlay.open{opacity:1;pointer-events:auto;}
+
+  /* iOS Safari tap fixes */
+  a, button, [onclick], .fbtn, .pbtn, .pat-btn, .prow, .pb, .vtab, .tab {
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  * { -webkit-overflow-scrolling: touch; }
+  .main, .sidebar { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
 
   @media(max-width:768px){
     .hamburger{display:flex;}
@@ -622,9 +631,10 @@ function setFilter(f){
 // ── NEXT UP
 function getNext(){for(const g of PATTERNS){if(g.phase<2)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
 function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Real-world analogy (intuition only, no implementation)\n- Optimal time and space complexity — the target to hit\n\nNothing else. No pattern name, no decision points, no bugs, no hints.\nStop after the brief and wait for my attempt.\n\nWhen I share my attempt, then identify: what pattern I used, where my thinking was right or wrong, and what to correct.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
-function openNextClaude(){const n=getNext();if(n)window.open(claudeUrl(n),'_blank');}
-function openInClaude(){const p=ALL.find(x=>x.id===activeId);if(p)window.open(claudeUrl(p),'_blank');}
-function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)window.open(claudeUrl(p),'_blank');}
+function openNextClaude(){const n=getNext();if(n)iosOpen(claudeUrl(n, false),'_blank');}
+function iosOpen(url,blank){const a=document.createElement("a");a.href=url;if(blank)a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();document.body.removeChild(a);}
+function openInClaude(){const p=ALL.find(x=>x.id===activeId);if(p)iosOpen(claudeUrl(p, false),'_blank');}
+function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)iosOpen(claudeUrl(p, false),'_blank');}
 
 // ── RENDER
 function render(){renderFilters();renderPatLevels();renderNextUp();renderProblems();renderStats();renderDecisionPoints();}
@@ -1017,7 +1027,7 @@ function openDebugInClaude(){
     'then ask me one question that leads me to the fix myself.',
   ].filter(l=>l!==null).join('\n');
 
-  window.open(`https://claude.ai/new?q=${encodeURIComponent(lines)}`,'_blank');
+  iosOpen(`https://claude.ai/new?q=${encodeURIComponent(lines, false)}`,'_blank');
 }
 
 function resetDebugForm(){

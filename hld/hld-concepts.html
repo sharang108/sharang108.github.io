@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HLD · Concept Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --accent:#4ade80;--amber:#fbbf24;--blue:#60a5fa;--coral:#f87171;
+  --purple:#a78bfa;--teal:#2dd4bf;--orange:#fb923c;--tr:0.18s ease;}
+[data-theme="dark"]{--bg:#0d0f11;--bg2:#13161a;--bg3:#1a1e23;--bg4:#1f242b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e2e4e7;--muted:#4e5666;--muted2:#7a8090;}
+[data-theme="light"]{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0ede8;--bg4:#e8e5df;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --text:#1a1c20;--muted:#9a9fa8;--muted2:#6b7280;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;transition:background var(--tr),color var(--tr);}
+
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:52px;gap:10px;position:sticky;top:0;z-index:100;}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 7px var(--amber);flex-shrink:0;}
+.tb-link{font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;}
+.tb-link:hover{color:var(--text);}
+.tb-sep{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
+.tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;text-decoration:none;white-space:nowrap;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:252px 1fr;min-height:calc(100vh - 52px);}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 32px;overflow-y:auto;}
+.main{padding:24px 28px;overflow-y:auto;background:var(--bg);}
+
+/* SIDEBAR */
+.s-sec{margin-bottom:20px;}
+.s-lbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 16px;margin-bottom:7px;}
+.con-btn{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;width:100%;background:none;border-top:none;border-right:none;border-bottom:none;text-align:left;color:var(--text);}
+.con-btn:hover{background:var(--bg3);}
+.con-btn.active{border-left-color:var(--amber);background:var(--bg3);}
+.con-icon{width:28px;height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.con-info{flex:1;min-width:0;}
+.con-name{font-family:var(--mono);font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.con-sub{font-family:var(--mono);font-size:9px;color:var(--muted2);}
+
+.progress-row{display:flex;align-items:center;gap:8px;padding:4px 16px;}
+.prog-name{font-family:var(--mono);font-size:10px;color:var(--muted2);flex:1;}
+.prog-pips{display:flex;gap:3px;}
+.pip{width:7px;height:7px;border-radius:50%;background:var(--border);}
+.pip.done{background:var(--amber);}
+
+/* TABS */
+.tab-bar{display:flex;gap:3px;margin-bottom:24px;border-bottom:1px solid var(--border);}
+.tab{font-family:var(--mono);font-size:11px;padding:8px 14px;cursor:pointer;border:none;background:none;color:var(--muted2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .12s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber);}
+
+/* CONCEPT HEADER */
+.con-header{margin-bottom:20px;}
+.con-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.con-h-icon{width:38px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:rgba(251,191,36,.1);}
+.con-h-name{font-family:var(--mono);font-size:20px;font-weight:600;}
+.con-h-type{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2);}
+.con-h-desc{font-size:13px;color:var(--muted2);max-width:700px;line-height:1.7;}
+
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:16px 18px;margin-bottom:14px;}
+.card-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+
+/* MENTAL MODEL */
+.mm-points{display:flex;flex-direction:column;gap:8px;}
+.mm-point{display:flex;gap:10px;align-items:flex-start;}
+.mm-num{font-family:var(--mono);font-size:10px;color:var(--amber);font-weight:600;flex-shrink:0;margin-top:2px;}
+.mm-text{font-size:12px;color:var(--muted2);line-height:1.6;}
+.mm-text strong{color:var(--text);font-weight:500;}
+
+/* COMPARISON TABLE */
+.compare-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;}
+.compare-table th{text-align:left;padding:8px 10px;background:var(--bg4);color:var(--muted2);font-size:9px;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--border2);}
+.compare-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted2);vertical-align:top;line-height:1.5;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table td:first-child{color:var(--text);font-weight:500;}
+.good{color:var(--accent);}
+.bad{color:var(--coral);}
+.neutral{color:var(--amber);}
+
+/* WHEN TO USE */
+.trigger-list{display:flex;flex-direction:column;gap:6px;}
+.trigger{display:flex;gap:8px;align-items:flex-start;}
+.t-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px;}
+.t-avoid .t-dot{background:var(--coral);}
+.t-text{font-size:12px;color:var(--muted2);line-height:1.6;}
+.t-text strong{color:var(--text);}
+
+/* TRADEOFF CARDS */
+.tradeoff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tradeoff-card{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:12px 14px;}
+.tc-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.tc-name{font-family:var(--mono);font-size:11px;font-weight:600;}
+.tc-pill{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;text-transform:uppercase;}
+.pill-pro{background:rgba(74,222,128,.1);color:var(--accent);border:1px solid rgba(74,222,128,.2);}
+.pill-con{background:rgba(248,113,113,.1);color:var(--coral);border:1px solid rgba(248,113,113,.2);}
+.tc-body{font-size:11px;color:var(--muted2);line-height:1.6;}
+.tc-body strong{color:var(--text);}
+
+/* INTERVIEW CHALLENGE */
+.challenge-banner{background:var(--bg3);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--amber);border-radius:6px;padding:14px 16px;margin-bottom:14px;}
+.cb-label{font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;}
+.cb-title{font-family:var(--mono);font-size:14px;font-weight:500;margin-bottom:6px;}
+.cb-desc{font-size:12px;color:var(--muted2);line-height:1.7;}
+.reqs-list{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.req{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;}
+.req-num{font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0;margin-top:2px;width:16px;}
+.req-text{font-size:12px;color:var(--muted2);line-height:1.6;}
+.req-text strong{color:var(--text);}
+.guided-q{background:var(--bg3);border:1px solid rgba(251,191,36,.15);border-radius:5px;padding:12px 14px;margin-bottom:14px;}
+.gq-label{font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.gq-text{font-size:13px;color:var(--text);line-height:1.7;}
+
+/* ACTIONS */
+.action-row{display:flex;gap:8px;flex-wrap:wrap;}
+.abtn{font-family:var(--mono);font-size:11px;font-weight:500;padding:7px 14px;border-radius:4px;cursor:pointer;border:1px solid;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .12s;white-space:nowrap;}
+.btn-amber{background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);}
+.btn-amber:hover{background:rgba(251,191,36,.18);}
+.btn-teal{background:rgba(45,212,191,.08);color:var(--teal);border-color:rgba(45,212,191,.25);}
+.btn-teal:hover{background:rgba(45,212,191,.15);}
+.btn-ghost{background:none;color:var(--muted2);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--muted2);}
+.empty-icon{font-size:32px;margin-bottom:12px;}
+.empty-text{font-family:var(--mono);font-size:12px;line-height:1.7;}
+
+/* MOBILE */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:4px;background:none;border:1px solid var(--border2);}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--muted2);border-radius:2px;transition:all .2s;}
+.hamburger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;pointer-events:none;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .shell{grid-template-columns:1fr;}
+  .sidebar{position:fixed;top:52px;left:0;bottom:0;width:280px;transform:translateX(-100%);transition:transform .25s ease;z-index:999;border-right:1px solid var(--border2);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{display:block;}
+  .main{padding:14px;}
+  .tradeoff-grid{grid-template-columns:1fr!important;}
+  .compare-table{font-size:10px;}
+  .compare-table th,.compare-table td{padding:6px 7px;}
+}
+a,button,[onclick],.con-btn{-webkit-tap-highlight-color:transparent;cursor:pointer;}
+*{-webkit-overflow-scrolling:touch;}
+.main,.sidebar{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.view{animation:fadeIn .15s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="sidebar-overlay"></div>
+<div class="topbar">
+  <div class="tb-dot"></div>
+  <a href="../index.html" class="tb-link">prep-index</a>
+  <span class="tb-sep"> / </span>
+  <a href="index.html" class="tb-link">hld-prep</a>
+  <span class="tb-sep"> / </span>
+  <span class="tb-title">concept-lab</span>
+  <div class="tb-right">
+    <button class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></button>
+    <a href="index.html" class="icon-btn">⇄ Problems</a>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="s-sec">
+      <div class="s-lbl">Concepts</div>
+      <div id="nav-concepts"></div>
+    </div>
+    <div class="s-sec">
+      <div class="s-lbl">Progress</div>
+      <div id="progress-list" style="padding:0 16px;display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+  </div>
+  <div class="main" id="main-area">
+    <div class="empty">
+      <div class="empty-icon">⬡</div>
+      <div class="empty-text">Select a concept group from the sidebar<br/>to begin learning.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const CONCEPTS = [
+  {
+    id:'scalability', name:'Scalability', icon:'📈', sub:'Horizontal · Vertical · Sharding',
+    tagline:'How to grow a system from 100 to 100 million users without rewriting it.',
+    mentalModel:[
+      {n:'01', text:'<strong>Vertical vs horizontal:</strong> vertical scaling (bigger machine) is fast but has a hard ceiling and a single point of failure. Horizontal scaling (more machines) is unbounded but requires stateless design and a load balancer.'},
+      {n:'02', text:'<strong>Stateless is the prerequisite:</strong> you cannot horizontally scale a service that stores session data in memory. Move session state to Redis, move files to S3, move everything out of the process — then you can run 1000 copies.'},
+      {n:'03', text:'<strong>Sharding:</strong> when a single database can\'t handle the write load, split data across multiple DB instances by a shard key. Horizontal sharding by user_id, tenant_id, or region is most common. Choose a key with high cardinality and even distribution.'},
+      {n:'04', text:'<strong>Consistent hashing:</strong> maps keys to shards in a ring. When you add or remove a node, only 1/N of keys move (not all of them). Critical for distributed caches and databases where node count changes.'},
+      {n:'05', text:'<strong>Hot spots:</strong> a bad shard key (e.g. created_at) sends all new writes to one shard. A celebrity user sends disproportionate reads to one cache node. Design for even load, then add special-casing for known hot spots.'},
+    ],
+    comparison:{
+      headers:['Approach','Write scale','Read scale','Complexity','SPOF risk'],
+      rows:[
+        ['Single DB','Low','Medium','None','High'],
+        ['Read replicas','Low','High','Low','Medium'],
+        ['Vertical scale','Medium','Medium','None','High'],
+        ['Horizontal sharding','High','High','High','Low'],
+        ['Consistent hashing','High','High','Medium','Low'],
+      ]
+    },
+    tradeoffs:[
+      {name:'Horizontal scaling',pro:true,body:'Unbounded capacity, no single point of failure, deploy independently. Cost scales with actual load.'},
+      {name:'Horizontal scaling',pro:false,body:'Requires stateless services, distributed state management, and a load balancer. Debugging across nodes is harder.'},
+      {name:'Sharding',pro:true,body:'Spreads write load. Each shard can be a different database type if needed.'},
+      {name:'Sharding',pro:false,body:'Cross-shard queries are slow or impossible. Resharding when you choose the wrong key is expensive and risky.'},
+    ],
+    triggers:[
+      {text:'Single DB CPU > 70% sustained → consider <strong>read replicas first</strong>, then sharding.'},
+      {text:'App servers stateful (in-process session) → move to <strong>Redis sessions</strong> before horizontal scaling.'},
+      {text:'Write throughput maxed → <strong>shard by user_id or tenant_id</strong>, never by time.'},
+      {text:'Cache node removal causes mass misses → switch to <strong>consistent hashing</strong>.'},
+    ],
+    avoids:[
+      {text:'Don\'t shard prematurely. A single Postgres instance handles millions of rows with proper indexing. Shard only when you\'ve measured the bottleneck.'},
+      {text:'Don\'t choose created_at as a shard key. All new writes hit the latest shard — it\'s a hot spot by design.'},
+    ],
+    challenge:{
+      title:'Design the data layer for a social media platform at scale',
+      desc:'A social platform has 50M users. Posts, likes, and follows grow 20% monthly. Single DB is at 90% CPU. Read:write ratio is 80:20.',
+      reqs:[
+        {text:'<strong>Read scaling:</strong> Reduce DB read load by 70% without changing application code significantly.'},
+        {text:'<strong>Write scaling:</strong> Distribute write load for the posts table which receives 10K writes/sec at peak.'},
+        {text:'<strong>Shard key:</strong> Choose and justify a shard key for the posts table.'},
+        {text:'<strong>Hot spot mitigation:</strong> A celebrity with 10M followers creates a hot spot. How do you handle it?'},
+      ],
+      guidedQ:'If you shard posts by user_id, what happens when you need to show a user\'s global feed sorted by time — and how does that shape your query strategy?',
+    },
+  },
+
+  {
+    id:'databases', name:'Databases', icon:'🗃', sub:'SQL · NoSQL · Replication · CAP',
+    tagline:'Choosing the right database is the most consequential early architecture decision. Get it wrong and you rebuild.',
+    mentalModel:[
+      {n:'01', text:'<strong>SQL vs NoSQL is the wrong question.</strong> The real question is: what are your access patterns? SQL excels at relational queries, transactions, and flexible ad-hoc queries. NoSQL excels at a specific, known access pattern at massive scale.'},
+      {n:'02', text:'<strong>CAP theorem:</strong> a distributed system can guarantee at most two of: Consistency (every read gets the latest write), Availability (every request gets a response), Partition tolerance (system works despite network failures). Since partitions happen, you choose CP (strong consistency, may reject requests) or AP (always responds, may serve stale data).'},
+      {n:'03', text:'<strong>Replication:</strong> primary-replica (leader-follower) for reads. One primary accepts writes, replicas serve reads. Replication lag means replicas may serve stale data — design reads that can tolerate eventual consistency, or route critical reads to primary.'},
+      {n:'04', text:'<strong>Indexes are not free:</strong> every index speeds up reads but slows down writes (index must be updated) and consumes storage. Add indexes for query patterns you know you have, not defensively.'},
+      {n:'05', text:'<strong>ACID vs BASE:</strong> ACID (Atomicity, Consistency, Isolation, Durability) is what SQL gives you. BASE (Basically Available, Soft state, Eventually consistent) is what most NoSQL gives you. Financial systems need ACID. Social feeds are fine with BASE.'},
+    ],
+    comparison:{
+      headers:['Database','Best for','Weak at','Consistency','Scale pattern'],
+      rows:[
+        ['PostgreSQL','Relational data, ACID, complex queries','Very high write throughput','Strong ACID','Vertical + read replicas'],
+        ['MySQL','Same as Postgres, wider ecosystem','Complex queries vs Postgres','Strong ACID','Vertical + read replicas'],
+        ['MongoDB','Flexible schema, document model','Multi-document transactions','Tunable','Horizontal sharding'],
+        ['Cassandra','Time-series, high write throughput','Complex queries, consistency','Eventual','Horizontal, masterless'],
+        ['Redis','Cache, sessions, pub-sub, leaderboards','Persistence, complex data','Tunable','Cluster mode'],
+        ['DynamoDB','Key-value at any scale, serverless','Complex queries, cost at scale','Tunable','Fully managed'],
+        ['Elasticsearch','Full-text search, analytics','Primary storage, transactions','Eventual','Horizontal'],
+      ]
+    },
+    tradeoffs:[
+      {name:'Strong consistency',pro:true,body:'Every read reflects the latest write. Correct for financial ledgers, inventory counts, user permissions.'},
+      {name:'Strong consistency',pro:false,body:'Higher latency (must wait for all replicas to confirm). Lower availability during network partitions.'},
+      {name:'Eventual consistency',pro:true,body:'Lower latency, higher availability. Acceptable for social feeds, product catalogues, notification counts.'},
+      {name:'Eventual consistency',pro:false,body:'Reads may serve stale data. Application must handle or tolerate inconsistency. Harder to reason about.'},
+    ],
+    triggers:[
+      {text:'Structured relational data + transactions → <strong>PostgreSQL</strong>.'},
+      {text:'High-cardinality time-series writes (IoT, logs, events) → <strong>Cassandra or InfluxDB</strong>.'},
+      {text:'Full-text search, faceted filtering → <strong>Elasticsearch</strong> alongside your primary DB.'},
+      {text:'Session store, rate limiter counters, leaderboards → <strong>Redis</strong>.'},
+      {text:'Flexible schema, rapid iteration, document model → <strong>MongoDB</strong>.'},
+    ],
+    avoids:[
+      {text:'Don\'t use MongoDB as a default because "it\'s flexible". Flexibility in schema = no schema = eventual pain when you need relationships.'},
+      {text:'Don\'t run Elasticsearch as your primary database. It\'s an index, not a source of truth — data loss risk is real.'},
+    ],
+    challenge:{
+      title:'Choose the database stack for a ride-sharing platform',
+      desc:'A ride-sharing platform needs: user profiles + auth, real-time driver locations, trip history, driver-rider matching, and fare calculation with payment records.',
+      reqs:[
+        {text:'<strong>User profiles:</strong> Choose DB and justify for relational, low-volume, ACID-required data.'},
+        {text:'<strong>Driver locations:</strong> Updated every 5 seconds per driver. 500K active drivers. Choose DB and data structure.'},
+        {text:'<strong>Trip history:</strong> Append-only, queried by user, never deleted. 1B rows eventually.'},
+        {text:'<strong>Payment records:</strong> ACID required. Must not lose a single record. Justify your choice.'},
+      ],
+      guidedQ:'Driver location updates every 5 seconds from 500K drivers = 100K writes/second. Which database can handle this write pattern — and why does a relational DB immediately fail here?',
+    },
+  },
+
+  {
+    id:'caching', name:'Caching', icon:'⚡', sub:'Strategies · Invalidation · CDN',
+    tagline:'A cache is a lie you tell your system for performance. The art is controlling which lies are acceptable.',
+    mentalModel:[
+      {n:'01', text:'<strong>Cache-aside (lazy loading):</strong> app checks cache first, on miss fetches from DB and writes to cache. Most common pattern. Cache only contains data that\'s been requested — no wasted entries. Cold start problem: first request after deploy is always a miss.'},
+      {n:'02', text:'<strong>Write-through:</strong> on every DB write, also write to cache. Cache is always fresh. Costs: every write is 2 writes. Cache fills with data that may never be read.'},
+      {n:'03', text:'<strong>Write-behind (write-back):</strong> write to cache first, async flush to DB later. Very fast writes, but risk of data loss if cache dies before flush. Only acceptable when some data loss is tolerable (view counts, non-critical counters).'},
+      {n:'04', text:'<strong>Cache invalidation is the hard part:</strong> there are only two hard problems in computer science — cache invalidation and naming things. On update, do you delete the key (lazy re-population on next read) or update the value (write-through)? Deleting is safer; updating risks race conditions.'},
+      {n:'05', text:'<strong>TTL is your safety net:</strong> every cache entry should have a TTL. If invalidation logic has a bug, TTL guarantees eventual correctness. Set TTL based on how stale data you can tolerate, not how long you think data lives.'},
+      {n:'06', text:'<strong>CDN for static + quasi-static content:</strong> CDN = geographically distributed cache. Static assets (JS, CSS, images) belong on CDN always. API responses can go on CDN if they\'re the same for all users (public product catalogue). Never cache authenticated or user-specific responses on CDN.'},
+    ],
+    comparison:{
+      headers:['Strategy','Read perf','Write perf','Staleness risk','Complexity'],
+      rows:[
+        ['Cache-aside','High on hit','DB speed','Medium (TTL bounded)','Low'],
+        ['Write-through','High','Slower (2 writes)','Low','Medium'],
+        ['Write-behind','High','Very fast','High (loss risk)','High'],
+        ['Read-through','High on hit','DB speed','Medium','Medium'],
+        ['CDN (static)','Very high','N/A','Low','Low'],
+      ]
+    },
+    tradeoffs:[
+      {name:'Aggressive caching',pro:true,body:'Dramatic read latency reduction. DB load drops significantly. Cost scales independently of read volume.'},
+      {name:'Aggressive caching',pro:false,body:'Stale data risk. Cache invalidation bugs are subtle and hard to detect. Cache stampede on cold start or TTL expiry.'},
+      {name:'Short TTL',pro:true,body:'Data stays fresh. Staleness window is bounded. Safer default.'},
+      {name:'Short TTL',pro:false,body:'More DB hits. Cache provides less relief for infrequently accessed data.'},
+    ],
+    triggers:[
+      {text:'Read:write ratio > 5:1 → <strong>cache the read path</strong>.'},
+      {text:'Same DB query appears in multiple endpoints → <strong>cache the result with the query as key</strong>.'},
+      {text:'User session data read on every request → <strong>Redis session cache</strong>.'},
+      {text:'Static assets served from app server → <strong>CDN immediately</strong>.'},
+      {text:'API rate limit counters → <strong>Redis INCR with TTL</strong>, not a DB row.'},
+    ],
+    avoids:[
+      {text:'Never cache user-specific data on a CDN (responses include user_id, auth tokens, personal data).'},
+      {text:'Don\'t cache mutable data without an invalidation strategy. "We\'ll just set a long TTL" is not a strategy.'},
+      {text:'Cache stampede: when a hot key\'s TTL expires, thousands of requests hit the DB simultaneously. Fix with lock-based population or jittered TTL.'},
+    ],
+    challenge:{
+      title:'Design the caching layer for a product catalogue',
+      desc:'An e-commerce product catalogue has 2M products. 95% of traffic reads product pages. 5% of traffic is price/inventory updates from vendors. A product page read involves 3 DB queries. P99 read latency must be < 20ms.',
+      reqs:[
+        {text:'<strong>Cache strategy:</strong> Choose between cache-aside and write-through. Justify for this specific read:write ratio.'},
+        {text:'<strong>Key design:</strong> What is the cache key? What granularity — per product, per product section, per query?'},
+        {text:'<strong>Invalidation:</strong> When a vendor updates a price, what must be invalidated and how fast?'},
+        {text:'<strong>Stampede prevention:</strong> A product goes viral. 100K concurrent users hit its cache key at the exact same TTL expiry. What do you do?'},
+      ],
+      guidedQ:'A flash sale drops the price of a product to $1. The cache still serves the old price for 5 minutes. What is the business impact — and does that change your TTL strategy for price vs non-price attributes?',
+    },
+  },
+
+  {
+    id:'messaging', name:'Messaging & Queues', icon:'📨', sub:'Async · Kafka · Pub-Sub · Guarantees',
+    tagline:'Decouple producers from consumers. If a service can\'t fail your user, it should be async.',
+    mentalModel:[
+      {n:'01', text:'<strong>Why async:</strong> synchronous calls couple availability. If Service A calls Service B synchronously, Service A\'s uptime = min(A uptime, B uptime). Async decouples them — A enqueues a message and moves on. B processes when it\'s ready.'},
+      {n:'02', text:'<strong>At-least-once vs exactly-once:</strong> at-least-once delivery guarantees the message is delivered but may deliver it multiple times (on retry). Exactly-once is very expensive to guarantee across distributed systems. Design consumers to be idempotent — processing the same message twice produces the same result.'},
+      {n:'03', text:'<strong>Kafka vs SQS vs RabbitMQ:</strong> Kafka retains messages as a log (consumers can replay). SQS/RabbitMQ delete messages after consumption. Use Kafka when you need replay, audit trail, or multiple consumer groups reading the same stream. Use SQS for simple task queues.'},
+      {n:'04', text:'<strong>Consumer groups:</strong> Kafka allows multiple consumer groups to read the same topic independently. One group for notifications, one for analytics, one for search indexing — all reading the same OrderCreated event stream without interfering.'},
+      {n:'05', text:'<strong>Dead letter queue (DLQ):</strong> when a message fails processing N times, move it to a DLQ rather than blocking the queue. The DLQ is for investigation and manual replay. Without a DLQ, one bad message can halt an entire queue.'},
+      {n:'06', text:'<strong>Ordering guarantees:</strong> Kafka guarantees ordering within a partition, not across partitions. SQS standard queue has no ordering guarantee. SQS FIFO has ordering but lower throughput. If ordering matters, use a single partition or FIFO queue.'},
+    ],
+    comparison:{
+      headers:['System','Delivery','Ordering','Replay','Throughput','Best for'],
+      rows:[
+        ['Kafka','At-least-once','Per partition','Yes (log)','Very high','Event streaming, audit, replay'],
+        ['SQS Standard','At-least-once','None','No','High','Task queues, decoupling'],
+        ['SQS FIFO','Exactly-once','FIFO','No','Lower','Order-sensitive tasks'],
+        ['RabbitMQ','At-least-once','Per queue','No','High','Complex routing, RPC'],
+        ['Redis Streams','At-least-once','Yes','Yes','High','Lightweight Kafka alternative'],
+      ]
+    },
+    tradeoffs:[
+      {name:'Async messaging',pro:true,body:'Decouples services. Producer never waits for consumer. Absorbs traffic spikes. Consumer can scale independently.'},
+      {name:'Async messaging',pro:false,body:'Eventual consistency — user doesn\'t see immediate result. Harder to debug. Failure modes are less visible.'},
+      {name:'Kafka (log-based)',pro:true,body:'Replay events. Multiple consumer groups. Audit trail. Near-unlimited retention.'},
+      {name:'Kafka (log-based)',pro:false,body:'Operationally complex. Partition count must be planned upfront. Consumer offset management is a new failure mode.'},
+    ],
+    triggers:[
+      {text:'Operation takes > 200ms and user doesn\'t need the result immediately → <strong>make it async</strong>.'},
+      {text:'Multiple services need to react to the same event → <strong>pub-sub (Kafka topic or SNS)</strong>.'},
+      {text:'Need audit trail or event replay → <strong>Kafka</strong>.'},
+      {text:'Simple background job queue → <strong>SQS or Redis queue</strong>.'},
+      {text:'Order confirmation email, notification, analytics — all triggered by same event → <strong>fan-out via Kafka consumer groups</strong>.'},
+    ],
+    avoids:[
+      {text:'Don\'t make a queue your primary database. Queues are for transit, not storage.'},
+      {text:'Don\'t skip the DLQ. A message that always fails will block your queue until you handle it.'},
+      {text:'Don\'t assume exactly-once. Design for idempotency instead — it\'s simpler and more reliable.'},
+    ],
+    challenge:{
+      title:'Design the notification system for an e-commerce platform',
+      desc:'When an order is placed, the platform must: send an email receipt, send an SMS, update in-app notification badge, trigger inventory reservation, and emit an analytics event. All within 30 seconds. Order placement response time must stay under 200ms.',
+      reqs:[
+        {text:'<strong>Async boundary:</strong> Which of the 5 operations must be synchronous with order placement, and which can be async?'},
+        {text:'<strong>Fan-out:</strong> How does one OrderPlaced event trigger all 5 downstream operations without the order service knowing about them?'},
+        {text:'<strong>Failure handling:</strong> The SMS provider is down for 10 minutes. What happens to the queue? How do you recover?'},
+        {text:'<strong>Idempotency:</strong> A message is delivered twice due to retry. The user receives two emails. How do you prevent this?'},
+      ],
+      guidedQ:'If you use SQS and the SMS provider goes down for 10 minutes while 50K orders arrive, what happens to the queue depth — and what does that mean for message processing order when the provider comes back up?',
+    },
+  },
+
+  {
+    id:'reliability', name:'Reliability', icon:'🛡', sub:'Circuit breakers · Rate limiting · SLOs',
+    tagline:'Systems fail. Design for graceful degradation, not optimistic availability.',
+    mentalModel:[
+      {n:'01', text:'<strong>Circuit breaker:</strong> wraps a remote call. Counts consecutive failures. After a threshold (e.g. 5 failures in 10s), the circuit "opens" — all calls fail immediately without hitting the downstream service. After a timeout, one "probe" call tests recovery. Prevents cascade failures: a slow dependency won\'t exhaust your thread pool if you fail fast.'},
+      {n:'02', text:'<strong>Rate limiting:</strong> protects your service from being overwhelmed. Token bucket: N tokens added per second, each request costs 1 token. Allows bursting up to bucket size. Sliding window: count requests in the last N seconds. Fixed window: simpler but allows 2x burst at window boundary.'},
+      {n:'03', text:'<strong>Retry with exponential backoff:</strong> retry failed requests, but double the wait time each attempt (1s, 2s, 4s, 8s…). Add jitter (random delay) to prevent retry storms where all clients retry at the same time after a failure.'},
+      {n:'04', text:'<strong>Bulkhead:</strong> isolate failures. Give each downstream dependency its own thread pool. If dependency A is slow, it only exhausts A\'s pool — not all threads. Inspired by ship hull compartments: one breach doesn\'t sink the ship.'},
+      {n:'05', text:'<strong>SLOs and error budgets:</strong> SLO = Service Level Objective (e.g. 99.9% uptime = 8.7h downtime/year allowed). Error budget = how much unreliability you\'re allowed before you must prioritise reliability over features. If error budget is exhausted, feature work stops until reliability improves.'},
+      {n:'06', text:'<strong>Graceful degradation:</strong> when a non-critical dependency fails, return a degraded response rather than an error. Netflix still serves recommendations without ML personalisation (use cached popular items). Show stale data rather than an error page.'},
+    ],
+    comparison:{
+      headers:['Pattern','Protects','Against','Trade-off'],
+      rows:[
+        ['Circuit breaker','Caller','Slow/failed dependency','May fail-fast when dependency recovers'],
+        ['Rate limiter','Service','Overload, abuse','Legitimate users may be throttled'],
+        ['Retry + backoff','Caller','Transient failures','Amplifies load during outages'],
+        ['Bulkhead','Service','Cascade from one slow dep','More complex thread pool management'],
+        ['Timeout','Caller','Hanging connections','Too short = false failures; too long = slow cascade'],
+        ['Graceful degrade','User','Complete outage','Stale/partial data shown'],
+      ]
+    },
+    tradeoffs:[
+      {name:'Aggressive retries',pro:true,body:'Masks transient failures from the user. Improves perceived reliability for flaky networks.'},
+      {name:'Aggressive retries',pro:false,body:'Amplifies load on a struggling dependency. Without backoff and jitter, retries cause retry storms.'},
+      {name:'Short timeouts',pro:true,body:'Fail fast. Don\'t hold connections open. Thread pool freed quickly.'},
+      {name:'Short timeouts',pro:false,body:'False failures on slow but healthy responses. Increases error rate artificially.'},
+    ],
+    triggers:[
+      {text:'Calling an external API that\'s sometimes slow → <strong>circuit breaker + timeout</strong>.'},
+      {text:'Public-facing API endpoint → <strong>rate limiter (token bucket by IP or API key)</strong>.'},
+      {text:'Downstream dependency fails and cascades to your service → <strong>bulkhead</strong>.'},
+      {text:'Idempotent operation failing transiently → <strong>retry with exponential backoff + jitter</strong>.'},
+      {text:'Non-critical feature dependency fails → <strong>graceful degradation with fallback</strong>.'},
+    ],
+    avoids:[
+      {text:'Don\'t retry non-idempotent operations (POST to charge a card). Retry only safe/idempotent operations.'},
+      {text:'Don\'t set timeouts longer than your SLO. If your SLO is 500ms P99, your timeout must be shorter.'},
+      {text:'Don\'t open circuit breakers too eagerly. A single failure is noise. Set threshold to multiple failures in a time window.'},
+    ],
+    challenge:{
+      title:'Design the reliability layer for a payment processing service',
+      desc:'A payment service calls three external providers: card processor (critical), fraud detection (important), and analytics (non-critical). Card processing must succeed. Fraud detection failure should degrade gracefully. Analytics failure should be invisible to the user.',
+      reqs:[
+        {text:'<strong>Timeouts:</strong> Set timeout strategy per dependency based on criticality. Justify each value.'},
+        {text:'<strong>Circuit breaker:</strong> Configure circuit breaker thresholds for the card processor. What triggers open/close?'},
+        {text:'<strong>Graceful degradation:</strong> Fraud detection is down. Do you approve the payment, reject it, or something else? Justify.'},
+        {text:'<strong>Rate limiting:</strong> Your service receives 10x normal traffic (possible DDoS). What rate limiting strategy protects it?'},
+      ],
+      guidedQ:'The card processor\'s circuit is open (too many failures). A user tries to pay. Do you return an error immediately, queue the payment for retry, or attempt the backup processor — and what does each choice mean for user experience and data consistency?',
+    },
+  },
+
+  {
+    id:'api-design', name:'API Design', icon:'🔌', sub:'REST · GraphQL · gRPC · Pagination',
+    tagline:'An API is a contract. Every design decision you make today is a migration someone runs in 3 years.',
+    mentalModel:[
+      {n:'01', text:'<strong>REST:</strong> resource-oriented. URLs are nouns (`/users/123/orders`), HTTP verbs are actions (GET, POST, PUT, DELETE, PATCH). Stateless — server holds no client state. Widely understood, easy to cache, works everywhere. Verb-based actions that don\'t map to CRUD (e.g. `/orders/123/cancel`) are awkward in pure REST.'},
+      {n:'02', text:'<strong>GraphQL:</strong> client specifies exactly what data it needs. One endpoint, flexible queries. Solves over-fetching (REST returns 50 fields, you need 3) and under-fetching (need data from 3 REST endpoints, GraphQL combines them). Trade-off: complex queries can be expensive server-side; caching is harder; N+1 query problem requires DataLoader.'},
+      {n:'03', text:'<strong>gRPC:</strong> binary protocol (Protocol Buffers), typed contracts, bidirectional streaming. 5-10x smaller payload than JSON REST. Perfect for internal service-to-service communication. Not browser-friendly without a proxy. Schema must be defined upfront — good discipline, less flexibility.'},
+      {n:'04', text:'<strong>Pagination:</strong> never return unbounded lists. Offset pagination (`?page=2&limit=20`) is simple but breaks when items are inserted mid-result. Cursor pagination (`?after=cursor_token`) is stable for live data and scales to arbitrarily large datasets. Use cursor for anything that changes in real time.'},
+      {n:'05', text:'<strong>Versioning:</strong> version in the URL (`/v1/users`) or in headers (`Accept: application/vnd.api+json;version=2`). URL versioning is explicit and cacheable. Never make breaking changes without a new version. Deprecate old versions with a sunset date.'},
+      {n:'06', text:'<strong>Idempotency keys:</strong> for non-idempotent operations (payment, order creation), accept a client-generated idempotency key. If the same key is submitted twice, return the same result without re-executing. Solves the "did my payment go through?" retry problem safely.'},
+    ],
+    comparison:{
+      headers:['Protocol','Best for','Payload','Browser support','Caching'],
+      rows:[
+        ['REST','Public APIs, CRUD','JSON (verbose)','Native','Easy (HTTP)'],
+        ['GraphQL','Complex client needs, BFF','JSON (precise)','Native','Harder'],
+        ['gRPC','Internal service RPC','Protobuf (binary)','Needs proxy','Manual'],
+        ['WebSocket','Real-time bidirectional','Binary/text','Native','N/A'],
+        ['SSE','Server push (one-way)','Text','Native','N/A'],
+      ]
+    },
+    tradeoffs:[
+      {name:'REST',pro:true,body:'Universal support, easy caching, widely understood, stateless, great tooling.'},
+      {name:'REST',pro:false,body:'Over-fetching, under-fetching, awkward for non-CRUD actions, multiple round trips.'},
+      {name:'GraphQL',pro:true,body:'Clients fetch exactly what they need. One endpoint. Strongly typed schema.'},
+      {name:'GraphQL',pro:false,body:'N+1 queries, complex caching, expensive introspection, security exposure (arbitrary queries).'},
+    ],
+    triggers:[
+      {text:'Public API consumed by external developers → <strong>REST with OpenAPI spec</strong>.'},
+      {text:'Mobile app with diverse screens needing different data shapes → <strong>GraphQL or BFF pattern</strong>.'},
+      {text:'Internal microservice-to-microservice calls → <strong>gRPC</strong>.'},
+      {text:'Real-time updates (live scores, notifications) → <strong>WebSocket or SSE</strong>.'},
+      {text:'Idempotent retries for payments/orders → <strong>idempotency keys</strong>.'},
+    ],
+    avoids:[
+      {text:'Don\'t use offset pagination for live feeds. Page 2 shifts when new items are inserted — users see duplicates or miss items.'},
+      {text:'Don\'t expose internal DB IDs in public APIs. Use opaque tokens or UUIDs — prevents enumeration attacks and lets you change storage later.'},
+      {text:'Don\'t put verbs in REST URLs (`/createUser`). Use HTTP methods (`POST /users`). Verbs belong to HTTP, not URLs.'},
+    ],
+    challenge:{
+      title:'Design the API layer for a food delivery platform',
+      desc:'A food delivery app has: customer mobile app, restaurant dashboard (web), delivery driver app, and third-party integrations. Each has different data needs, update frequencies, and latency requirements.',
+      reqs:[
+        {text:'<strong>Protocol choice:</strong> Choose REST vs GraphQL vs gRPC for each of the four clients. Justify each independently.'},
+        {text:'<strong>Real-time:</strong> Driver location updates every 5 seconds to the customer. What API mechanism handles this?'},
+        {text:'<strong>Pagination:</strong> The restaurant menu has 200 items. The order history has 10K orders. Choose pagination strategy for each.'},
+        {text:'<strong>Versioning:</strong> You need to add a required field to the order response. How do you do this without breaking existing clients?'},
+      ],
+      guidedQ:'The customer app needs: restaurant name, rating, delivery time estimate, and menu items for a search results page. A REST call to `/restaurants` returns 80 fields. What problem does this cause on mobile — and does GraphQL solve it or introduce new problems?',
+    },
+  },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let current = null;
+let currentTab = 'overview';
+let progress = JSON.parse(localStorage.getItem('hld-cpl') || '{}');
+let isDark = true;
+
+function save(){ localStorage.setItem('hld-cpl', JSON.stringify(progress)); }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init(){
+  renderNav();
+  renderProgressList();
+}
+
+function renderNav(){
+  document.getElementById('nav-concepts').innerHTML = CONCEPTS.map(c => `
+    <button class="con-btn ${current && current.id === c.id ? 'active' : ''}" onclick="selectConcept('${c.id}')">
+      <div class="con-icon">${c.icon}</div>
+      <div class="con-info">
+        <div class="con-name">${c.name}</div>
+        <div class="con-sub">${c.sub}</div>
+      </div>
+    </button>`).join('');
+}
+
+function renderProgressList(){
+  const tabs = ['overview','compare','tradeoffs','challenge'];
+  document.getElementById('progress-list').innerHTML = CONCEPTS.map(c => {
+    const done = tabs.filter(t => progress[c.id+':'+t]).length;
+    const pips = tabs.map(t => `<div class="pip ${progress[c.id+':'+t]?'done':''}"></div>`).join('');
+    return `<div class="progress-row"><span class="prog-name">${c.icon} ${c.name}</span><div class="prog-pips">${pips}</div></div>`;
+  }).join('');
+}
+
+// ── SELECT ────────────────────────────────────────────────────────────────────
+function selectConcept(id){
+  current = CONCEPTS.find(c => c.id === id);
+  currentTab = 'overview';
+  renderAll();
+}
+
+function renderAll(){
+  if(!current) return;
+  renderNav();
+  renderProgressList();
+  const c = current;
+  const tabs = [
+    {id:'overview',  label:'① Overview'},
+    {id:'compare',   label:'② Comparison'},
+    {id:'tradeoffs', label:'③ Trade-offs'},
+    {id:'challenge', label:'④ Challenge'},
+  ];
+  const tabHtml = tabs.map(t =>
+    `<button class="tab ${currentTab===t.id?'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`
+  ).join('');
+
+  document.getElementById('main-area').innerHTML = `
+    <div class="view">
+      <div class="con-header">
+        <div class="con-title-row">
+          <div class="con-h-icon">${c.icon}</div>
+          <span class="con-h-name">${c.name}</span>
+          <span class="con-h-type">HLD Concept</span>
+        </div>
+        <div class="con-h-desc">${c.tagline}</div>
+      </div>
+      <div class="tab-bar">${tabHtml}</div>
+      <div id="tab-content"></div>
+    </div>`;
+  renderTab();
+}
+
+function setTab(tab){
+  currentTab = tab;
+  progress[current.id+':'+tab] = true;
+  save();
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.textContent.includes(
+      tab==='overview'?'①':tab==='compare'?'②':tab==='tradeoffs'?'③':'④'));
+  });
+  renderProgressList();
+  renderTab();
+}
+
+function renderTab(){
+  const el = document.getElementById('tab-content');
+  if(!el) return;
+  const c = current;
+
+  if(currentTab === 'overview'){
+    const triggers = (c.triggers||[]).map(t=>`<div class="trigger"><div class="t-dot"></div><div class="t-text">${t.text}</div></div>`).join('');
+    const avoids = (c.avoids||[]).map(t=>`<div class="trigger t-avoid"><div class="t-dot"></div><div class="t-text">${t.text}</div></div>`).join('');
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-title">🧠 Mental model — read before anything else</div>
+        <div class="mm-points">${c.mentalModel.map(m=>`
+          <div class="mm-point"><div class="mm-num">${m.n}</div><div class="mm-text">${m.text}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">✅ When to reach for this</div>
+        <div class="trigger-list">${triggers}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ When NOT to use it / common mistakes</div>
+        <div class="trigger-list">${avoids}</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:4px">
+        <button class="abtn btn-amber" onclick="setTab('compare')">Next: Comparison →</button>
+      </div>`;
+  }
+
+  else if(currentTab === 'compare'){
+    const {headers, rows} = c.comparison;
+    const ths = headers.map(h=>`<th>${h}</th>`).join('');
+    const trs = rows.map(r=>`<tr>${r.map((cell,i)=>`<td>${cell}</td>`).join('')}</tr>`).join('');
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-title">📊 Side-by-side comparison</div>
+        <div style="overflow-x:auto">
+          <table class="compare-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <button class="abtn btn-ghost" onclick="setTab('overview')">← Overview</button>
+        <button class="abtn btn-amber" onclick="setTab('tradeoffs')">Next: Trade-offs →</button>
+      </div>`;
+  }
+
+  else if(currentTab === 'tradeoffs'){
+    const cards = c.tradeoffs.map(t=>`
+      <div class="tradeoff-card">
+        <div class="tc-header">
+          <span class="tc-name">${t.name}</span>
+          <span class="tc-pill ${t.pro?'pill-pro':'pill-con'}">${t.pro?'✓ Pro':'✗ Con'}</span>
+        </div>
+        <div class="tc-body">${t.body}</div>
+      </div>`).join('');
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-title">⚖️ Trade-offs — memorise these, you'll be asked</div>
+        <div class="tradeoff-grid">${cards}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <button class="abtn btn-ghost" onclick="setTab('compare')">← Comparison</button>
+        <button class="abtn btn-amber" onclick="setTab('challenge')">Next: Challenge →</button>
+      </div>`;
+  }
+
+  else if(currentTab === 'challenge'){
+    const ch = c.challenge;
+    const prompt = buildPrompt(c);
+    el.innerHTML = `
+      <div class="challenge-banner">
+        <div class="cb-label">↳ Interview challenge</div>
+        <div class="cb-title">${ch.title}</div>
+        <div class="cb-desc">${ch.desc}</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Requirements</div>
+        <div class="reqs-list">${ch.reqs.map((r,i)=>`
+          <div class="req"><div class="req-num">${String(i+1).padStart(2,'0')}</div><div class="req-text">${r.text}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="guided-q">
+        <div class="gq-label">↳ Guided question — answer before designing</div>
+        <div class="gq-text">${ch.guidedQ}</div>
+      </div>
+      <div class="action-row">
+        <button class="abtn btn-amber" onclick="iosOpen('${encodeURI('https://claude.ai/new?q='+encodeURIComponent(prompt))}', true)">→ Open in Claude</button>
+        <button class="abtn btn-ghost" onclick="copyPrompt('${c.id}')">⎘ Copy prompt</button>
+        <a class="abtn btn-teal" href="index.html">⇄ Practice problems</a>
+        <button class="abtn btn-ghost" onclick="setTab('tradeoffs')">← Trade-offs</button>
+      </div>`;
+  }
+}
+
+function buildPrompt(c){
+  const ch = c.challenge;
+  const reqs = ch.reqs.map((r,i)=>`${i+1}. ${r.text.replace(/<[^>]+>/g,'')}`).join('\n');
+  return `You are my HLD (High Level Design) mentor. I am a senior software engineer preparing for system design interviews.
+
+Concept I am studying: ${c.name}
+Challenge: ${ch.title}
+
+${ch.desc}
+
+Requirements:
+${reqs}
+
+Before I attempt, ask me only this question and wait:
+"${ch.guidedQ}"
+
+After I answer and describe my design:
+1. Identify gaps in my design — missing components, wrong technology choices, unaddressed failure modes
+2. Push on trade-offs — why did I choose X over Y? What happens at 10x scale?
+3. Call out any CAP theorem or consistency mistakes
+4. Ask one follow-up that reveals the depth of my understanding
+Do NOT give me the answer. Guide me to it.`;
+}
+
+function copyPrompt(id){
+  const c = CONCEPTS.find(x=>x.id===id);
+  if(!c) return;
+  navigator.clipboard.writeText(buildPrompt(c)).then(()=>{
+    const btns = document.querySelectorAll('.abtn');
+    btns.forEach(b=>{ if(b.textContent.includes('Copy')){const o=b.textContent;b.textContent='✓ Copied';setTimeout(()=>b.textContent=o,1800);}});
+  });
+}
+
+function iosOpen(url, blank){
+  const a = document.createElement('a');
+  a.href = decodeURI(url);
+  if(blank) a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent = isDark?'🌙 theme':'☀️ theme';
+}
+
+function initMobileSidebar(){
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+  const btn = document.getElementById('hamburger-btn');
+  if(!sidebar||!overlay||!btn) return;
+  function open(){ sidebar.classList.add('open');overlay.classList.add('open');btn.classList.add('open');document.body.style.overflow='hidden';}
+  function close(){ sidebar.classList.remove('open');overlay.classList.remove('open');btn.classList.remove('open');document.body.style.overflow='';}
+  btn.addEventListener('click',()=>sidebar.classList.contains('open')?close():open());
+  overlay.addEventListener('click',close);
+  sidebar.querySelectorAll('button,a').forEach(el=>el.addEventListener('click',()=>{if(window.innerWidth<=768)close();}));
+}
+
+init();
+initMobileSidebar();
+</script>
+</body>
+</html>

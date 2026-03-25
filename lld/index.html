@@ -228,8 +228,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   .hamburger.open span:nth-child(2){opacity:0;}
   .hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
 
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;}
-  .sidebar-overlay.open{opacity:1;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .sidebar-overlay.open{opacity:1;pointer-events:auto;}
+
+  /* iOS Safari tap fixes */
+  a, button, [onclick], .fbtn, .pbtn, .pat-btn, .prow, .pb, .vtab, .tab {
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  * { -webkit-overflow-scrolling: touch; }
+  .main, .sidebar { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
 
   @media(max-width:768px){
     .hamburger{display:flex;}
@@ -273,15 +282,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="tb-dot"></div>
+  <a href="../index.html" style="font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;">prep-index</a>
+  <span class="tb-sep"> / </span>
   <span class="tb-title">lld-prep</span>
   <span class="tb-sep"> / </span>
-  <span class="tb-sub">index</span>
+  <span class="tb-sub">problems</span>
   <div class="tb-right">
       <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
     <span class="phase-pill pill-active">Phase 1–2 active</span>
     <span class="phase-pill pill-locked">Phase 3–4 🔒</span>
     <span class="phase-pill" style="background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.25);">Modern ✓</span>
-    <a class="icon-btn" href="lld-pattern-learn.html">⇄ Pattern lab</a>
+    <a class="icon-btn" href="pattern-lab.html">⇄ Pattern lab</a>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
 </div>
@@ -472,7 +483,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="mlinks">
       <button class="mlbtn btn-purple" onclick="openModalClaude()">→ Open in Claude</button>
       <button class="mlbtn btn-amber"  onclick="copyModalPrompt()">⎘ Copy mentor prompt</button>
-      <a class="mlbtn" id="m-learn-link" href="lld-pattern-learn.html" target="_blank"
+      <a class="mlbtn" id="m-learn-link" href="pattern-lab.html" target="_blank"
          style="background:rgba(45,212,191,.08);color:var(--teal);border-color:rgba(45,212,191,.25);">
         ⇄ Learn pattern
       </a>
@@ -1550,7 +1561,7 @@ function openNextClaude(){
   for(const g of GROUPS){
     for(const p of g.problems){
       if(!statuses[p.id]||statuses[p.id]==='todo'){
-        window.open(buildPromptUrl({...p,groupName:g.name}),'_blank');
+        iosOpen(buildPromptUrl({...p,groupName:g.name}, false),'_blank');
         return;
       }
     }
@@ -1704,14 +1715,24 @@ After my attempt:
 5. Do NOT rewrite my solution — correct the mental model only`;
 }
 
+function iosOpen(url, blank){
+  // iOS Safari blocks window.open() from async context — use <a> click trick
+  const a = document.createElement('a');
+  a.href = url;
+  if(blank) a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 function openByIdClaude(id){
   const p = ALL.find(x=>x.id===id); if(!p) return;
-  window.open(buildPromptUrl(p),'_blank');
+  iosOpen(buildPromptUrl(p, false),'_blank');
 }
 
 function openModalClaude(){
   const p = ALL.find(x=>x.id===activeId); if(!p) return;
-  window.open(buildPromptUrl(p),'_blank');
+  iosOpen(buildPromptUrl(p, false),'_blank');
 }
 
 function copyModalPrompt(){
@@ -1750,7 +1771,7 @@ function openModal(id){
   document.getElementById('m-notes').value          = notes[id]||'';
   // Cross-link: deep-link to this pattern in the Pattern Lab
   const learnLink = document.getElementById('m-learn-link');
-  if(learnLink) learnLink.href = `lld-pattern-learn.html#${p.groupId}`;
+  if(learnLink) learnLink.href = `pattern-lab.html#${p.groupId}`;
   document.getElementById('moverlay').classList.add('open');
 }
 
@@ -1871,7 +1892,7 @@ function openDebugClaude(){
     'If there is a SOLID violation, name the principle and show the consequence — do not fix it.',
   ].filter(l=>l!==null&&l!=='').join('\n');
 
-  window.open(`https://claude.ai/new?q=${encodeURIComponent(lines)}`,'_blank');
+  iosOpen(`https://claude.ai/new?q=${encodeURIComponent(lines, false)}`,'_blank');
 }
 
 function resetDebug(){
