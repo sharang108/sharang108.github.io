@@ -1685,10 +1685,10 @@ function buildPromptUrl(p){
 
 function buildPrompt(p){
   const reqs = (p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
-  const solidFocus = p.solid ? `\nSOLID focus for this problem:\n${p.solid}\n` : '';
-  const type = p.type === 'system' ? 'full system design' : `micro-problem drilling the ${p.groupName} pattern`;
+  const solidFocus = p.solid ? `\nSOLID constraint for this problem:\n${p.solid}\n` : '';
+  const type = p.type === 'system' ? 'full system design' : `micro-problem`;
 
-  return `You are my LLD mentor. I am a senior software engineer learning low-level design for interviews. I code in Python.
+  return `You are a strict LLD interviewer. I am a senior software engineer preparing for design interviews. I code in Python.
 
 Problem #${p.id}: ${p.title}
 Type: ${type}
@@ -1699,20 +1699,26 @@ ${p.desc}
 Requirements:
 ${reqs}
 ${solidFocus}
-Open with the brief only:
-- Restate the problem cleanly
-- Pattern(s) that fit and the trigger that signals them
-- The single most important structural decision I need to make
+INTERVIEWER RULES — follow these exactly:
 
-Then ask me this one question and wait for my attempt:
-"Before you write any code — ${p.type==='micro' ? 'what is the minimum interface the core abstraction needs, and why should the caller never instantiate a concrete class directly?' : 'what are the top 2 patterns this problem uses, and what is the relationship between the classes that use each pattern?'}"
+1. Do NOT name the pattern, hint at the pattern, or confirm my pattern choice until I have proposed a class structure. If I ask "is this the right pattern?", respond only with "walk me through your reasoning."
 
-After my attempt:
-1. Identify conceptual mistakes first, code mistakes second
-2. Map my design against SOLID — call out every violation by principle name
-3. Call out wrong relationships (composition vs inheritance) with consequences
-4. Flag un-Pythonic patterns (missing ABCs, wrong use of dataclasses, no type hints)
-5. Do NOT rewrite my solution — correct the mental model only`;
+2. ONE question at a time. Wait for my full response before asking the next.
+
+3. Reject vague answers. If I say "use an abstract class" without naming the method signatures, say "show me the interface — method names, parameters, return types."
+
+4. Do not let me write code before I have a correct mental model. If my class structure is wrong, stop me before I implement it.
+
+5. After I submit any design or code:
+   - Identify the deepest conceptual mistake first — not surface syntax
+   - Map every flaw to the specific SOLID principle it violates, by name
+   - Call out wrong relationships (composition vs inheritance) and state the consequence
+   - Flag un-Pythonic patterns: missing ABCs, no type hints, wrong use of dataclasses, bare except
+   - Do NOT rewrite my solution — fix the mental model only, then ask me to redo it
+
+6. Never say "great", "exactly", "correct", or any affirmation. Stay neutral.
+
+Start with only the problem statement as written above — nothing else. No hints, no pattern names, no structural guidance. Then ask: "${p.type==='micro' ? 'What is the core abstraction this problem needs — and what methods must it expose to the caller?' : 'What are the two main responsibilities in this system — and should they be in the same class or different ones?'}"`;
 }
 
 function iosOpen(url, blank){
@@ -1875,9 +1881,9 @@ function openDebugClaude(){
   const lines = [
     probLabel ? `LLD Debug — ${probLabel}` : 'LLD Debug session',
     '',
-    'You are my LLD mentor. Diagnose my design thinking, not just my code.',
+    'You are a strict LLD interviewer. Diagnose exactly where my mental model broke — not my syntax.',
     '',
-    pattern ? `Pattern I identified: ${pattern}` : 'Pattern: I am not sure',
+    pattern ? `Pattern I identified: ${pattern}` : 'Pattern: I could not identify one',
     '',
     'My class structure:',
     classes,
@@ -1887,9 +1893,12 @@ function openDebugClaude(){
     '',
     thinking ? `What I thought my design would achieve:\n${thinking}` : '',
     '',
-    'Do NOT rewrite my design. Identify exactly where my mental model is wrong.',
-    'Then ask me one question that leads me to the fix myself.',
+    'Rules:',
+    'Do NOT rewrite my design.',
+    'Identify the single deepest conceptual mistake — not surface errors.',
     'If there is a SOLID violation, name the principle and show the consequence — do not fix it.',
+    'Then ask me exactly one question that leads me to correct it myself.',
+    'Do not ask multiple questions. One only.',
   ].filter(l=>l!==null&&l!=='').join('\n');
 
   iosOpen(`https://claude.ai/new?q=${encodeURIComponent(lines, false)}`,'_blank');

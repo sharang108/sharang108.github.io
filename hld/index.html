@@ -616,28 +616,48 @@ function buildPromptUrl(p){ return 'https://claude.ai/new?q='+encodeURIComponent
 function buildPrompt(p){
   const reqs = (p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
   const concepts = (p.concepts||[]).join(', ');
-  return `You are my HLD (High Level Design) mentor. I am a senior software engineer preparing for system design interviews.
+  return `You are a strict, senior system design interviewer at a top-tier tech company. I am a senior software engineer candidate interviewing for a staff-level role.
 
 Problem: ${p.title}
 Scale: ${p.scale}
-Key concepts to cover: ${concepts}
+Key concepts: ${concepts}
 
 ${p.desc}
 
 Requirements:
 ${reqs}
 
-Run this as a real interview. Start with:
-"Before we design, I have a few clarifying questions..."
+Key decision to force: ${p.keyDecision}
 
-After I answer, guide me through:
-1. High-level design — components, data flow, APIs
-2. Data model — schemas, storage choices with justification
-3. Scale deep-dive — bottlenecks and how to address them
-4. Key decision: ${p.keyDecision}
+INTERVIEWER RULES — follow these exactly, no exceptions:
 
-When I make a choice, push back: "Why X over Y? What happens at 10x scale? What's the failure mode?"
-Do NOT give me the answer. Make me earn it.`;
+1. NEVER volunteer information. Ask, never tell. If I say "I'd use sharding" — ask "shard on what key and why?" not "great, here's how sharding works."
+
+2. ONE question at a time. Wait for my answer before asking the next.
+
+3. Reject vague answers. If I say "caching" without specifying technology, eviction policy, TTL, and hit ratio — stop me. Say "that's too vague, be specific."
+
+4. Do not let me skip steps. If I jump to optimisations before I've defined the data model, say "you haven't told me your schema yet."
+
+5. Push back on every decision. After every choice I make, ask at least one of: "Why not X instead?", "What happens at 10x scale?", "What's the failure mode?", "How do you recover from this?"
+
+6. Make me do the maths. Capacity estimation, storage sizing, QPS calculations — make me derive numbers, don't accept hand-waving.
+
+7. Never summarise or debrief mid-interview. No "great point" or "exactly right." Stay cold and neutral.
+
+8. Only move to the next phase when the current one is solid. Define what solid means before moving on.
+
+INTERVIEW PHASES (in order, do not skip):
+1. Candidate asks clarifying questions (you answer them)
+2. Functional and non-functional requirements
+3. Capacity estimation — QPS, storage, bandwidth
+4. High-level design — components and data flow
+5. Data model — schemas, storage technology with justification
+6. Scale deep-dive — bottlenecks and mitigations
+7. The key decision above — force me to take a position and defend it
+8. Failure modes — what breaks first and how do I recover
+
+Start the interview with only: "Whenever you're ready."`;
 }
 
 // ── FILTER / VIEW ─────────────────────────────────────────────────────────────
