@@ -170,12 +170,12 @@ a,button,[onclick],.con-btn{-webkit-tap-highlight-color:transparent;cursor:point
   <div class="tb-dot"></div>
   <a href="../index.html" class="tb-link">prep-index</a>
   <span class="tb-sep"> / </span>
-  <a href="index.html" class="tb-link">hld-prep</a>
+  <a href="hld-index.html" class="tb-link">hld-prep</a>
   <span class="tb-sep"> / </span>
   <span class="tb-title">concept-lab</span>
   <div class="tb-right">
     <button class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></button>
-    <a href="index.html" class="icon-btn">⇄ Problems</a>
+    <a href="hld-index.html" class="icon-btn">⇄ Problems</a>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
 </div>
@@ -684,7 +684,7 @@ function renderTab(){
       <div class="action-row">
         <button class="abtn btn-amber" onclick="iosOpen('${encodeURI('https://claude.ai/new?q='+encodeURIComponent(prompt))}', true)">→ Open in Claude</button>
         <button class="abtn btn-ghost" onclick="copyPrompt('${c.id}')">⎘ Copy prompt</button>
-        <a class="abtn btn-teal" href="index.html">⇄ Practice problems</a>
+        <a class="abtn btn-teal" href="hld-index.html">⇄ Practice problems</a>
         <button class="abtn btn-ghost" onclick="setTab('tradeoffs')">← Trade-offs</button>
       </div>`;
   }
