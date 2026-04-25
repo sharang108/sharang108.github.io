@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HLD · Estimation Drills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--accent:#4ade80;--amber:#fbbf24;--blue:#60a5fa;--coral:#f87171;--purple:#a78bfa;--teal:#2dd4bf;--tr:0.15s ease;}
+[data-theme="dark"]{--bg:#0d0f11;--bg2:#13161a;--bg3:#1a1e23;--bg4:#1f242b;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e2e4e7;--muted:#4e5666;--muted2:#7a8090;}
+[data-theme="light"]{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0ede8;--bg4:#e8e5df;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1a1c20;--muted:#9a9fa8;--muted2:#6b7280;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:52px;gap:10px;position:sticky;top:0;z-index:100;}
+.tb-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 7px var(--amber);flex-shrink:0;}
+.tb-link{font-family:var(--mono);font-size:11px;color:var(--muted2);text-decoration:none;letter-spacing:.04em;}
+.tb-link:hover{color:var(--text);}
+.tb-sep{font-family:var(--mono);color:var(--muted2);font-size:11px;}
+.tb-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;}
+.tb-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+.icon-btn{height:30px;padding:0 10px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .12s;color:var(--muted2);gap:5px;text-decoration:none;white-space:nowrap;}
+.icon-btn:hover{background:var(--bg4);color:var(--text);}
+
+/* LAYOUT */
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 52px);}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:16px 0 40px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
+.main{padding:24px 28px;overflow-y:auto;}
+
+/* SIDEBAR */
+.s-lbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:0 16px;margin-bottom:8px;margin-top:16px;display:block;}
+.cat-btn{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .12s;width:100%;background:none;border-top:none;border-right:none;border-bottom:none;text-align:left;color:var(--text);}
+.cat-btn:hover{background:var(--bg3);}
+.cat-btn.active{border-left-color:var(--amber);background:var(--bg3);}
+.cb-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0;}
+.cb-info{flex:1;min-width:0;}
+.cb-name{font-family:var(--mono);font-size:11px;font-weight:500;}
+.cb-done{font-family:var(--mono);font-size:10px;color:var(--muted2);}
+.s-score{padding:10px 16px;margin-top:8px;}
+.score-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;margin-bottom:4px;}
+.score-key{color:var(--muted);}
+.score-val{font-weight:500;color:var(--amber);}
+.streak-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;}
+.streak-fill{height:100%;background:var(--amber);border-radius:2px;transition:width .4s ease;}
+
+/* MAIN */
+.cat-header{margin-bottom:20px;}
+.cat-title{font-family:var(--mono);font-size:17px;font-weight:600;margin-bottom:4px;}
+.cat-sub{font-size:12px;color:var(--muted2);line-height:1.6;max-width:560px;}
+.cat-formula{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid rgba(251,191,36,.2);border-left:3px solid var(--amber);padding:8px 12px;border-radius:4px;margin-top:10px;color:var(--amber);}
+
+/* DRILL CARD */
+.drill-card{background:var(--bg3);border:1px solid var(--border);border-radius:7px;margin-bottom:14px;overflow:hidden;transition:border-color .12s;}
+.drill-card.done{border-color:rgba(74,222,128,.25);}
+.drill-card.wrong{border-color:rgba(248,113,113,.25);}
+.dc-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;}
+.dc-num{font-family:var(--mono);font-size:10px;color:var(--muted2);flex-shrink:0;padding-top:2px;}
+.dc-body{flex:1;min-width:0;}
+.dc-title{font-family:var(--mono);font-size:13px;font-weight:500;margin-bottom:4px;}
+.dc-scenario{font-size:12px;color:var(--muted2);line-height:1.6;}
+.dc-status{flex-shrink:0;display:flex;align-items:center;gap:6px;}
+.diff-badge{font-family:var(--mono);font-size:9px;padding:2px 5px;border-radius:2px;}
+.d-easy{color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.15);}
+.d-med{color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.15);}
+.d-hard{color:var(--coral);background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);}
+.sdot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);}
+.sd-done{background:rgba(74,222,128,.15);color:var(--accent);}
+.sd-wrong{background:rgba(248,113,113,.15);color:var(--coral);}
+.sd-todo{background:var(--border);color:var(--muted);}
+
+/* STEPS (hidden until card is open) */
+.dc-steps{border-top:1px solid var(--border);display:none;}
+.dc-steps.open{display:block;}
+.step{padding:14px 16px;border-bottom:1px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.step-q{font-family:var(--mono);font-size:11px;font-weight:600;margin-bottom:8px;color:var(--text);}
+.step-q-num{color:var(--amber);margin-right:6px;}
+.step-input-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.step-input{background:var(--bg4);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:13px;padding:7px 10px;width:200px;outline:none;transition:border-color .12s;}
+.step-input:focus{border-color:var(--amber);}
+.step-unit{font-family:var(--mono);font-size:11px;color:var(--muted2);}
+.step-hint{font-size:11px;color:var(--muted2);line-height:1.5;margin-bottom:8px;font-style:italic;}
+.reveal-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:var(--bg4);color:var(--muted2);transition:all .1s;}
+.reveal-btn:hover{border-color:var(--amber);color:var(--amber);}
+.answer-box{display:none;margin-top:8px;padding:10px 12px;background:var(--bg4);border:1px solid rgba(74,222,128,.2);border-left:3px solid var(--accent);border-radius:4px;}
+.answer-box.show{display:block;}
+.answer-formula{font-family:var(--mono);font-size:11px;color:var(--muted2);margin-bottom:6px;line-height:1.8;}
+.answer-formula span{color:var(--amber);}
+.answer-result{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);}
+.answer-insight{font-size:11px;color:var(--muted2);margin-top:6px;line-height:1.6;border-top:1px solid var(--border);padding-top:6px;}
+.answer-insight strong{color:var(--text);}
+
+/* CARD FOOTER */
+.dc-footer{padding:10px 16px;display:flex;gap:7px;align-items:center;border-top:1px solid var(--border);background:var(--bg4);}
+.mark-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid;transition:all .1s;}
+.mb-got{color:var(--accent);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.08);}
+.mb-got:hover{background:rgba(74,222,128,.15);}
+.mb-missed{color:var(--coral);border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08);}
+.mb-missed:hover{background:rgba(248,113,113,.15);}
+.mb-reset{color:var(--muted2);border-color:var(--border);background:none;}
+.mb-reset:hover{color:var(--text);border-color:var(--border2);}
+.dc-footer-note{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-left:auto;}
+
+/* CHEAT SHEET PANEL */
+.cheat-sheet{background:var(--bg3);border:1px solid rgba(251,191,36,.15);border-radius:7px;padding:16px 18px;margin-bottom:20px;}
+.cs-title{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--amber);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em;}
+.cs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cs-item{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:8px 10px;}
+.cs-key{font-family:var(--mono);font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.cs-val{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--amber);}
+.cs-note{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-top:2px;}
+
+/* PROGRESS */
+.progress-bar-wrap{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:20px;}
+.progress-bar-fill{height:100%;background:var(--amber);border-radius:2px;transition:width .4s ease;}
+
+/* RESPONSIVE */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:4px;background:none;border:1px solid var(--border2);}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--muted2);border-radius:2px;transition:all .2s;}
+.hamburger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98;opacity:0;transition:opacity .2s;pointer-events:none;}
+.sidebar-overlay.open{opacity:1;pointer-events:auto;}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .shell{grid-template-columns:1fr;}
+  .sidebar{position:fixed;top:52px;left:0;bottom:0;width:260px;transform:translateX(-100%);transition:transform .25s;z-index:99;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay{display:block;}
+  .main{padding:14px;}
+  .cs-grid{grid-template-columns:1fr!important;}
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+*{-webkit-tap-highlight-color:transparent;}
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<div class="topbar">
+  <div class="tb-dot"></div>
+  <a class="tb-link" href="../index.html">prep-index</a>
+  <span class="tb-sep"> / </span>
+  <a class="tb-link" href="hld-index.html">hld-prep</a>
+  <span class="tb-sep"> / </span>
+  <span class="tb-title">estimation-drills</span>
+  <div class="tb-right">
+    <button class="hamburger" id="ham-btn"><span></span><span></span><span></span></button>
+    <a class="icon-btn" href="hld-index.html">⇄ Problems</a>
+    <a class="icon-btn" href="hld-concepts.html">⇄ Concept lab</a>
+    <button class="icon-btn" onclick="toggleTheme()">🌙 theme</button>
+  </div>
+</div>
+
+<div class="shell">
+<div class="sidebar" id="sidebar">
+  <span class="s-lbl">Categories</span>
+  <div id="cat-nav"></div>
+  <span class="s-lbl" style="margin-top:20px">Session</span>
+  <div class="s-score">
+    <div class="score-row"><span class="score-key">got it</span><span class="score-val" id="sc-got">0</span></div>
+    <div class="score-row"><span class="score-key">missed</span><span class="score-val" id="sc-miss" style="color:var(--coral)">0</span></div>
+    <div class="score-row"><span class="score-key">accuracy</span><span class="score-val" id="sc-acc">—</span></div>
+    <div class="streak-bar"><div class="streak-fill" id="streak-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="main" id="main-area">
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+  <div id="content-area"></div>
+</div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+// Each drill has steps. Each step has:
+//   q       — the question shown to the user
+//   hint    — formula / what to plug in (shown before reveal)
+//   formula — worked formula shown in answer
+//   answer  — the computed result
+//   unit    — unit label next to the input field
+//   insight — the "so what" shown after answer
+
+const CATS = [
+{id:'qps', icon:'⚡', name:'QPS & traffic', formula:'DAU × events/day ÷ 86,400 = avg QPS  |  avg QPS × 3 = peak QPS', drills:[
+  {id:1, title:'Social feed read QPS', diff:'easy',
+   scenario:'Instagram: 500M DAU. Each user opens the feed 8 times/day. Each open = 1 API call for feed data.',
+   steps:[
+     {q:'Average feed API calls per second?',
+      hint:'DAU × opens_per_day ÷ 86,400',
+      formula:'500,000,000 × 8 ÷ 86,400',
+      answer:'~46,300 QPS',
+      unit:'QPS',
+      insight:'<strong>~46K QPS average</strong>. This is why a single app server (handles ~5K RPS) is never enough. You need ~10 just for average load.'},
+     {q:'Peak QPS (assume 3× average)?',
+      hint:'avg QPS × 3',
+      formula:'46,300 × 3',
+      answer:'~139,000 QPS',
+      unit:'QPS peak',
+      insight:'<strong>~140K peak QPS</strong>. This is the number you design for. Now ask: how many load-balanced app servers at 5K RPS each? Answer: 28.'},
+     {q:'How many app servers at 5K RPS each to handle peak?',
+      hint:'peak QPS ÷ RPS per server — always round up',
+      formula:'139,000 ÷ 5,000',
+      answer:'~28 servers',
+      unit:'servers',
+      insight:'<strong>28 servers minimum at peak</strong>. Add 20% headroom → 34. This is how infrastructure sizing works: estimate → divide by per-unit capacity → add buffer.'},
+   ]},
+  {id:2, title:'Video upload write QPS', diff:'easy',
+   scenario:'YouTube: 500 hours of video uploaded every minute. Average video is 1 hour long.',
+   steps:[
+     {q:'How many video upload requests per second?',
+      hint:'uploads_per_minute ÷ 60',
+      formula:'500 ÷ 60',
+      answer:'~8.3 uploads/sec',
+      unit:'uploads/sec',
+      insight:'<strong>Only ~8 uploads/sec</strong>. Write QPS is often surprisingly low. The challenge is not QPS — it is the size of each write (each upload is gigabytes).'},
+     {q:'Upload bandwidth in GB/sec (assume average 1GB per 1-hour video)?',
+      hint:'uploads_per_sec × GB_per_upload',
+      formula:'8.3 × 1 GB',
+      answer:'~8.3 GB/sec',
+      unit:'GB/sec',
+      insight:'<strong>8.3 GB/sec ingest bandwidth</strong>. At $0.02/GB transfer cost, that\'s $166/sec in upload costs alone. This is why upload infrastructure is expensive and why chunked uploads matter.'},
+   ]},
+  {id:3, title:'Message throughput — chat app', diff:'med',
+   scenario:'WhatsApp: 500M DAU. Average user sends 40 messages/day. Average message size = 100 bytes.',
+   steps:[
+     {q:'Messages per second?',
+      hint:'DAU × messages_per_day ÷ 86,400',
+      formula:'500,000,000 × 40 ÷ 86,400',
+      answer:'~231,500 msg/sec',
+      unit:'msg/sec',
+      insight:'<strong>~230K messages/second</strong>. At this rate a single Kafka partition (50MB/sec, ~500K small messages/sec) could handle it — but you want partitions for parallelism and fault isolation.'},
+     {q:'Message throughput in MB/sec?',
+      hint:'msg_per_sec × bytes_per_msg ÷ 1,048,576',
+      formula:'231,500 × 100 ÷ 1,048,576',
+      answer:'~22 MB/sec',
+      unit:'MB/sec',
+      insight:'<strong>~22 MB/sec</strong>. Kafka partition capacity is typically 50–100 MB/sec. So 1–2 partitions suffice for throughput — but you use more for ordering guarantees (1 partition per conversation).'},
+   ]},
+]},
+
+{id:'storage', icon:'💾', name:'Storage sizing', formula:'items × size_per_item × days × replication_factor = total storage', drills:[
+  {id:4, title:'Tweet storage — 1 year', diff:'easy',
+   scenario:'Twitter: 300M DAU, 2 tweets/user/day. Each tweet: 280 bytes text + 100 bytes metadata. 30% include an image (avg 500KB).',
+   steps:[
+     {q:'Raw text + metadata storage per day (in GB)?',
+      hint:'DAU × tweets_per_day × (text + metadata) bytes, then convert to GB (÷ 1,073,741,824)',
+      formula:'300M × 2 × 380 bytes ÷ 1,073,741,824',
+      answer:'~213 GB/day',
+      unit:'GB/day',
+      insight:'<strong>~213 GB/day</strong> just for text. That\'s manageable — text is cheap. The real storage cost is images.'},
+     {q:'Image storage per day (in TB)?',
+      hint:'DAU × tweets_per_day × 0.30 × 500KB, then convert to TB (÷ 1,099,511,627,776)',
+      formula:'300M × 2 × 0.3 × 500,000 ÷ 1,099,511,627,776',
+      answer:'~82 TB/day',
+      unit:'TB/day',
+      insight:'<strong>~82 TB/day</strong> for images alone. Text was 213GB — images are 400× larger. This is why object storage (S3) exists separately from the tweet DB.'},
+     {q:'Total storage for 1 year with 3× replication (in PB)?',
+      hint:'(text_per_day + image_per_day) × 365 × 3, convert to PB (÷ 1,024 if in TB)',
+      formula:'(0.213 + 82) × 365 × 3 TB',
+      answer:'~89.9 PB/year',
+      unit:'PB/year',
+      insight:'<strong>~90 PB/year</strong>. This is why Twitter uses tiered storage — hot (SSD, last 30 days), warm (HDD, last year), cold (S3 Glacier, everything older). You cannot afford 90 PB on SSDs.'},
+   ]},
+  {id:5, title:'Ride trip record storage', diff:'easy',
+   scenario:'Uber: 50M trips/day. Each trip record: 1KB. Trips are kept "hot" for 90 days, then archived. A DB node holds 2TB SSD.',
+   steps:[
+     {q:'Total hot storage needed (in TB)?',
+      hint:'trips_per_day × KB_per_trip × 90 days ÷ 1,073,741,824 (KB→TB)',
+      formula:'50,000,000 × 1,000 × 90 ÷ 1,073,741,824',
+      answer:'~4.2 TB',
+      unit:'TB',
+      insight:'<strong>~4.2 TB</strong> for 90 days of hot data. At 2TB per node, you need 3 nodes minimum for storage. But storage is rarely the binding constraint — read QPS usually is.'},
+     {q:'DB nodes needed for storage (at 2TB/node, with 3× replication)?',
+      hint:'ceil(total_TB ÷ node_TB) × replication_factor',
+      formula:'ceil(4.2 ÷ 2) × 3',
+      answer:'9 nodes',
+      unit:'nodes',
+      insight:'<strong>9 nodes</strong> for storage alone. Always compute QPS separately and take the larger number — you might need 20 nodes for QPS even though 9 suffice for storage.'},
+   ]},
+  {id:6, title:'Log retention storage', diff:'med',
+   scenario:'A platform ingests 1TB of logs per day. Logs are kept for 90 days hot, 1 year warm (compressed 5:1), and 7 years cold (compressed 10:1 on S3).',
+   steps:[
+     {q:'Hot storage needed (90 days, no compression, in TB)?',
+      hint:'1 TB/day × 90 days',
+      formula:'1 × 90',
+      answer:'90 TB',
+      unit:'TB',
+      insight:'<strong>90 TB hot</strong>. At $0.10/GB/month SSD, this is ~$9,000/month just for hot logs. Cost drives the tiering decision.'},
+     {q:'Warm storage (days 91–365, 5:1 compression, in TB)?',
+      hint:'1 TB/day × 275 days ÷ 5 (compression ratio)',
+      formula:'1 × 275 ÷ 5',
+      answer:'55 TB',
+      unit:'TB',
+      insight:'<strong>55 TB warm</strong>. At $0.02/GB/month HDD, that\'s ~$1,100/month. Compression alone saves ~$4,400/month vs hot storage.'},
+     {q:'Cold storage (years 2–7, 10:1 compression, in TB)?',
+      hint:'1 TB/day × (7 years − 1 year) × 365 days ÷ 10',
+      formula:'1 × 2,190 ÷ 10',
+      answer:'219 TB',
+      unit:'TB',
+      insight:'<strong>219 TB cold on S3 Glacier</strong>. At $0.004/GB/month, that\'s ~$876/month. Compare: same data on hot SSD would cost $21,900/month. Tiering saves 25×.'},
+   ]},
+]},
+
+{id:'bandwidth', icon:'📡', name:'Bandwidth & CDN', formula:'users × content_size × frequency = total bandwidth  |  bandwidth × CDN_hit_rate = CDN offload', drills:[
+  {id:7, title:'Video streaming egress', diff:'easy',
+   scenario:'YouTube: 1B DAU. Each user watches 30 minutes of video. 50% watch at 720p (2 Mbps), 30% at 1080p (5 Mbps), 20% at 360p (0.5 Mbps).',
+   steps:[
+     {q:'Weighted average bitrate per user (in Mbps)?',
+      hint:'(0.5 × 2) + (0.3 × 5) + (0.2 × 0.5)',
+      formula:'1.0 + 1.5 + 0.1',
+      answer:'2.6 Mbps',
+      unit:'Mbps avg',
+      insight:'<strong>2.6 Mbps average</strong>. Weighted average is the tool for "mix of users at different quality tiers." Always compute it before total bandwidth.'},
+     {q:'Total egress bandwidth right now (in Tbps)?',
+      hint:'DAU × avg_Mbps ÷ 1,000,000 (Mbps→Tbps)  — assume all users watching simultaneously (worst case)',
+      formula:'1,000,000,000 × 2.6 ÷ 1,000,000',
+      answer:'2,600 Tbps',
+      unit:'Tbps',
+      insight:'<strong>2,600 Tbps</strong>. The entire internet backbone is ~600 Tbps. This is why YouTube uses a global CDN — they push content to thousands of edge servers so egress is distributed, not centralised.'},
+     {q:'Daily CDN cost at $0.01/GB (assume 90% CDN hit rate)?',
+      hint:'total_GB_per_day × CDN_hit_rate × cost_per_GB. Total GB/day = avg_Mbps ÷ 8 × watch_seconds × DAU ÷ 1,073,741,824',
+      formula:'(2.6 ÷ 8 × 1800 × 1B) ÷ 1,073,741,824 × 0.9 × $0.01',
+      answer:'~$5.5M/day',
+      unit:'$/day',
+      insight:'<strong>~$5.5M/day in CDN costs</strong>. YouTube makes ~$20M/day in ad revenue. CDN is ~27% of revenue — which is why Google built its own CDN and ISP peering instead of paying AWS.'},
+   ]},
+  {id:8, title:'Image delivery bandwidth', diff:'easy',
+   scenario:'Instagram: 500M DAU. Each user views 50 photos/day. Average photo: 200KB (thumbnail) served via CDN. CDN hit rate: 95%.',
+   steps:[
+     {q:'Total image bandwidth per second (in GB/sec)?',
+      hint:'DAU × photos_per_day × size_KB ÷ 86,400 ÷ 1,048,576 (KB→GB)',
+      formula:'500M × 50 × 200 ÷ 86,400 ÷ 1,048,576',
+      answer:'~55 GB/sec',
+      unit:'GB/sec',
+      insight:'<strong>~55 GB/sec</strong>. At 95% CDN hit rate, only 5% hits origin — that\'s 2.75 GB/sec to your origin servers. Without CDN: all 55 GB/sec hits origin and your infrastructure collapses.'},
+     {q:'Daily CDN data transfer in PB (at 95% hit rate)?',
+      hint:'total_GB_per_sec × 86,400 × 0.95 ÷ 1,000,000 (GB→PB)',
+      formula:'55 × 86,400 × 0.95 ÷ 1,000,000',
+      answer:'~4.5 PB/day',
+      unit:'PB/day',
+      insight:'<strong>4.5 PB/day through CDN</strong>. At $0.01/GB, that\'s $45M/day. This is why Instagram negotiates bulk CDN contracts and why large platforms eventually build their own edge infrastructure.'},
+   ]},
+]},
+
+{id:'nodes', icon:'🖥️', name:'Node & cluster sizing', formula:'required_QPS ÷ QPS_per_node = nodes for QPS  |  required_storage ÷ storage_per_node = nodes for storage  →  take max', drills:[
+  {id:9, title:'Redis cluster sizing', diff:'easy',
+   scenario:'An e-commerce cache: 1M reads/sec, 100K writes/sec. Each Redis node: 10K ops/sec, 64GB RAM. Hot working set: 200GB (top 20% of 10M products × 1KB each).',
+   steps:[
+     {q:'Redis nodes needed for QPS (reads + writes)?',
+      hint:'(read_QPS + write_QPS) ÷ ops_per_node',
+      formula:'(1,000,000 + 100,000) ÷ 10,000',
+      answer:'110 nodes',
+      unit:'nodes (QPS)',
+      insight:'<strong>110 nodes for QPS</strong>. Redis is single-threaded per core — 10K ops/sec per node is realistic for mixed workloads. Cluster mode splits keyspace across nodes automatically.'},
+     {q:'Redis nodes needed for memory (200GB working set)?',
+      hint:'ceil(working_set_GB ÷ RAM_per_node)',
+      formula:'ceil(200 ÷ 64)',
+      answer:'4 nodes',
+      unit:'nodes (RAM)',
+      insight:'<strong>Only 4 nodes for memory</strong>. QPS (110 nodes) wins. This is the key insight: always compute both constraints and take the binding one. Memory is rarely the bottleneck in Redis clusters.'},
+   ]},
+  {id:10, title:'Kafka cluster sizing', diff:'med',
+   scenario:'An event pipeline: 1M messages/sec, 10KB average message size. Each Kafka broker: 1GB/sec throughput, 10TB disk. Messages retained 7 days. Replication factor: 3.',
+   steps:[
+     {q:'Ingestion throughput in GB/sec?',
+      hint:'messages_per_sec × message_size_KB ÷ 1,048,576 (KB→GB)',
+      formula:'1,000,000 × 10 ÷ 1,048,576',
+      answer:'~9.5 GB/sec',
+      unit:'GB/sec',
+      insight:'<strong>~9.5 GB/sec write throughput</strong>. This is the raw ingest rate before replication. With replication factor 3, each byte is written 3× — total broker write load is 28.5 GB/sec.'},
+     {q:'Total storage needed across cluster (7-day retention, 3× replication, in PB)?',
+      hint:'throughput_GB_per_sec × 86,400 × 7 days × replication_factor ÷ 1,000 (GB→TB→PB)',
+      formula:'9.5 × 86,400 × 7 × 3 ÷ 1,000,000',
+      answer:'~17.2 PB',
+      unit:'PB',
+      insight:'<strong>17.2 PB of Kafka storage</strong>. At 10TB per broker, that\'s 1,720 brokers — which is why real Kafka at this scale uses tiered storage (recent data on broker SSDs, older data on S3).'},
+     {q:'Brokers needed for throughput (at 1GB/sec per broker, with 3× replication)?',
+      hint:'(throughput × replication_factor) ÷ GB_per_sec_per_broker',
+      formula:'(9.5 × 3) ÷ 1',
+      answer:'~29 brokers',
+      unit:'brokers',
+      insight:'<strong>29 brokers for throughput</strong>. Storage needs 1,720 — storage wins by a factor of 60. This is the argument for tiered storage: decouple broker count from retention period.'},
+   ]},
+  {id:11, title:'WebSocket server sizing', diff:'med',
+   scenario:'Chat app: 50M DAU, 20% online simultaneously at peak. Each WebSocket connection: 65KB RAM on server. Each server handles 50K concurrent connections.',
+   steps:[
+     {q:'Peak simultaneous WebSocket connections?',
+      hint:'DAU × concurrent_percentage',
+      formula:'50,000,000 × 0.20',
+      answer:'10,000,000',
+      unit:'connections',
+      insight:'<strong>10M simultaneous connections</strong>. This is a stateful, persistent number — not requests per second. Each connection holds memory for its lifetime, not just during a request.'},
+     {q:'Memory per server for 50K connections (in GB)?',
+      hint:'connections_per_server × KB_per_connection ÷ 1,048,576 (KB→GB)',
+      formula:'50,000 × 65 ÷ 1,048,576',
+      answer:'~3.1 GB',
+      unit:'GB RAM',
+      insight:'<strong>3.1 GB per server</strong> just for connection state. Add OS overhead, app memory, buffers → realistically 8–16GB total per server. This is why chat servers need large RAM instances.'},
+     {q:'How many chat servers at 50K connections each?',
+      hint:'total_connections ÷ connections_per_server',
+      formula:'10,000,000 ÷ 50,000',
+      answer:'200 servers',
+      unit:'servers',
+      insight:'<strong>200 chat servers</strong>. This is why chat uses consistent hashing to route connections — user A is always on server #47, so messages to A go directly there without broadcasting.'},
+   ]},
+]},
+
+{id:'latency', icon:'⏱️', name:'Latency budgeting', formula:'SLA_ms − Σ(fixed_overheads_ms) = remaining budget for your code + DB', drills:[
+  {id:12, title:'200ms SLA decomposition', diff:'easy',
+   scenario:'Your API SLA: P99 < 200ms. Fixed overheads: DNS 10ms, TLS handshake 30ms (first request only — ignore), LB 2ms, serialisation 3ms, network round-trip to client 20ms.',
+   steps:[
+     {q:'Budget remaining for app server + DB (in ms)?',
+      hint:'SLA − DNS − LB − serialisation − network',
+      formula:'200 − 10 − 2 − 3 − 20',
+      answer:'165ms',
+      unit:'ms remaining',
+      insight:'<strong>165ms left</strong> for your actual business logic + DB query. Seems like a lot — but a cold Postgres query on a large table easily takes 100–200ms. Cache your reads.'},
+     {q:'If DB query takes 80ms, how much is left for app logic?',
+      hint:'remaining_budget − DB_ms',
+      formula:'165 − 80',
+      answer:'85ms',
+      unit:'ms for app logic',
+      insight:'<strong>85ms for app logic</strong>. This covers: auth check, business rules, response assembly. Sounds fine until you add a second DB call (permissions check): 165 − 80 − 80 = 5ms. No margin. Every extra DB call costs.'},
+     {q:'At 95% cache hit rate, what is the weighted average DB latency contribution?',
+      hint:'(hit_rate × cache_latency_ms) + (miss_rate × DB_latency_ms)',
+      formula:'(0.95 × 1) + (0.05 × 80)',
+      answer:'4.95ms',
+      unit:'ms avg DB',
+      insight:'<strong>~5ms average</strong> vs 80ms without cache. Caching converts a 80ms P99 DB call into a ~1ms average. The SLA becomes very achievable. This is the quantitative argument for caching.'},
+   ]},
+  {id:13, title:'Multi-region latency budget', diff:'med',
+   scenario:'Global SLA: P99 < 500ms worldwide. Speed of light US→India: ~170ms RTT. Your US datacenter handles all traffic. Each API request round-trips: client → US DC → DB → US DC → client.',
+   steps:[
+     {q:'Latency floor just from physics (US↔India round-trip, in ms)?',
+      hint:'RTT is round-trip: client→DC + DC→client. Speed-of-light RTT is already round-trip.',
+      formula:'170ms (physics floor)',
+      answer:'170ms',
+      unit:'ms floor',
+      insight:'<strong>170ms just from physics</strong> before any processing. With a 500ms SLA, you have 330ms left for everything else. But this assumes the user is at the DC. India users are further.'},
+     {q:'If India users add 200ms each way (400ms RTT), what is left in the 500ms budget?',
+      hint:'SLA − RTT_to_India',
+      formula:'500 − 400',
+      answer:'100ms',
+      unit:'ms remaining',
+      insight:'<strong>Only 100ms for processing</strong>. A cold DB query takes 80ms. You have 20ms of margin. One retry and you miss SLA. This is the quantitative argument for regional edge servers or read replicas near users.'},
+   ]},
+]},
+
+{id:'replication', icon:'🔄', name:'Replication & consistency', formula:'lag grows when write_rate > replication_throughput  |  max_staleness = lag_seconds', drills:[
+  {id:14, title:'Replication lag threshold', diff:'med',
+   scenario:'Primary DB: 10K writes/sec. Replication log to replica processes at 8K events/sec. Network RTT between primary and replica: 5ms.',
+   steps:[
+     {q:'Is replication lag growing or shrinking? At what rate (events/sec)?',
+      hint:'If write_rate > replication_rate, lag grows at (write_rate − replication_rate)',
+      formula:'10,000 − 8,000',
+      answer:'Growing at 2,000 events/sec',
+      unit:'events/sec behind',
+      insight:'<strong>Falling 2,000 events/sec behind</strong>. After 60 seconds, the replica is 120,000 events behind. This is not eventually consistent — it is diverging. You need to either reduce writes or increase replica throughput.'},
+     {q:'How many seconds until replica is 1 hour of writes behind (3.6M events)?',
+      hint:'events_to_fall_behind ÷ fall_rate_per_sec',
+      formula:'3,600,000 ÷ 2,000',
+      answer:'1,800 seconds (30 min)',
+      unit:'seconds',
+      insight:'<strong>30 minutes to fall 1 hour behind</strong>. At this point, reads from the replica are 1 hour stale. For most systems this is catastrophic. The fix: reduce writes (batching), increase replica hardware, or stop routing reads to this replica.'},
+     {q:'At what write rate does lag stabilise (neither growing nor shrinking)?',
+      hint:'lag stabilises when write_rate = replication_rate',
+      formula:'8,000 writes/sec',
+      answer:'8,000 writes/sec',
+      unit:'writes/sec break-even',
+      insight:'<strong>8K writes/sec is the break-even</strong>. Design your system to stay below this. If you expect bursts above it, size your replica throughput for peak, not average.'},
+   ]},
+  {id:15, title:'Quorum read/write sizing', diff:'hard',
+   scenario:'A distributed KV store: N=5 replicas per key. You want strong consistency on reads. Network partition tolerance required. Writes must succeed even if 1 node is down.',
+   steps:[
+     {q:'Minimum write quorum W to tolerate 1 node failure?',
+      hint:'W nodes must acknowledge the write. To tolerate 1 failure: W must be reachable with N-1 nodes. W ≤ N-1 and W > N/2 (majority).',
+      formula:'W = 3 (majority of 5, tolerates 2 failures for reads)',
+      answer:'W = 3',
+      unit:'nodes',
+      insight:'<strong>W=3</strong>. Write succeeds when 3 of 5 nodes acknowledge. If 1 node is down, 4 remain — W=3 is still reachable. The write does not block.'},
+     {q:'Minimum read quorum R to guarantee seeing the latest write (W=3, N=5)?',
+      hint:'Strong consistency requires W + R > N. Solve for R.',
+      formula:'3 + R > 5  →  R > 2  →  R = 3',
+      answer:'R = 3',
+      unit:'nodes',
+      insight:'<strong>R=3</strong>. W+R=6 > N=5. This guarantees at least 1 node in the read quorum saw the latest write. This is the mathematical basis of strong consistency in distributed systems.'},
+     {q:'If you relax to eventual consistency (R=1), what is the trade-off?',
+      hint:'With R=1, W+R = 3+1 = 4, which is NOT > N=5.',
+      formula:'W + R = 4, N = 5  →  4 < 5  →  NOT strongly consistent',
+      answer:'May read stale data',
+      unit:'consistency',
+      insight:'<strong>R=1 = eventual consistency</strong>. You might read from a replica that hasn\'t received the latest write yet. The benefit: 1-node read is faster and tolerates more failures. Trade: you can\'t guarantee freshness.'},
+   ]},
+]},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const SKEY = 'hld-est-v1';
+let state = JSON.parse(localStorage.getItem(SKEY) || '{}');
+// state[drillId] = 'done' | 'wrong' | undefined
+let activeCat = CATS[0].id;
+let sessionGot = 0, sessionMiss = 0;
+let openCards = {}; // drillId → true
+
+function save(){ localStorage.setItem(SKEY, JSON.stringify(state)); }
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+renderNav();
+renderCat(activeCat);
+initMobile();
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function renderNav(){
+  const nav = document.getElementById('cat-nav');
+  nav.innerHTML = CATS.map(c => {
+    const total = c.drills.length;
+    const done  = c.drills.filter(d => state[d.id] === 'done').length;
+    return `<button class="cat-btn ${c.id===activeCat?'active':''}" onclick="switchCat('${c.id}')">
+      <span class="cb-icon">${c.icon}</span>
+      <div class="cb-info">
+        <div class="cb-name">${c.name}</div>
+        <div class="cb-done">${done}/${total} done</div>
+      </div>
+    </button>`;
+  }).join('');
+  updateScore();
+}
+
+function switchCat(id){
+  activeCat = id;
+  openCards = {};
+  renderNav();
+  renderCat(id);
+  if(window.innerWidth <= 768){ closeSidebar(); }
+}
+
+// ─── CATEGORY VIEW ─────────────────────────────────────────────────────────────
+function renderCat(id){
+  const cat = CATS.find(c => c.id === id);
+  const done = cat.drills.filter(d => state[d.id]).length;
+  const pct  = Math.round(done / cat.drills.length * 100);
+
+  document.getElementById('prog-bar').style.width = pct + '%';
+
+  let h = `<div class="cat-header">
+    <div class="cat-title">${cat.icon} ${cat.name}</div>
+    <div class="cat-sub">Work through each drill step by step. Write your answer, then reveal the worked solution. Mark "got it" only if your order of magnitude matched.</div>
+    <div class="cat-formula">Core formula: ${cat.formula}</div>
+  </div>`;
+
+  h += `<div class="cheat-sheet">
+    <div class="cs-title">Reference numbers — memorise these</div>
+    <div class="cs-grid">
+      <div class="cs-item"><div class="cs-key">Seconds in a day</div><div class="cs-val">86,400</div><div class="cs-note">≈ 10⁵ — use this constantly</div></div>
+      <div class="cs-item"><div class="cs-key">1 million</div><div class="cs-val">10⁶</div><div class="cs-note">1M users, 1M QPS</div></div>
+      <div class="cs-item"><div class="cs-key">1 billion</div><div class="cs-val">10⁹</div><div class="cs-note">1B DAU (big platform)</div></div>
+      <div class="cs-item"><div class="cs-key">1 GB in bytes</div><div class="cs-val">~10⁹</div><div class="cs-note">1,073,741,824 exactly</div></div>
+      <div class="cs-item"><div class="cs-key">1 TB in bytes</div><div class="cs-val">~10¹²</div><div class="cs-note">1,099,511,627,776 exactly</div></div>
+      <div class="cs-item"><div class="cs-key">Peak = avg × ?</div><div class="cs-val">2–3×</div><div class="cs-note">Always design for peak</div></div>
+      <div class="cs-item"><div class="cs-key">Replication factor</div><div class="cs-val">3×</div><div class="cs-note">Standard for durability</div></div>
+      <div class="cs-item"><div class="cs-key">Order of magnitude</div><div class="cs-val">10×</div><div class="cs-note">If you are within 3×, you are close enough</div></div>
+    </div>
+  </div>`;
+
+  cat.drills.forEach(d => { h += renderCard(d); });
+
+  document.getElementById('content-area').innerHTML = h;
+}
+
+function renderCard(d){
+  const st = state[d.id];
+  const isOpen = openCards[d.id];
+  const stepsHtml = d.steps.map((s, si) => `
+    <div class="step" id="step-${d.id}-${si}">
+      <div class="step-q"><span class="step-q-num">Q${si+1}.</span>${s.q}</div>
+      <div class="step-hint">${s.hint}</div>
+      <div class="step-input-row">
+        <input class="step-input" type="text" placeholder="your answer..." id="inp-${d.id}-${si}"/>
+        <span class="step-unit">${s.unit}</span>
+      </div>
+      <button class="reveal-btn" onclick="reveal(${d.id},${si})">Reveal answer →</button>
+      <div class="answer-box" id="ans-${d.id}-${si}">
+        <div class="answer-formula">Formula: <span>${s.formula}</span></div>
+        <div class="answer-result">= ${s.answer}</div>
+        <div class="answer-insight">${s.insight}</div>
+      </div>
+    </div>`).join('');
+
+  return `<div class="drill-card ${st==='done'?'done':st==='wrong'?'wrong':''}" id="card-${d.id}">
+    <div class="dc-header" onclick="toggleCard(${d.id})">
+      <div class="dc-num">#${d.id}</div>
+      <div class="dc-body">
+        <div class="dc-title">${d.title}</div>
+        <div class="dc-scenario">${d.scenario}</div>
+      </div>
+      <div class="dc-status">
+        <span class="diff-badge d-${d.diff}">${d.diff}</span>
+        <div class="sdot ${st==='done'?'sd-done':st==='wrong'?'sd-wrong':'sd-todo'}">${st==='done'?'✓':st==='wrong'?'✗':'·'}</div>
+      </div>
+    </div>
+    <div class="dc-steps ${isOpen?'open':''}" id="steps-${d.id}">
+      ${stepsHtml}
+      <div class="dc-footer">
+        <button class="mark-btn mb-got"   onclick="mark(${d.id},'done')">✓ Got it</button>
+        <button class="mark-btn mb-missed" onclick="mark(${d.id},'wrong')">✗ Missed</button>
+        <button class="mark-btn mb-reset"  onclick="mark(${d.id},null)">Reset</button>
+        <span class="dc-footer-note">Mark after revealing all answers</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(id){
+  openCards[id] = !openCards[id];
+  const el = document.getElementById(`steps-${id}`);
+  if(el) el.classList.toggle('open', !!openCards[id]);
+}
+
+function reveal(drillId, stepIdx){
+  const el = document.getElementById(`ans-${drillId}-${stepIdx}`);
+  if(el){ el.classList.add('show'); }
+}
+
+function mark(id, status){
+  const prev = state[id];
+  if(status === null){ delete state[id]; }
+  else { state[id] = status; }
+  save();
+  if(status === 'done' && prev !== 'done'){ sessionGot++; }
+  if(status === 'wrong' && prev !== 'wrong'){ sessionMiss++; }
+  // re-render just this card
+  const cat = CATS.find(c => c.drills.some(d => d.id === id));
+  const drill = cat && cat.drills.find(d => d.id === id);
+  if(drill){
+    const card = document.getElementById(`card-${id}`);
+    if(card){
+      const wasOpen = openCards[id];
+      card.outerHTML = renderCard(drill);
+      if(wasOpen){
+        openCards[id] = true;
+        const el = document.getElementById(`steps-${id}`);
+        if(el) el.classList.add('open');
+      }
+    }
+  }
+  renderNav();
+  updateScore();
+}
+
+function updateScore(){
+  const total = CATS.flatMap(c => c.drills).length;
+  const allDone = Object.values(state).filter(v => v === 'done').length;
+  document.getElementById('sc-got').textContent  = sessionGot;
+  document.getElementById('sc-miss').textContent = sessionMiss;
+  const total_marked = sessionGot + sessionMiss;
+  document.getElementById('sc-acc').textContent  = total_marked ? Math.round(sessionGot/total_marked*100)+'%' : '—';
+  document.getElementById('streak-fill').style.width = Math.round(allDone/total*100) + '%';
+}
+
+// ─── THEME ────────────────────────────────────────────────────────────────────
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+}
+
+// ─── MOBILE ───────────────────────────────────────────────────────────────────
+function initMobile(){
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  const btn = document.getElementById('ham-btn');
+  btn.addEventListener('click', () => {
+    const open = sb.classList.toggle('open');
+    ov.classList.toggle('open', open);
+    btn.classList.toggle('open', open);
+  });
+  ov.addEventListener('click', closeSidebar);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('ham-btn').classList.remove('open');
+}
+</script>
+</body>
+</html>
