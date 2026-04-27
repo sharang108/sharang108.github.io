@@ -289,6 +289,9 @@ const CONCEPTS = [
     avoids:[
       {text:'Don\'t use MongoDB as a default because "it\'s flexible". Flexibility in schema = no schema = eventual pain when you need relationships.'},
       {text:'Don\'t run Elasticsearch as your primary database. It\'s an index, not a source of truth — data loss risk is real.'},
+      {text:'Schema migrations under live traffic require the 3-phase pattern: (1) add column nullable, (2) deploy dual-write code and backfill in batches, (3) add NOT NULL constraint. Never ALTER TABLE ADD COLUMN NOT NULL on millions of rows in production — it acquires a table lock for the full rewrite duration.'},
+      {text:'Index write amplification: every index added to a high-write table costs one additional write per row insert or update. At 50K inserts/sec, an unnecessary index is a measurable throughput cost. Add indexes for known query patterns, not defensively.'},
+      {text:'Event sourcing: for systems requiring full audit trail or point-in-time queries (financial ledgers, compliance), use append-only event logs rather than mutable current state. State = replay of all events. Correction = compensating event appended, never an edit to history.'},
     ],
     challenge:{
       title:'Choose the database stack for a ride-sharing platform',
@@ -313,6 +316,9 @@ const CONCEPTS = [
       {n:'04', text:'<strong>Cache invalidation is the hard part:</strong> there are only two hard problems in computer science — cache invalidation and naming things. On update, do you delete the key (lazy re-population on next read) or update the value (write-through)? Deleting is safer; updating risks race conditions.'},
       {n:'05', text:'<strong>TTL is your safety net:</strong> every cache entry should have a TTL. If invalidation logic has a bug, TTL guarantees eventual correctness. Set TTL based on how stale data you can tolerate, not how long you think data lives.'},
       {n:'06', text:'<strong>CDN for static + quasi-static content:</strong> CDN = geographically distributed cache. Static assets (JS, CSS, images) belong on CDN always. API responses can go on CDN if they\'re the same for all users (public product catalogue). Never cache authenticated or user-specific responses on CDN.'},
+      {n:'07', text:'<strong>Stale-while-revalidate + single-flight:</strong> serve the stale cached value immediately to all concurrent requests, trigger exactly one background DB refresh via request coalescing (single-flight), write fresh value back on success. Use when stampede prevention and zero availability impact are both required. The triggering request gets stale immediately, not after the refresh completes.'},
+      {n:'08', text:'<strong>Bounded vs unbounded staleness:</strong> bounded = maximum age of served data is known and finite (e.g. at most TTL seconds old under normal operation). Unbounded = no guarantee on age — occurs when circuit breaker is open indefinitely or TTL is disabled. A freshness SLA requires a number under normal operation AND an explicit serving policy under failure. "Eventual consistency" is not an SLA.'},
+      {n:'09', text:'<strong>Cache cold-start after recovery:</strong> when a circuit breaker closes after an outage, or a cache restarts, the cache is cold. Full traffic hitting DB simultaneously = recovery stampede — indistinguishable from the original failure. Pre-warm the cache before opening full traffic, or use a gradual traffic ramp-up through half-open circuit states.'},
     ],
     comparison:{
       headers:['Strategy','Read perf','Write perf','Staleness risk','Complexity'],
@@ -340,7 +346,8 @@ const CONCEPTS = [
     avoids:[
       {text:'Never cache user-specific data on a CDN (responses include user_id, auth tokens, personal data).'},
       {text:'Don\'t cache mutable data without an invalidation strategy. "We\'ll just set a long TTL" is not a strategy.'},
-      {text:'Cache stampede: when a hot key\'s TTL expires, thousands of requests hit the DB simultaneously. Fix with lock-based population or jittered TTL.'},
+      {text:'Cache stampede: when a hot key\'s TTL expires, thousands of requests hit the DB simultaneously. Fix with stale-while-revalidate + single-flight, or jittered TTL — not a distributed lock (lock errors all waiting requests).'},
+      {text:'Recovery stampede: when a circuit breaker closes after an outage, the cold cache plus full traffic = a new stampede. Pre-warm or ramp gradually before fully opening traffic.'},
     ],
     challenge:{
       title:'Design the caching layer for a product catalogue',
@@ -365,6 +372,8 @@ const CONCEPTS = [
       {n:'04', text:'<strong>Consumer groups:</strong> Kafka allows multiple consumer groups to read the same topic independently. One group for notifications, one for analytics, one for search indexing — all reading the same OrderCreated event stream without interfering.'},
       {n:'05', text:'<strong>Dead letter queue (DLQ):</strong> when a message fails processing N times, move it to a DLQ rather than blocking the queue. The DLQ is for investigation and manual replay. Without a DLQ, one bad message can halt an entire queue.'},
       {n:'06', text:'<strong>Ordering guarantees:</strong> Kafka guarantees ordering within a partition, not across partitions. SQS standard queue has no ordering guarantee. SQS FIFO has ordering but lower throughput. If ordering matters, use a single partition or FIFO queue.'},
+      {n:'07', text:'<strong>Consumer group rebalancing:</strong> when a consumer in a group crashes or joins, a rebalance pauses all consumption in the group for the rebalance duration (seconds to minutes). Uncommitted offsets in the crashed consumer\'s partitions are re-delivered to the new consumer — the primary source of duplicates in at-least-once Kafka systems. Tune session.timeout.ms vs max.poll.interval.ms: faster detection = more false rebalances on GC pauses.'},
+      {n:'08', text:'<strong>Retry storm (jitter is not optional):</strong> without jitter, N clients that fail together retry together — a thundering herd that re-kills a recovering service. Exponential backoff alone does not solve this: all clients that failed at T=0 still retry at the same backoff intervals. Full jitter (random(0, backoff_interval)) distributes the spike. The storm is calculable: N clients \u00d7 convergence = spike RPS. Always compute before designing the fix.'},
     ],
     comparison:{
       headers:['System','Delivery','Ordering','Replay','Throughput','Best for'],
@@ -415,6 +424,7 @@ const CONCEPTS = [
       {n:'02', text:'<strong>Rate limiting:</strong> protects your service from being overwhelmed. Token bucket: N tokens added per second, each request costs 1 token. Allows bursting up to bucket size. Sliding window: count requests in the last N seconds. Fixed window: simpler but allows 2x burst at window boundary.'},
       {n:'03', text:'<strong>Retry with exponential backoff:</strong> retry failed requests, but double the wait time each attempt (1s, 2s, 4s, 8s…). Add jitter (random delay) to prevent retry storms where all clients retry at the same time after a failure.'},
       {n:'04', text:'<strong>Bulkhead:</strong> isolate failures. Give each downstream dependency its own thread pool. If dependency A is slow, it only exhausts A\'s pool — not all threads. Inspired by ship hull compartments: one breach doesn\'t sink the ship.'},
+      {n:'04b', text:'<strong>Timeout derivation formula:</strong> timeout = P99(dependency) \u00d7 safety factor (1.5\u20132\u00d7), constrained so that sum of critical-path timeouts + own overhead < your own SLO. Too short = false failures on healthy systems. Too long = thread-pool exhaustion from slow dependencies. Differentiate by criticality.'},
       {n:'05', text:'<strong>SLOs and error budgets:</strong> SLO = Service Level Objective (e.g. 99.9% uptime = 8.7h downtime/year allowed). Error budget = how much unreliability you\'re allowed before you must prioritise reliability over features. If error budget is exhausted, feature work stops until reliability improves.'},
       {n:'06', text:'<strong>Graceful degradation:</strong> when a non-critical dependency fails, return a degraded response rather than an error. Netflix still serves recommendations without ML personalisation (use cached popular items). Show stale data rather than an error page.'},
     ],
@@ -469,7 +479,7 @@ const CONCEPTS = [
       {n:'03', text:'<strong>gRPC:</strong> binary protocol (Protocol Buffers), typed contracts, bidirectional streaming. 5-10x smaller payload than JSON REST. Perfect for internal service-to-service communication. Not browser-friendly without a proxy. Schema must be defined upfront — good discipline, less flexibility.'},
       {n:'04', text:'<strong>Pagination:</strong> never return unbounded lists. Offset pagination (`?page=2&limit=20`) is simple but breaks when items are inserted mid-result. Cursor pagination (`?after=cursor_token`) is stable for live data and scales to arbitrarily large datasets. Use cursor for anything that changes in real time.'},
       {n:'05', text:'<strong>Versioning:</strong> version in the URL (`/v1/users`) or in headers (`Accept: application/vnd.api+json;version=2`). URL versioning is explicit and cacheable. Never make breaking changes without a new version. Deprecate old versions with a sunset date.'},
-      {n:'06', text:'<strong>Idempotency keys:</strong> for non-idempotent operations (payment, order creation), accept a client-generated idempotency key. If the same key is submitted twice, return the same result without re-executing. Solves the "did my payment go through?" retry problem safely.'},
+      {n:'06', text:'<strong>Idempotency keys:</strong> client generates a UUID and sends it with the request. Server stores key \u2192 full response in Redis/DB with TTL \u2265 maximum client retry window (often 24h, not seconds). On duplicate: return stored response without re-executing. Use atomic SETNX to handle simultaneous retries \u2014 "check then set" has a race condition. Store the full original response alongside the key, not just a processed flag. If key reused with different payload, return 409.'},
     ],
     comparison:{
       headers:['Protocol','Best for','Payload','Browser support','Caching'],
