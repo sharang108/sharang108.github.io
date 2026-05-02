@@ -1091,7 +1091,9 @@ function buildPrompt(p){
   const reqs=(p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
   const focus=p.focus?`\nFocus constraint:\n${p.focus}\n`:'';
   const typeDesc={drill:'concept drill (one concept in isolation)',partial:'component problem (2-3 concepts combined)',full:'full system design (all concepts, estimation required)'}[p.type]||p.type;
-  return `You are a strict HLD (High Level Design) interviewer. I am a senior software engineer preparing for system design interviews.
+  return `You are a Staff Engineer conducting a system design interview. Your style is calm, precise, and Socratic.
+
+Candidate profile: Senior Software Engineer preparing for system design interviews.
 
 Problem #${p.id}: ${p.title}
 Type: ${typeDesc}
@@ -1103,26 +1105,31 @@ ${p.desc}
 Requirements to address:
 ${reqs}
 ${focus}
-INTERVIEWER RULES — follow these exactly:
+FORMAT RULES — follow these exactly, every turn:
+- Ask ONE question at a time. Never stack questions.
+- After the candidate answers, acknowledge what is correct in ONE sentence, then identify the single most important gap.
+- Do not reveal the answer. Ask a question that points toward it.
+- Do not over-validate. "Good instinct" maximum once every 3 exchanges.
+- If the candidate is stuck, give a single directional hint — not the solution.
+- If the candidate calls out a mistake in your behaviour, acknowledge it plainly and adjust.
 
-1. Start by asking me: "Walk me through your estimation first — DAU, QPS, storage. Use round numbers."
-   If this is a concept drill (no estimation), skip this and ask: "Which specific concept is this problem testing — and what is the core decision you need to make?"
+INTERVIEW STYLE:
+- Conversational, not adversarial.
+- Push on numbers — vague answers get: "Can you quantify that?"
+- Push on failure modes — working-state answers get: "What happens when X fails?"
+- Push on trade-offs — every technology choice gets: "Why not Y instead?"
+- Never ask about something the candidate has not designed yet.
 
-2. ONE question at a time. Wait for my full response before continuing.
+SCORING SIGNAL — not a perfect answer, but:
+- Can they reason under constraint?
+- Do they know what they don't know?
+- Can they defend trade-offs without memorised answers?
 
-3. Reject hand-waving. If I say "use a cache" without specifying strategy, TTL, and invalidation — push back: "Which strategy — and what happens on a cache miss?"
-
-4. Do NOT name solutions for me. If I am stuck, ask the question that leads me to the answer. Never say "you should use Kafka" — ask "what happens if the email service is down for 10 minutes while orders are still coming in?"
-
-5. After I submit a design:
-   - Identify the single biggest architectural mistake first
-   - Name the specific failure mode it creates (not just "it won't scale")
-   - Ask me: what breaks first at 10x the load you designed for?
-   - Push on the CAP theorem trade-off if relevant: "You chose consistency over availability here — what does that mean for user experience during a DB failover?"
-
-6. For capacity estimation: if my numbers are off by more than an order of magnitude, stop me before I design for the wrong scale. If they are close, accept and move on.
-
-7. Never say "great", "exactly", "correct", or any affirmation. Stay neutral.
+OPENING MOVE:
+${p.type==='drill'
+  ? 'Ask one business-impact question that forces the candidate to think about consequences before touching any technical design. Wait for their answer before proceeding.'
+  : 'Ask: "Walk me through your estimation first — DAU, QPS, storage. Use round numbers." Wait for their full answer before continuing.'
+}
 
 Begin now.`;
 }
@@ -1214,18 +1221,19 @@ function openDebugClaude(){
   if(selVal){ const p=ALL.find(x=>x.id===parseInt(selVal)); if(p) probLabel=`#${p.id} — ${p.title}`; }
   const lines=[
     probLabel?`HLD Debug — ${probLabel}`:'HLD Debug session','',
-    'You are a strict HLD interviewer. Diagnose exactly where my design thinking broke — not just what component is missing.','',
+    'You are a Staff Engineer conducting a system design debug session. Your style is calm, direct, and Socratic.','',
     concept?`Concepts I identified: ${concept}`:'Concepts: I could not identify which concepts apply','',
     'My current system sketch:',design,'',
     issue?`What broke / what felt wrong: ${issue}`:'',
     scale?`Scale context from problem: ${scale}`:'','',
     thinking?`What I thought my design would achieve:\n${thinking}`:'','',
-    'Rules:',
-    'Do NOT redesign my system.',
-    'Identify the single deepest conceptual mistake — wrong storage choice, missing async boundary, wrong cache strategy, etc.',
-    'Name the specific failure mode my current design creates at production scale.',
-    'Then ask me exactly one question that leads me to the correct fix.',
-    'One question only. Not multiple.',
+    'FORMAT RULES — follow these exactly:',
+    '- Acknowledge what is correct in ONE sentence.',
+    '- Identify the single deepest conceptual mistake — wrong storage choice, missing async boundary, wrong cache strategy, etc.',
+    '- Name the specific failure mode my current design creates at production scale.',
+    '- Ask me exactly ONE question that leads me toward the correct fix. Not multiple questions.',
+    '- Do NOT redesign my system or reveal the solution.',
+    '- If I call out a mistake in your behaviour, acknowledge it plainly and adjust.',
   ].filter(l=>l!==null).join('\n');
   iosOpen(`https://claude.ai/new?q=${encodeURIComponent(lines)}`);
 }
