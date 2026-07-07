@@ -317,7 +317,7 @@
         <div class="pb-bar"><div class="pb-fill f-done" id="p2-bar" style="width:100%"></div></div>
       </div>
       <div class="pb" style="border-left-color:var(--amber)" onclick="setFilter('phase3')">
-        <div class="pb-hdr"><span class="pb-name" style="color:var(--amber)">Phase 3</span><span class="pb-cnt" id="p3-cnt">0/26</span></div>
+        <div class="pb-hdr"><span class="pb-name" style="color:var(--amber)">Phase 3</span><span class="pb-cnt" id="p3-cnt">0/31</span></div>
         <div class="pb-bar"><div class="pb-fill f-act" id="p3-bar" style="width:0%"></div></div>
       </div>
       <div class="pb locked">
@@ -592,58 +592,67 @@ const PATTERNS=[
     {id:37,lc:84,title:'Largest Rectangle in Histogram',diff:'hard',time:'O(n)',space:'O(n)'},
   ]},
   // ── PHASE 3 ──────────────────────────────────────────────────────────────
+  {id:'recursion',name:'Recursion',phase:3,phaseLabel:'Phase 3',
+   decisionPoints:['Base case first — what is the smallest input that returns without a recursive call? Define it before the recursive case.','Trust the recursion — assume the function works correctly for n-1. Your job is only to define the current step.','Call stack model — each call frame holds its own state. Draw 3 levels before coding any recursive solution.','Return value contract — what does the function promise to return? Every branch must honour that contract.','When to memoize — if you draw the recursion tree and see repeated subproblems, add a cache. This is the bridge to DP.'],
+   problems:[
+    {id:38,lc:509,title:'Fibonacci Number',diff:'easy',time:'O(n)',space:'O(n)'},
+    {id:39,lc:206,title:'Reverse Linked List (recursive)',diff:'easy',time:'O(n)',space:'O(n)'},
+    {id:40,lc:344,title:'Reverse String',diff:'easy',time:'O(n)',space:'O(n)'},
+    {id:41,lc:21,title:'Merge Two Sorted Lists (recursive)',diff:'easy',time:'O(n+m)',space:'O(n+m)'},
+    {id:42,lc:50,title:'Pow(x, n)',diff:'med',time:'O(log n)',space:'O(log n)'},
+  ]},
   {id:'trees',name:'Trees',phase:3,phaseLabel:'Phase 3',
    decisionPoints:['Traversal order — pre/in/post-order: which visits root relative to children?','Recursive vs iterative — iterative uses explicit stack; mandatory when stack depth is a risk.','Base case — null node is the most common; what should null return?','BST property — left < root < right; use it to prune half the tree at each node.'],
    problems:[
-    {id:38,lc:226,title:'Invert Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:39,lc:104,title:'Maximum Depth of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:40,lc:543,title:'Diameter of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:41,lc:110,title:'Balanced Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:42,lc:100,title:'Same Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:43,lc:572,title:'Subtree of Another Tree',diff:'easy',time:'O(nm)',space:'O(h)'},
-    {id:44,lc:235,title:'Lowest Common Ancestor of BST',diff:'med',time:'O(h)',space:'O(1)'},
-    {id:45,lc:102,title:'Binary Tree Level Order Traversal',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:46,lc:199,title:'Binary Tree Right Side View',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:47,lc:1448,title:'Count Good Nodes in Binary Tree',diff:'med',time:'O(n)',space:'O(h)'},
-    {id:48,lc:98,title:'Validate Binary Search Tree',diff:'med',time:'O(n)',space:'O(h)'},
-    {id:49,lc:230,title:'Kth Smallest Element in BST',diff:'med',time:'O(h+k)',space:'O(h)'},
-    {id:50,lc:105,title:'Construct Binary Tree from Preorder and Inorder',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:51,lc:124,title:'Binary Tree Maximum Path Sum',diff:'hard',time:'O(n)',space:'O(h)'},
-    {id:52,lc:297,title:'Serialize and Deserialize Binary Tree',diff:'hard',time:'O(n)',space:'O(n)'},
+    {id:43,lc:226,title:'Invert Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
+    {id:44,lc:104,title:'Maximum Depth of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
+    {id:45,lc:543,title:'Diameter of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
+    {id:46,lc:110,title:'Balanced Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
+    {id:47,lc:100,title:'Same Tree',diff:'easy',time:'O(n)',space:'O(h)'},
+    {id:48,lc:572,title:'Subtree of Another Tree',diff:'easy',time:'O(nm)',space:'O(h)'},
+    {id:49,lc:235,title:'Lowest Common Ancestor of BST',diff:'med',time:'O(h)',space:'O(1)'},
+    {id:50,lc:102,title:'Binary Tree Level Order Traversal',diff:'med',time:'O(n)',space:'O(n)'},
+    {id:51,lc:199,title:'Binary Tree Right Side View',diff:'med',time:'O(n)',space:'O(n)'},
+    {id:52,lc:1448,title:'Count Good Nodes in Binary Tree',diff:'med',time:'O(n)',space:'O(h)'},
+    {id:53,lc:98,title:'Validate Binary Search Tree',diff:'med',time:'O(n)',space:'O(h)'},
+    {id:54,lc:230,title:'Kth Smallest Element in BST',diff:'med',time:'O(h+k)',space:'O(h)'},
+    {id:55,lc:105,title:'Construct Binary Tree from Preorder and Inorder',diff:'med',time:'O(n)',space:'O(n)'},
+    {id:56,lc:124,title:'Binary Tree Maximum Path Sum',diff:'hard',time:'O(n)',space:'O(h)'},
+    {id:57,lc:297,title:'Serialize and Deserialize Binary Tree',diff:'hard',time:'O(n)',space:'O(n)'},
   ]},
   {id:'graphs',name:'Graphs',phase:3,phaseLabel:'Phase 3',
    decisionPoints:['BFS vs DFS — BFS for shortest path / level-by-level; DFS for connectivity / path existence.','Visited set — always track visited to avoid infinite loops in cyclic graphs.','Graph representation — adjacency list vs matrix; list for sparse, matrix for dense.','Directed vs undirected — cycle detection differs; undirected needs parent tracking.'],
    problems:[
-    {id:53,lc:200,title:'Number of Islands',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:54,lc:133,title:'Clone Graph',diff:'med',time:'O(V+E)',space:'O(V)'},
-    {id:55,lc:695,title:'Max Area of Island',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:56,lc:417,title:'Pacific Atlantic Water Flow',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:57,lc:130,title:'Surrounded Regions',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:58,lc:994,title:'Rotting Oranges',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:59,lc:207,title:'Course Schedule',diff:'med',time:'O(V+E)',space:'O(V+E)'},
-    {id:60,lc:210,title:'Course Schedule II',diff:'med',time:'O(V+E)',space:'O(V+E)'},
-    {id:61,lc:684,title:'Redundant Connection',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:62,lc:127,title:'Word Ladder',diff:'hard',time:'O(M²×N)',space:'O(M²×N)'},
+    {id:58,lc:200,title:'Number of Islands',diff:'med',time:'O(mn)',space:'O(mn)'},
+    {id:59,lc:133,title:'Clone Graph',diff:'med',time:'O(V+E)',space:'O(V)'},
+    {id:60,lc:695,title:'Max Area of Island',diff:'med',time:'O(mn)',space:'O(mn)'},
+    {id:61,lc:417,title:'Pacific Atlantic Water Flow',diff:'med',time:'O(mn)',space:'O(mn)'},
+    {id:62,lc:130,title:'Surrounded Regions',diff:'med',time:'O(mn)',space:'O(mn)'},
+    {id:63,lc:994,title:'Rotting Oranges',diff:'med',time:'O(mn)',space:'O(mn)'},
+    {id:64,lc:207,title:'Course Schedule',diff:'med',time:'O(V+E)',space:'O(V+E)'},
+    {id:65,lc:210,title:'Course Schedule II',diff:'med',time:'O(V+E)',space:'O(V+E)'},
+    {id:66,lc:684,title:'Redundant Connection',diff:'med',time:'O(n)',space:'O(n)'},
+    {id:67,lc:127,title:'Word Ladder',diff:'hard',time:'O(M²×N)',space:'O(M²×N)'},
   ]},
   {id:'dp',name:'Dynamic programming',phase:3,phaseLabel:'Phase 3',
    decisionPoints:['Subproblem definition — what does dp[i] represent? Be precise before coding.','Recurrence — how does dp[i] depend on smaller subproblems?','Base cases — what are dp[0] and dp[1]? Off-by-one here propagates everywhere.','1D vs 2D — 1D for single sequence problems; 2D for two sequences or grids.'],
    problems:[
-    {id:63,lc:70,title:'Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:64,lc:746,title:'Min Cost Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:65,lc:198,title:'House Robber',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:66,lc:213,title:'House Robber II',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:67,lc:5,title:'Longest Palindromic Substring',diff:'med',time:'O(n²)',space:'O(1)'},
-    {id:68,lc:647,title:'Palindromic Substrings',diff:'med',time:'O(n²)',space:'O(1)'},
-    {id:69,lc:91,title:'Decode Ways',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:70,lc:322,title:'Coin Change',diff:'med',time:'O(n×m)',space:'O(n)'},
-    {id:71,lc:152,title:'Maximum Product Subarray',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:72,lc:139,title:'Word Break',diff:'med',time:'O(n²)',space:'O(n)'},
-    {id:73,lc:300,title:'Longest Increasing Subsequence',diff:'med',time:'O(n²)',space:'O(n)'},
-    {id:74,lc:416,title:'Partition Equal Subset Sum',diff:'med',time:'O(n×sum)',space:'O(sum)'},
+    {id:68,lc:70,title:'Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
+    {id:69,lc:746,title:'Min Cost Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
+    {id:70,lc:198,title:'House Robber',diff:'med',time:'O(n)',space:'O(1)'},
+    {id:71,lc:213,title:'House Robber II',diff:'med',time:'O(n)',space:'O(1)'},
+    {id:72,lc:5,title:'Longest Palindromic Substring',diff:'med',time:'O(n²)',space:'O(1)'},
+    {id:73,lc:647,title:'Palindromic Substrings',diff:'med',time:'O(n²)',space:'O(1)'},
+    {id:74,lc:91,title:'Decode Ways',diff:'med',time:'O(n)',space:'O(n)'},
+    {id:75,lc:322,title:'Coin Change',diff:'med',time:'O(n×m)',space:'O(n)'},
+    {id:76,lc:152,title:'Maximum Product Subarray',diff:'med',time:'O(n)',space:'O(1)'},
+    {id:77,lc:139,title:'Word Break',diff:'med',time:'O(n²)',space:'O(n)'},
+    {id:78,lc:300,title:'Longest Increasing Subsequence',diff:'med',time:'O(n²)',space:'O(n)'},
+    {id:79,lc:416,title:'Partition Equal Subset Sum',diff:'med',time:'O(n×sum)',space:'O(sum)'},
   ]},
 ];
 
-const SLUGS={1:'two-sum',3:'longest-substring-without-repeating-characters',5:'longest-palindromic-substring',11:'container-with-most-water',15:'3sum',19:'remove-nth-node-from-end-of-list',20:'valid-parentheses',21:'merge-two-sorted-lists',23:'merge-k-sorted-lists',33:'search-in-rotated-sorted-array',36:'valid-sudoku',42:'trapping-rain-water',49:'group-anagrams',70:'climbing-stairs',74:'search-a-2d-matrix',75:'sort-colors',76:'minimum-window-substring',84:'largest-rectangle-in-histogram',91:'decode-ways',98:'validate-binary-search-tree',100:'same-tree',102:'binary-tree-level-order-traversal',104:'maximum-depth-of-binary-tree',105:'construct-binary-tree-from-preorder-and-inorder-traversal',110:'balanced-binary-tree',121:'best-time-to-buy-and-sell-stock',124:'binary-tree-maximum-path-sum',125:'valid-palindrome',127:'word-ladder',128:'longest-consecutive-sequence',130:'surrounded-regions',133:'clone-graph',139:'word-break',141:'linked-list-cycle',143:'reorder-list',150:'evaluate-reverse-polish-notation',152:'maximum-product-subarray',153:'find-minimum-in-rotated-sorted-array',155:'min-stack',167:'two-sum-ii-input-array-is-sorted',198:'house-robber',199:'binary-tree-right-side-view',200:'number-of-islands',206:'reverse-linked-list',207:'course-schedule',210:'course-schedule-ii',213:'house-robber-ii',226:'invert-binary-tree',230:'kth-smallest-element-in-a-bst',235:'lowest-common-ancestor-of-a-binary-search-tree',238:'product-of-array-except-self',271:'encode-and-decode-strings',297:'serialize-and-deserialize-binary-tree',300:'longest-increasing-subsequence',322:'coin-change',347:'top-k-frequent-elements',416:'partition-equal-subset-sum',417:'pacific-atlantic-water-flow',424:'longest-repeating-character-replacement',543:'diameter-of-binary-tree',567:'permutation-in-string',572:'subtree-of-another-tree',647:'palindromic-substrings',684:'redundant-connection',695:'maximum-area-of-island',704:'binary-search',739:'daily-temperatures',746:'min-cost-climbing-stairs',853:'car-fleet',875:'koko-eating-bananas',977:'squares-of-a-sorted-array',981:'time-based-key-value-store',994:'rotting-oranges',1448:'count-good-nodes-in-binary-tree'};
+const SLUGS={1:'two-sum',3:'longest-substring-without-repeating-characters',5:'longest-palindromic-substring',11:'container-with-most-water',15:'3sum',19:'remove-nth-node-from-end-of-list',20:'valid-parentheses',21:'merge-two-sorted-lists',23:'merge-k-sorted-lists',33:'search-in-rotated-sorted-array',36:'valid-sudoku',42:'trapping-rain-water',49:'group-anagrams',50:'powx-n',70:'climbing-stairs',74:'search-a-2d-matrix',75:'sort-colors',76:'minimum-window-substring',84:'largest-rectangle-in-histogram',91:'decode-ways',98:'validate-binary-search-tree',100:'same-tree',102:'binary-tree-level-order-traversal',104:'maximum-depth-of-binary-tree',105:'construct-binary-tree-from-preorder-and-inorder-traversal',110:'balanced-binary-tree',121:'best-time-to-buy-and-sell-stock',124:'binary-tree-maximum-path-sum',125:'valid-palindrome',127:'word-ladder',128:'longest-consecutive-sequence',130:'surrounded-regions',133:'clone-graph',139:'word-break',141:'linked-list-cycle',143:'reorder-list',150:'evaluate-reverse-polish-notation',152:'maximum-product-subarray',153:'find-minimum-in-rotated-sorted-array',155:'min-stack',167:'two-sum-ii-input-array-is-sorted',198:'house-robber',199:'binary-tree-right-side-view',200:'number-of-islands',206:'reverse-linked-list',207:'course-schedule',210:'course-schedule-ii',213:'house-robber-ii',226:'invert-binary-tree',230:'kth-smallest-element-in-a-bst',235:'lowest-common-ancestor-of-a-binary-search-tree',238:'product-of-array-except-self',271:'encode-and-decode-strings',297:'serialize-and-deserialize-binary-tree',300:'longest-increasing-subsequence',322:'coin-change',344:'reverse-string',347:'top-k-frequent-elements',416:'partition-equal-subset-sum',417:'pacific-atlantic-water-flow',424:'longest-repeating-character-replacement',509:'fibonacci-number',543:'diameter-of-binary-tree',567:'permutation-in-string',572:'subtree-of-another-tree',647:'palindromic-substrings',684:'redundant-connection',695:'maximum-area-of-island',704:'binary-search',739:'daily-temperatures',746:'min-cost-climbing-stairs',853:'car-fleet',875:'koko-eating-bananas',977:'squares-of-a-sorted-array',981:'time-based-key-value-store',994:'rotting-oranges',1448:'count-good-nodes-in-binary-tree'};
 
 // pat level stored separately per pattern id
 const ALL=PATTERNS.flatMap(g=>g.problems.map(p=>({...p,patternId:g.id,patternName:g.name,phaseLabel:g.phaseLabel,phase:g.phase})));
@@ -679,7 +688,7 @@ function setView(v, btn){
 
 function setFilter(f){
   filter=f;
-  const L={all:'All problems','binary-search':'Binary search','linked-list':'Linked lists','stack-queue':'Stacks & queues','two-pointers':'Two pointers','sliding-window':'Sliding window','hashing':'Hashing',phase2:'Phase 2 ✓',phase3:'Phase 3 — active','trees':'Trees','graphs':'Graphs','dp':'Dynamic programming'};
+  const L={all:'All problems','binary-search':'Binary search','linked-list':'Linked lists','stack-queue':'Stacks & queues','two-pointers':'Two pointers','sliding-window':'Sliding window','hashing':'Hashing',phase2:'Phase 2 ✓',phase3:'Phase 3 — active','recursion':'Recursion','trees':'Trees','graphs':'Graphs','dp':'Dynamic programming'};
   document.getElementById('main-title').textContent=L[f]||f;
   render();
 }
