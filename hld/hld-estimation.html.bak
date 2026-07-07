@@ -554,73 +554,16 @@ function renderCat(id){
   </div>`;
 
   h += `<div class="cheat-sheet">
-    <div class="cs-title">⚡ Cold-start framework — say this before any estimation</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.8;background:var(--bg4);padding:10px 14px;border-radius:5px;border:1px solid rgba(251,191,36,.15);margin-bottom:14px;">
-      1. <strong style="color:var(--text)">Users</strong> — DAU, concurrent % at peak<br/>
-      2. <strong style="color:var(--text)">Traffic</strong> — QPS avg (DAU × events ÷ 86,400), then peak (×2–3)<br/>
-      3. <strong style="color:var(--text)">Storage</strong> — per item size × items/day × retention × replication<br/>
-      4. <strong style="color:var(--text)">Bandwidth</strong> — QPS × payload size<br/>
-      5. <strong style="color:var(--text)">Servers</strong> — peak QPS ÷ QPS/server. Storage ÷ storage/server. Take the larger.
-    </div>
-
-    <div class="cs-title">📐 Time & scale anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Seconds / day</div><div class="cs-val">86,400</div><div class="cs-note">≈ 10⁵ — use constantly</div></div>
-      <div class="cs-item"><div class="cs-key">Seconds / month</div><div class="cs-val">2.6M</div><div class="cs-note">≈ 30 × 86,400</div></div>
-      <div class="cs-item"><div class="cs-key">Peak multiplier</div><div class="cs-val">2–3×</div><div class="cs-note">Always size for peak</div></div>
+    <div class="cs-title">Reference numbers — memorise these</div>
+    <div class="cs-grid">
+      <div class="cs-item"><div class="cs-key">Seconds in a day</div><div class="cs-val">86,400</div><div class="cs-note">≈ 10⁵ — use this constantly</div></div>
+      <div class="cs-item"><div class="cs-key">1 million</div><div class="cs-val">10⁶</div><div class="cs-note">1M users, 1M QPS</div></div>
+      <div class="cs-item"><div class="cs-key">1 billion</div><div class="cs-val">10⁹</div><div class="cs-note">1B DAU (big platform)</div></div>
+      <div class="cs-item"><div class="cs-key">1 GB in bytes</div><div class="cs-val">~10⁹</div><div class="cs-note">1,073,741,824 exactly</div></div>
+      <div class="cs-item"><div class="cs-key">1 TB in bytes</div><div class="cs-val">~10¹²</div><div class="cs-note">1,099,511,627,776 exactly</div></div>
+      <div class="cs-item"><div class="cs-key">Peak = avg × ?</div><div class="cs-val">2–3×</div><div class="cs-note">Always design for peak</div></div>
       <div class="cs-item"><div class="cs-key">Replication factor</div><div class="cs-val">3×</div><div class="cs-note">Standard for durability</div></div>
-      <div class="cs-item"><div class="cs-key">Order of magnitude OK</div><div class="cs-val">±3×</div><div class="cs-note">Within 3× = close enough</div></div>
-      <div class="cs-item"><div class="cs-key">Headroom buffer</div><div class="cs-val">+20–30%</div><div class="cs-note">Add after sizing</div></div>
-    </div>
-
-    <div class="cs-title">💾 Storage size anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Tweet / short text</div><div class="cs-val">280 B</div><div class="cs-note">UTF-8, ~280 chars</div></div>
-      <div class="cs-item"><div class="cs-key">Chat message</div><div class="cs-val">100–500 B</div><div class="cs-note">text + metadata</div></div>
-      <div class="cs-item"><div class="cs-key">User profile row</div><div class="cs-val">~1 KB</div><div class="cs-note">name, email, prefs</div></div>
-      <div class="cs-item"><div class="cs-key">DB row (avg)</div><div class="cs-val">1–10 KB</div><div class="cs-note">depends on columns</div></div>
-      <div class="cs-item"><div class="cs-key">Thumbnail image</div><div class="cs-val">50–200 KB</div><div class="cs-note">JPEG compressed</div></div>
-      <div class="cs-item"><div class="cs-key">Photo (full res)</div><div class="cs-val">2–5 MB</div><div class="cs-note">smartphone photo</div></div>
-      <div class="cs-item"><div class="cs-key">Video (1 min 720p)</div><div class="cs-val">~50 MB</div><div class="cs-note">compressed H.264</div></div>
-      <div class="cs-item"><div class="cs-key">Video (1 hr 720p)</div><div class="cs-val">~1–2 GB</div><div class="cs-note">×60 from above</div></div>
-      <div class="cs-item"><div class="cs-key">1 KB → GB</div><div class="cs-val">÷ 10⁶</div><div class="cs-note">1,048,576 exactly</div></div>
-      <div class="cs-item"><div class="cs-key">1 MB → GB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 MB = 1 GB</div></div>
-      <div class="cs-item"><div class="cs-key">1 GB → TB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 GB = 1 TB</div></div>
-      <div class="cs-item"><div class="cs-key">1 TB → PB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 TB = 1 PB</div></div>
-    </div>
-
-    <div class="cs-title">🖥️ Server capacity anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">App server RPS</div><div class="cs-val">5–10K</div><div class="cs-note">simple REST API</div></div>
-      <div class="cs-item"><div class="cs-key">Nginx (static)</div><div class="cs-val">~50K RPS</div><div class="cs-note">static file serving</div></div>
-      <div class="cs-item"><div class="cs-key">Redis ops/sec</div><div class="cs-val">~10K</div><div class="cs-note">single-threaded / core</div></div>
-      <div class="cs-item"><div class="cs-key">Redis RAM node</div><div class="cs-val">64–256 GB</div><div class="cs-note">typical cloud instance</div></div>
-      <div class="cs-item"><div class="cs-key">Kafka broker throughput</div><div class="cs-val">1 GB/sec</div><div class="cs-note">per broker</div></div>
-      <div class="cs-item"><div class="cs-key">Kafka partition limit</div><div class="cs-val">50–100 MB/sec</div><div class="cs-note">per partition</div></div>
-      <div class="cs-item"><div class="cs-key">DB node SSD</div><div class="cs-val">2–10 TB</div><div class="cs-note">NVMe SSD per node</div></div>
-      <div class="cs-item"><div class="cs-key">WebSocket server</div><div class="cs-val">50K conns</div><div class="cs-note">50K concurrent WS</div></div>
-      <div class="cs-item"><div class="cs-key">WS RAM per conn</div><div class="cs-val">~65 KB</div><div class="cs-note">connection state</div></div>
-      <div class="cs-item"><div class="cs-key">CDN hit rate</div><div class="cs-val">90–99%</div><div class="cs-note">origin sees 1–10%</div></div>
-    </div>
-
-    <div class="cs-title">📊 Platform DAU anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Small startup</div><div class="cs-val">10K–1M</div><div class="cs-note">single region</div></div>
-      <div class="cs-item"><div class="cs-key">Mid-size product</div><div class="cs-val">10M–50M</div><div class="cs-note">multi-AZ</div></div>
-      <div class="cs-item"><div class="cs-key">WhatsApp / Instagram</div><div class="cs-val">500M</div><div class="cs-note">global multi-region</div></div>
-      <div class="cs-item"><div class="cs-key">YouTube / Facebook</div><div class="cs-val">1–2B</div><div class="cs-note">global CDN + edge</div></div>
-      <div class="cs-item"><div class="cs-key">Concurrent % (peak)</div><div class="cs-val">10–25%</div><div class="cs-note">of DAU online at once</div></div>
-      <div class="cs-item"><div class="cs-key">Events/user/day</div><div class="cs-val">10–100</div><div class="cs-note">depends on product</div></div>
-    </div>
-
-    <div class="cs-title">💸 Cost anchors (AWS ballpark)</div>
-    <div class="cs-grid" style="margin-bottom:4px">
-      <div class="cs-item"><div class="cs-key">S3 storage</div><div class="cs-val">$0.023/GB/mo</div><div class="cs-note">standard tier</div></div>
-      <div class="cs-item"><div class="cs-key">S3 Glacier</div><div class="cs-val">$0.004/GB/mo</div><div class="cs-note">cold archive</div></div>
-      <div class="cs-item"><div class="cs-key">CDN egress</div><div class="cs-val">$0.01–0.08/GB</div><div class="cs-note">varies by region</div></div>
-      <div class="cs-item"><div class="cs-key">SSD (EBS gp3)</div><div class="cs-val">$0.08/GB/mo</div><div class="cs-note">block storage</div></div>
-      <div class="cs-item"><div class="cs-key">HDD (EBS sc1)</div><div class="cs-val">$0.015/GB/mo</div><div class="cs-note">cold HDD</div></div>
-      <div class="cs-item"><div class="cs-key">EC2 (c5.xlarge)</div><div class="cs-val">~$0.17/hr</div><div class="cs-note">4 vCPU, 8 GB RAM</div></div>
+      <div class="cs-item"><div class="cs-key">Order of magnitude</div><div class="cs-val">10×</div><div class="cs-note">If you are within 3×, you are close enough</div></div>
     </div>
   </div>`;
 

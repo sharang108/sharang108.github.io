@@ -295,9 +295,8 @@
     <div class="tb-right">
       <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu"><span></span><span></span><span></span></button>
       <span class="phase-pill pill-done">Phase 1 ✓</span>
-      <span class="phase-pill pill-done">Phase 2 ✓</span>
-      <span class="phase-pill pill-active">Phase 3 active</span>
-      <span class="phase-pill pill-locked">Phase 4–5 🔒</span>
+      <span class="phase-pill pill-active">Phase 2 active</span>
+      <span class="phase-pill pill-locked">Phase 3–5 🔒</span>
       <button class="icon-btn" onclick="exportXLSX()" title="Export to Excel" style="width:auto;padding:0 10px;font-family:var(--mono);font-size:10px;gap:5px;">⬇ Export</button>
       <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
       <button class="icon-btn" id="max-btn"   onclick="toggleMax()"   title="Maximize">⛶</button>
@@ -312,16 +311,12 @@
         <div class="pb-hdr"><span class="pb-name" style="color:var(--accent)">Phase 1</span><span class="pb-cnt">27/27</span></div>
         <div class="pb-bar"><div class="pb-fill f-done" style="width:100%"></div></div>
       </div>
-      <div class="pb" style="border-left-color:var(--accent)" onclick="setFilter('phase2')">
-        <div class="pb-hdr"><span class="pb-name" style="color:var(--accent)">Phase 2</span><span class="pb-cnt" id="p2-cnt">18/18</span></div>
-        <div class="pb-bar"><div class="pb-fill f-done" id="p2-bar" style="width:100%"></div></div>
-      </div>
-      <div class="pb" style="border-left-color:var(--amber)" onclick="setFilter('phase3')">
-        <div class="pb-hdr"><span class="pb-name" style="color:var(--amber)">Phase 3</span><span class="pb-cnt" id="p3-cnt">0/26</span></div>
-        <div class="pb-bar"><div class="pb-fill f-act" id="p3-bar" style="width:0%"></div></div>
+      <div class="pb" style="border-left-color:var(--amber)" onclick="setFilter('phase2')">
+        <div class="pb-hdr"><span class="pb-name" style="color:var(--amber)">Phase 2</span><span class="pb-cnt" id="p2-cnt">0/18</span></div>
+        <div class="pb-bar"><div class="pb-fill f-act" id="p2-bar" style="width:0%"></div></div>
       </div>
       <div class="pb locked">
-        <div class="pb-hdr"><span class="pb-name">Phase 4–5</span><span class="pb-cnt">locked</span></div>
+        <div class="pb-hdr"><span class="pb-name">Phase 3–5</span><span class="pb-cnt">locked</span></div>
         <div class="pb-bar"><div class="pb-fill f-lock" style="width:0%"></div></div>
       </div>
     </div>
@@ -342,8 +337,7 @@
         <div class="stat-row"><span class="stat-key">total solved</span><span class="stat-val" id="st-total">27</span></div>
         <div class="stat-row"><span class="stat-key">audited</span><span class="stat-val" id="st-audit">0</span></div>
         <div class="stat-row"><span class="stat-key">needs review</span><span class="stat-val" id="st-review">0</span></div>
-        <div class="stat-row"><span class="stat-key">phase 2 done</span><span class="stat-val">18/18 ✓</span></div>
-        <div class="stat-row"><span class="stat-key">phase 3 done</span><span class="stat-val" id="st-p3">0/26</span></div>
+        <div class="stat-row"><span class="stat-key">phase 2 done</span><span class="stat-val" id="st-p2">0/18</span></div>
         <div class="stat-row"><span class="stat-key">cycle</span><span class="stat-val" style="font-size:10px">DSA→LLD→HLD</span></div>
       </div>
     </div>
@@ -591,59 +585,9 @@ const PATTERNS=[
     {id:36,lc:853,title:'Car Fleet',diff:'med',time:'O(n log n)',space:'O(n)'},
     {id:37,lc:84,title:'Largest Rectangle in Histogram',diff:'hard',time:'O(n)',space:'O(n)'},
   ]},
-  // ── PHASE 3 ──────────────────────────────────────────────────────────────
-  {id:'trees',name:'Trees',phase:3,phaseLabel:'Phase 3',
-   decisionPoints:['Traversal order — pre/in/post-order: which visits root relative to children?','Recursive vs iterative — iterative uses explicit stack; mandatory when stack depth is a risk.','Base case — null node is the most common; what should null return?','BST property — left < root < right; use it to prune half the tree at each node.'],
-   problems:[
-    {id:38,lc:226,title:'Invert Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:39,lc:104,title:'Maximum Depth of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:40,lc:543,title:'Diameter of Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:41,lc:110,title:'Balanced Binary Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:42,lc:100,title:'Same Tree',diff:'easy',time:'O(n)',space:'O(h)'},
-    {id:43,lc:572,title:'Subtree of Another Tree',diff:'easy',time:'O(nm)',space:'O(h)'},
-    {id:44,lc:235,title:'Lowest Common Ancestor of BST',diff:'med',time:'O(h)',space:'O(1)'},
-    {id:45,lc:102,title:'Binary Tree Level Order Traversal',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:46,lc:199,title:'Binary Tree Right Side View',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:47,lc:1448,title:'Count Good Nodes in Binary Tree',diff:'med',time:'O(n)',space:'O(h)'},
-    {id:48,lc:98,title:'Validate Binary Search Tree',diff:'med',time:'O(n)',space:'O(h)'},
-    {id:49,lc:230,title:'Kth Smallest Element in BST',diff:'med',time:'O(h+k)',space:'O(h)'},
-    {id:50,lc:105,title:'Construct Binary Tree from Preorder and Inorder',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:51,lc:124,title:'Binary Tree Maximum Path Sum',diff:'hard',time:'O(n)',space:'O(h)'},
-    {id:52,lc:297,title:'Serialize and Deserialize Binary Tree',diff:'hard',time:'O(n)',space:'O(n)'},
-  ]},
-  {id:'graphs',name:'Graphs',phase:3,phaseLabel:'Phase 3',
-   decisionPoints:['BFS vs DFS — BFS for shortest path / level-by-level; DFS for connectivity / path existence.','Visited set — always track visited to avoid infinite loops in cyclic graphs.','Graph representation — adjacency list vs matrix; list for sparse, matrix for dense.','Directed vs undirected — cycle detection differs; undirected needs parent tracking.'],
-   problems:[
-    {id:53,lc:200,title:'Number of Islands',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:54,lc:133,title:'Clone Graph',diff:'med',time:'O(V+E)',space:'O(V)'},
-    {id:55,lc:695,title:'Max Area of Island',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:56,lc:417,title:'Pacific Atlantic Water Flow',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:57,lc:130,title:'Surrounded Regions',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:58,lc:994,title:'Rotting Oranges',diff:'med',time:'O(mn)',space:'O(mn)'},
-    {id:59,lc:207,title:'Course Schedule',diff:'med',time:'O(V+E)',space:'O(V+E)'},
-    {id:60,lc:210,title:'Course Schedule II',diff:'med',time:'O(V+E)',space:'O(V+E)'},
-    {id:61,lc:684,title:'Redundant Connection',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:62,lc:127,title:'Word Ladder',diff:'hard',time:'O(M²×N)',space:'O(M²×N)'},
-  ]},
-  {id:'dp',name:'Dynamic programming',phase:3,phaseLabel:'Phase 3',
-   decisionPoints:['Subproblem definition — what does dp[i] represent? Be precise before coding.','Recurrence — how does dp[i] depend on smaller subproblems?','Base cases — what are dp[0] and dp[1]? Off-by-one here propagates everywhere.','1D vs 2D — 1D for single sequence problems; 2D for two sequences or grids.'],
-   problems:[
-    {id:63,lc:70,title:'Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:64,lc:746,title:'Min Cost Climbing Stairs',diff:'easy',time:'O(n)',space:'O(1)'},
-    {id:65,lc:198,title:'House Robber',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:66,lc:213,title:'House Robber II',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:67,lc:5,title:'Longest Palindromic Substring',diff:'med',time:'O(n²)',space:'O(1)'},
-    {id:68,lc:647,title:'Palindromic Substrings',diff:'med',time:'O(n²)',space:'O(1)'},
-    {id:69,lc:91,title:'Decode Ways',diff:'med',time:'O(n)',space:'O(n)'},
-    {id:70,lc:322,title:'Coin Change',diff:'med',time:'O(n×m)',space:'O(n)'},
-    {id:71,lc:152,title:'Maximum Product Subarray',diff:'med',time:'O(n)',space:'O(1)'},
-    {id:72,lc:139,title:'Word Break',diff:'med',time:'O(n²)',space:'O(n)'},
-    {id:73,lc:300,title:'Longest Increasing Subsequence',diff:'med',time:'O(n²)',space:'O(n)'},
-    {id:74,lc:416,title:'Partition Equal Subset Sum',diff:'med',time:'O(n×sum)',space:'O(sum)'},
-  ]},
 ];
 
-const SLUGS={1:'two-sum',3:'longest-substring-without-repeating-characters',5:'longest-palindromic-substring',11:'container-with-most-water',15:'3sum',19:'remove-nth-node-from-end-of-list',20:'valid-parentheses',21:'merge-two-sorted-lists',23:'merge-k-sorted-lists',33:'search-in-rotated-sorted-array',36:'valid-sudoku',42:'trapping-rain-water',49:'group-anagrams',70:'climbing-stairs',74:'search-a-2d-matrix',75:'sort-colors',76:'minimum-window-substring',84:'largest-rectangle-in-histogram',91:'decode-ways',98:'validate-binary-search-tree',100:'same-tree',102:'binary-tree-level-order-traversal',104:'maximum-depth-of-binary-tree',105:'construct-binary-tree-from-preorder-and-inorder-traversal',110:'balanced-binary-tree',121:'best-time-to-buy-and-sell-stock',124:'binary-tree-maximum-path-sum',125:'valid-palindrome',127:'word-ladder',128:'longest-consecutive-sequence',130:'surrounded-regions',133:'clone-graph',139:'word-break',141:'linked-list-cycle',143:'reorder-list',150:'evaluate-reverse-polish-notation',152:'maximum-product-subarray',153:'find-minimum-in-rotated-sorted-array',155:'min-stack',167:'two-sum-ii-input-array-is-sorted',198:'house-robber',199:'binary-tree-right-side-view',200:'number-of-islands',206:'reverse-linked-list',207:'course-schedule',210:'course-schedule-ii',213:'house-robber-ii',226:'invert-binary-tree',230:'kth-smallest-element-in-a-bst',235:'lowest-common-ancestor-of-a-binary-search-tree',238:'product-of-array-except-self',271:'encode-and-decode-strings',297:'serialize-and-deserialize-binary-tree',300:'longest-increasing-subsequence',322:'coin-change',347:'top-k-frequent-elements',416:'partition-equal-subset-sum',417:'pacific-atlantic-water-flow',424:'longest-repeating-character-replacement',543:'diameter-of-binary-tree',567:'permutation-in-string',572:'subtree-of-another-tree',647:'palindromic-substrings',684:'redundant-connection',695:'maximum-area-of-island',704:'binary-search',739:'daily-temperatures',746:'min-cost-climbing-stairs',853:'car-fleet',875:'koko-eating-bananas',977:'squares-of-a-sorted-array',981:'time-based-key-value-store',994:'rotting-oranges',1448:'count-good-nodes-in-binary-tree'};
+const SLUGS={1:'two-sum',3:'longest-substring-without-repeating-characters',11:'container-with-most-water',15:'3sum',19:'remove-nth-node-from-end-of-list',20:'valid-parentheses',21:'merge-two-sorted-lists',23:'merge-k-sorted-lists',33:'search-in-rotated-sorted-array',36:'valid-sudoku',42:'trapping-rain-water',49:'group-anagrams',74:'search-a-2d-matrix',75:'sort-colors',76:'minimum-window-substring',84:'largest-rectangle-in-histogram',121:'best-time-to-buy-and-sell-stock',125:'valid-palindrome',128:'longest-consecutive-sequence',141:'linked-list-cycle',143:'reorder-list',150:'evaluate-reverse-polish-notation',153:'find-minimum-in-rotated-sorted-array',155:'min-stack',167:'two-sum-ii-input-array-is-sorted',206:'reverse-linked-list',238:'product-of-array-except-self',271:'encode-and-decode-strings',347:'top-k-frequent-elements',424:'longest-repeating-character-replacement',567:'permutation-in-string',704:'binary-search',739:'daily-temperatures',853:'car-fleet',875:'koko-eating-bananas',977:'squares-of-a-sorted-array',981:'time-based-key-value-store'};
 
 // pat level stored separately per pattern id
 const ALL=PATTERNS.flatMap(g=>g.problems.map(p=>({...p,patternId:g.id,patternName:g.name,phaseLabel:g.phaseLabel,phase:g.phase})));
@@ -655,9 +599,9 @@ let patLevel=JSON.parse(localStorage.getItem('dsa-pl')||'{}'); // {patternId: 1-
 let patAudit=JSON.parse(localStorage.getItem('dsa-pa')||'{}'); // {patternId: 'pending'|'done'|'due'}
 let filter='all', activeId=null, isDark=true, isMax=false, currentView='problems';
 
-// seed phases 1 & 2 as done
-PATTERNS.filter(g=>g.phase<=2).forEach(g=>g.problems.forEach(p=>{if(!statuses[p.id])statuses[p.id]='solved';}));
-PATTERNS.filter(g=>g.phase<=2).forEach(g=>{if(!patLevel[g.id])patLevel[g.id]=2;if(!patAudit[g.id])patAudit[g.id]='pending';});
+// seed
+PATTERNS.filter(g=>g.phase===1).forEach(g=>g.problems.forEach(p=>{if(!statuses[p.id])statuses[p.id]='solved';}));
+PATTERNS.filter(g=>g.phase===1).forEach(g=>{if(!patLevel[g.id])patLevel[g.id]=2;if(!patAudit[g.id])patAudit[g.id]='pending';});
 save();
 
 function save(){
@@ -679,13 +623,13 @@ function setView(v, btn){
 
 function setFilter(f){
   filter=f;
-  const L={all:'All problems','binary-search':'Binary search','linked-list':'Linked lists','stack-queue':'Stacks & queues','two-pointers':'Two pointers','sliding-window':'Sliding window','hashing':'Hashing',phase2:'Phase 2 ✓',phase3:'Phase 3 — active','trees':'Trees','graphs':'Graphs','dp':'Dynamic programming'};
+  const L={all:'All problems','binary-search':'Binary search','linked-list':'Linked lists','stack-queue':'Stacks & queues','two-pointers':'Two pointers','sliding-window':'Sliding window','hashing':'Hashing',phase2:'Phase 2 — active'};
   document.getElementById('main-title').textContent=L[f]||f;
   render();
 }
 
 // ── NEXT UP
-function getNext(){for(const g of PATTERNS){if(g.phase<3)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
+function getNext(){for(const g of PATTERNS){if(g.phase<2)continue;for(const p of g.problems){if(!statuses[p.id]||statuses[p.id]==='todo')return{...p,patternName:g.name};}}return null;}
 function claudeUrl(p){const prompt=`LC ${p.lc} — ${p.title}\n\nYou are my DSA mentor. Open with the brief only:\n- Problem statement (restate cleanly with constraints)\n- Real-world analogy (intuition only, no implementation)\n- Optimal time and space complexity — the target to hit\n\nNothing else. No pattern name, no decision points, no bugs, no hints.\nStop after the brief and wait for my attempt.\n\nWhen I share my attempt, then identify: what pattern I used, where my thinking was right or wrong, and what to correct.`;return`https://claude.ai/new?q=${encodeURIComponent(prompt)}`;}
 function openNextClaude(){const n=getNext();if(n)iosOpen(claudeUrl(n, false),'_blank');}
 function iosOpen(url,blank){const a=document.createElement("a");a.href=url;if(blank)a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();document.body.removeChild(a);}
@@ -696,7 +640,7 @@ function openInClaudeById(id){const p=ALL.find(x=>x.id===id);if(p)iosOpen(claude
 function render(){renderFilters();renderPatLevels();renderNextUp();renderProblems();renderStats();renderDecisionPoints();}
 
 function renderFilters(){
-  const dc={1:'var(--accent)',2:'var(--accent)',3:'var(--amber)'};
+  const dc={1:'var(--accent)',2:'var(--amber)'};
   let h=`<button class="fbtn ${filter==='all'?'sel':''}" onclick="setFilter('all')"><span class="fdot" style="background:var(--muted)"></span>All<span class="fbadge">${ALL.filter(p=>statuses[p.id]==='solved'||statuses[p.id]==='audited').length}/${ALL.length}</span></button>`;
   PATTERNS.forEach(g=>{
     const d=g.problems.filter(p=>statuses[p.id]==='solved'||statuses[p.id]==='audited').length;
@@ -746,8 +690,8 @@ function renderNextUp(){
 }
 
 function renderProblems(){
-  const groups=filter==='all'?PATTERNS:filter==='phase2'?PATTERNS.filter(g=>g.phase===2):filter==='phase3'?PATTERNS.filter(g=>g.phase===3):PATTERNS.filter(g=>g.id===filter);
-  const ps={1:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,2:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,3:`color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)`};
+  const groups=filter==='all'?PATTERNS:filter==='phase2'?PATTERNS.filter(g=>g.phase===2):PATTERNS.filter(g=>g.id===filter);
+  const ps={1:`color:var(--accent);background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2)`,2:`color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)`};
   let h='';
   groups.forEach(g=>{
     const sol=g.problems.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
@@ -777,17 +721,15 @@ function renderProblems(){
 
 function renderStats(){
   const p2=PATTERNS.filter(g=>g.phase===2).flatMap(g=>g.problems);
-  const p3=PATTERNS.filter(g=>g.phase===3).flatMap(g=>g.problems);
   const p2s=p2.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
-  const p3s=p3.filter(p=>['solved','audited'].includes(statuses[p.id])).length;
   const rev=ALL.filter(p=>statuses[p.id]==='review').length;
   const aud=ALL.filter(p=>statuses[p.id]==='audited').length;
-  document.getElementById('st-total').textContent=27+18+p3s;
+  document.getElementById('st-total').textContent=27+p2s;
   document.getElementById('st-audit').textContent=aud;
   document.getElementById('st-review').textContent=rev;
-  document.getElementById('st-p3').textContent=`${p3s}/${p3.length}`;
-  document.getElementById('p3-cnt').textContent=`${p3s}/${p3.length}`;
-  document.getElementById('p3-bar').style.width=`${p3.length?Math.round(p3s/p3.length*100):0}%`;
+  document.getElementById('st-p2').textContent=`${p2s}/${p2.length}`;
+  document.getElementById('p2-cnt').textContent=`${p2s}/${p2.length}`;
+  document.getElementById('p2-bar').style.width=`${Math.round(p2s/p2.length*100)}%`;
 }
 
 function learnPatternUrl(patternName){
@@ -968,14 +910,10 @@ function exportXLSX(){
     ['Total',p1probs.length],
     ['Solved',p1probs.filter(solvedOrAudited).length],
     ['',''],
-    ['── Phase 2 (complete) ──',''],
+    ['── Phase 2 (active) ──',''],
     ['Total',p2probs.length],
     ['Solved',p2probs.filter(solvedOrAudited).length],
-    ['',''],
-    ['── Phase 3 (active) ──',''],
-    ['Total',PATTERNS.filter(g=>g.phase===3).flatMap(g=>g.problems).length],
-    ['Solved',PATTERNS.filter(g=>g.phase===3).flatMap(g=>g.problems).filter(solvedOrAudited).length],
-    ['Remaining',PATTERNS.filter(g=>g.phase===3).flatMap(g=>g.problems).filter(p=>!solvedOrAudited(p)).length],
+    ['Remaining',p2probs.filter(p=>!solvedOrAudited(p)).length],
     ['',''],
     ['── Pattern internalization ──',''],
     ...PATTERNS.map(g=>[g.name,LEVEL_LABEL[patLevel[g.id]]||'Not set']),
