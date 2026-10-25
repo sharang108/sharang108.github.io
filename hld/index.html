@@ -204,9 +204,8 @@ a,button,[onclick],.fbtn,.prow{-webkit-tap-highlight-color:transparent;cursor:po
   <span class="tb-sub">problems</span>
   <div class="tb-right">
     <button class="hamburger" id="hamburger-btn"><span></span><span></span><span></span></button>
-    <span class="phase-pill pill-active">Phase 1–2 active</span>
-    <span class="phase-pill pill-locked">Phase 3–4 later</span>
-    <a class="icon-btn" href="hld-concepts.html">⇄ Concept lab</a>
+    <span class="phase-pill pill-active">Phases 1–4 available</span>
+    <a class="icon-btn" href="learn.html">◇ Learn HLD</a><a class="icon-btn" href="hld-concepts.html">⇄ Concept lab</a>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
 </div>
@@ -379,20 +378,20 @@ a,button,[onclick],.fbtn,.prow{-webkit-tap-highlight-color:transparent;cursor:po
     <button class="mclose" onclick="closeModal()">✕ close</button>
     <div class="m-id"    id="m-id"></div>
     <div class="m-title" id="m-title"></div>
-    <div class="mmeta">
+    <details><summary>Reveal topic and practice metadata</summary><div class="mmeta">
       <div class="mfield"><div class="mlabel">Type</div>     <div class="mval" id="m-type"></div></div>
       <div class="mfield"><div class="mlabel">Concepts</div> <div class="mval" id="m-concepts"></div></div>
       <div class="mfield"><div class="mlabel">Difficulty</div><div class="mval" id="m-diff"></div></div>
       <div class="mfield"><div class="mlabel">Phase</div>    <div class="mval" id="m-phase"></div></div>
       <div class="mfield"><div class="mlabel">Status</div>   <div class="mval" id="m-status"></div></div>
     </div>
-    <div class="m-desc"  id="m-desc"></div>
+    </details><div class="m-desc"  id="m-desc"></div>
     <div class="m-reqs"  id="m-reqs"></div>
-    <div class="m-focus" id="m-focus"></div>
+    <details id="m-hints"><summary>Progressive hints and examples</summary><div id="m-examples"></div><div class="m-focus" id="m-focus"></div><ol id="m-hint-list"></ol></details>
     <div class="mlinks">
       <button class="mlbtn btn-amber" onclick="openModalClaude()" style="background:rgba(251,191,36,.1);color:var(--amber);border-color:rgba(251,191,36,.3);">→ Open in Claude</button>
       <button class="mlbtn" onclick="copyModalPrompt()" style="background:none;color:var(--muted2);border-color:var(--border);">⎘ Copy mentor prompt</button>
-      <a class="mlbtn" href="hld-concepts.html" id="m-concept-link" style="background:rgba(45,212,191,.08);color:var(--teal);border-color:rgba(45,212,191,.25);">⇄ Concept lab</a>
+      <a class="mlbtn" id="m-learn-link">◇ Topic guide</a><a class="mlbtn" id="m-session-learn">Learn</a><a class="mlbtn" id="m-session-attempt">Attempt</a><a class="mlbtn" id="m-session-revisit">Revisit</a><a class="mlbtn" href="hld-concepts.html" id="m-concept-link" style="background:rgba(45,212,191,.08);color:var(--teal);border-color:rgba(45,212,191,.25);">⇄ Concept lab</a>
     </div>
     <hr class="divider"/>
     <div class="mlabel" style="margin-bottom:6px">Notes / insights</div>
@@ -406,6 +405,10 @@ a,button,[onclick],.fbtn,.prow{-webkit-tap-highlight-color:transparent;cursor:po
   </div>
 </div>
 
+<script src="../assets/catalog.js?v=final1"></script>
+<script src="../assets/hld-guides.js?v=final1"></script>
+<script src="../assets/prompts.js?v=final3"></script>
+<script src="../assets/progress.js?v=final1"></script>
 <script>
 // ─── DATA ────────────────────────────────────────────────────────────────────
 // 4-phase progression mirroring LLD index:
@@ -414,455 +417,8 @@ a,button,[onclick],.fbtn,.prow{-webkit-tap-highlight-color:transparent;cursor:po
 // Phase 3 — Partial systems      (estimation required, full component stack)
 // Phase 4 — Full system design   (interview-level, all concepts, scaling)
 
-const GROUPS = [
+const GROUPS = PrepCatalog.tracks.hld;
 
-// ══ PHASE 1: CONCEPT DRILLS ══════════════════════════════════════════════════
-// One concept per problem. The goal is to get comfortable applying a single
-// HLD concept correctly before combining them.
-
-{id:'caching-drills', name:'Caching drills', phase:1, color:'var(--accent)', problems:[
-  {id:1, title:'Choose a cache strategy for a news feed', diff:'easy', type:'drill',
-   concepts:'Caching',
-   desc:'A news feed endpoint is called 500 times/sec. Each response is identical for all users. The underlying DB query takes 200ms. You need P99 < 30ms.',
-   reqs:['Name the cache strategy you would use (cache-aside / write-through / write-behind)','Justify the choice given the read:write ratio','Specify TTL — and explain your reasoning for that value','What happens on a cache miss — describe the exact call sequence'],
-   focus:'One concept only: cache strategy selection. No estimation, no architecture. Just: which strategy, why, and what does miss look like.'},
-  {id:2, title:'Design cache invalidation for a product page', diff:'easy', type:'drill',
-   concepts:'Caching',
-   desc:'Product pages are cached for 10 minutes. A price update must be visible within 30 seconds. Your cache has 2M keys. The update happens ~100 times/day.',
-   reqs:['How do you invalidate the cache when a price changes?','Deletion vs update — which is safer and why?','What is the worst-case staleness window?','What happens if the cache delete succeeds but the DB write fails?'],
-   focus:'Cache invalidation only. The classic hard problem. No new architecture needed — just nail the invalidation logic and its failure modes.'},
-  {id:3, title:'CDN vs server cache — make the call', diff:'easy', type:'drill',
-   concepts:'Caching',
-   desc:'A media platform serves: (A) product images, (B) user profile data, (C) homepage banner (same for all users), (D) order history. For each, decide: CDN, Redis, or no cache.',
-   reqs:['Classify each of the 4 data types: CDN / Redis / no cache','Give one reason per decision','Identify which one would be a security mistake if cached on CDN','Explain what "cache poisoning" means in the CDN context'],
-   focus:'Concept discrimination — knowing *what* to cache where. Mastering this one decision saves you from catastrophic mistakes in full system designs.'},
-  {id:4, title:'Prevent cache stampede on a viral product', diff:'med', type:'drill',
-   concepts:'Caching',
-   desc:'A product goes viral. 50,000 concurrent users hit it at the exact moment its cache TTL expires. All 50,000 requests miss and hit the DB simultaneously. The DB has 200 QPS capacity.',
-   reqs:['Describe the stampede problem precisely — what fails and why','Propose one solution (lock-based / probabilistic TTL / background refresh)','What are the trade-offs of your chosen solution?','Is there a version of this problem that cannot be solved with TTL jitter alone?'],
-   focus:'Cache stampede is a single-concept failure mode. Nail this before you ever put caching in a full system design.'},
-  {id:5, title:'Multi-layer cache: L1 + L2', diff:'med', type:'drill',
-   concepts:'Caching',
-   desc:'A social graph service has 10M QPS read load. Redis alone maxes out at 500K QPS per node. You need sub-millisecond reads.',
-   reqs:['Design a two-layer cache: in-process (L1) + Redis (L2)','What is the eviction policy for L1?','How does a write propagate through both layers?','What is the consistency trade-off between L1 and L2?'],
-   focus:'L1/L2 caching architecture. The concept of cache layers is common in top-tier system design interviews. Understand it in isolation first.'},
-]},
-
-{id:'queue-drills', name:'Messaging & queue drills', phase:1, color:'var(--accent)', problems:[
-  {id:6, title:'Sync vs async — make the call', diff:'easy', type:'drill',
-   concepts:'Messaging',
-   desc:'An order is placed. The system must: (A) deduct inventory, (B) charge the card, (C) send confirmation email, (D) update analytics dashboard, (E) trigger fraud check.',
-   reqs:['Classify each operation: must be synchronous / can be async / must be async','Justify each decision with one sentence','What is the user-visible consequence if (B) is made async?','If (A) and (B) are synchronous and (B) fails, what do you do about (A)?'],
-   focus:'The sync/async boundary is the first decision in any queue problem. Master this classification before you design any queue topology.'},
-  {id:7, title:'Choose Kafka vs SQS', diff:'easy', type:'drill',
-   concepts:'Messaging',
-   desc:'You have four use cases: (A) sending email after user signs up, (B) updating 3 microservices when an order ships, (C) replaying the last 7 days of events for a new analytics service, (D) processing background resize jobs for image uploads.',
-   reqs:['For each use case: SQS or Kafka — choose one and give one reason','What property of Kafka makes (C) possible that SQS cannot do?','For use case (B) — how does Kafka fan-out to 3 services without coupling?','What does "consumer group" mean and why does it matter for (B)?'],
-   focus:'Kafka vs SQS discrimination. You will be asked this in every system design that involves events. Know the decision criteria cold.'},
-  {id:8, title:'Design a dead letter queue strategy', diff:'easy', type:'drill',
-   concepts:'Messaging',
-   desc:'A payment notification consumer fails processing for 1 in 10,000 messages. Without a DLQ, failed messages block the queue. With the wrong DLQ setup, you lose them silently.',
-   reqs:['What is a DLQ and when does a message go there?','How many retry attempts before DLQ — and how did you choose that number?','What happens to messages in the DLQ — who reads them and when?','How do you detect that messages are accumulating in the DLQ?'],
-   focus:'DLQ is a concept that every queue system needs. Understanding it in isolation prevents you from designing queues that silently lose messages.'},
-  {id:9, title:'Idempotency in message consumers', diff:'med', type:'drill',
-   concepts:'Messaging',
-   desc:'A payment confirmation email consumer receives the same message twice due to a network retry. The user gets two emails. You must prevent this without exactly-once delivery guarantees.',
-   reqs:['Define idempotency in the context of message processing','Propose an idempotency key strategy for this consumer','Where is the idempotency key stored — and what is its TTL?','What happens when the key store (Redis) goes down — do you process or drop?'],
-   focus:'Idempotency is the correct answer to "exactly-once" semantics. Understand it deeply — it comes up in payments, notifications, and any retry-enabled system.'},
-  {id:10, title:'Queue backpressure and consumer scaling', diff:'med', type:'drill',
-   concepts:'Messaging',
-   desc:'An image processing queue receives 10K jobs/hour normally but spikes to 200K/hour during business hours. Processing takes 2 seconds per job. You have 10 consumers running.',
-   reqs:['Calculate: at normal load, how long does the queue grow per hour?','At 200K/hour spike: how many consumers are needed to keep pace?','What is the risk of spinning up 200 consumers instantly?','Describe one backpressure mechanism — how does the producer know to slow down?'],
-   focus:'Queue math and backpressure. This is where estimation enters queuing. Start simple: jobs/hour ÷ jobs/consumer/hour = consumers needed.'},
-]},
-
-{id:'scalability-drills', name:'Scalability drills', phase:1, color:'var(--accent)', problems:[
-  {id:11, title:'When to add a read replica', diff:'easy', type:'drill',
-   concepts:'Scalability',
-   desc:'A Postgres DB is at 80% CPU. Your read:write ratio is 9:1. Reads are all SELECT queries. Writes are INSERT/UPDATE.',
-   reqs:['What is a read replica and what does it solve?','Will a read replica reduce CPU for writes? Why or why not?','What lag should you expect between primary and replica — and which queries must never go to the replica?','After adding 2 replicas, your CPU is still high. What do you check next?'],
-   focus:'Read replica is the first scaling step before sharding. Understand exactly what it does and does not solve before you jump to complex solutions.'},
-  {id:12, title:'Choose a shard key', diff:'easy', type:'drill',
-   concepts:'Scalability',
-   desc:'You are sharding a posts table (user_id, post_id, content, created_at, likes). You have 3 candidates: user_id, post_id, created_at.',
-   reqs:['Evaluate each candidate: distribution, hot spots, query locality','Which one do you choose and why?','What query becomes impossible or expensive after sharding by your chosen key?','What is a hot shard — and does your choice produce one for a celebrity user?'],
-   focus:'Shard key selection is a single, critical decision with permanent consequences. Practise it in isolation before applying it to a full system.'},
-  {id:13, title:'Consistent hashing — when and why', diff:'med', type:'drill',
-   concepts:'Scalability',
-   desc:'A Redis cache cluster has 10 nodes. A new node is added. Without consistent hashing, 90% of keys are remapped and the cache is effectively cold for several minutes under production load.',
-   reqs:['Explain what consistent hashing solves compared to modulo hashing','When you add an 11th node, what fraction of keys move in consistent hashing?','What is a virtual node — and what problem does it solve in consistent hashing?','Name one real system that uses consistent hashing internally'],
-   focus:'Consistent hashing is a specific technique for distributed cache/DB node management. Know it cold — interviewers ask "how would you add a node without cache misses?"'},
-  {id:14, title:'Stateless vs stateful scaling', diff:'easy', type:'drill',
-   concepts:'Scalability',
-   desc:'You want to run 50 copies of your app server behind a load balancer. The app currently stores the user session in memory. Deploying 50 copies breaks session continuity.',
-   reqs:['Why does in-memory session storage break horizontal scaling?','What is sticky sessions — and what problem does it create?','What is the correct fix for making the app server stateless?','After the fix, what does the load balancer not need to track anymore?'],
-   focus:'Stateless design is the prerequisite for all horizontal scaling. You cannot scale anything until you understand this. No estimation needed — just the concept.'},
-]},
-
-{id:'storage-drills', name:'Storage choice drills', phase:1, color:'var(--accent)', problems:[
-  {id:15, title:'SQL vs NoSQL — make the call', diff:'easy', type:'drill',
-   concepts:'Storage',
-   desc:'Four use cases: (A) user accounts with email/password, (B) driver location updates every 5 seconds from 500K drivers, (C) product catalogue with flexible per-category attributes, (D) bank transactions.',
-   reqs:['For each: SQL or NoSQL — choose one and give one reason','Which of the four would you never put in a NoSQL store — and why?','For (B): why does a relational DB immediately fail at 100K writes/sec?','For (C): what specific NoSQL model fits best — document, key-value, column, or graph?'],
-   focus:'Storage discrimination is the foundation of every system design. Mastering the SQL/NoSQL decision before you need it in a full design prevents the biggest category of interview mistakes.'},
-  {id:16, title:'When to use Redis vs Postgres', diff:'easy', type:'drill',
-   concepts:'Storage',
-   desc:'Classify: (A) session tokens, (B) rate limit counters, (C) order history, (D) leaderboard (top 100 users by score), (E) user preferences (rarely updated).',
-   reqs:['For each: Redis or Postgres — choose one','What Redis data structure is optimal for (D) and why?','For (E): is Redis appropriate even though it is rarely updated?','If Redis goes down, which of these 5 items cause user-facing failures?'],
-   focus:'Redis is not a replacement for Postgres. Knowing exactly what belongs in Redis vs a durable store is a concept that will come up in almost every system design.'},
-  {id:17, title:'Design for write-heavy vs read-heavy', diff:'med', type:'drill',
-   concepts:'Storage',
-   desc:'System A: 95% reads, 5% writes (product catalogue). System B: 95% writes, 5% reads (IoT sensor telemetry). Same DB: Postgres.',
-   reqs:['For System A: what two database features reduce read load without adding infrastructure?','For System B: why does Postgres struggle with 10K inserts/second?','For System B: name one database type designed for this write pattern','What does "write amplification" mean — and which system suffers from it more?'],
-   focus:'Write-heavy vs read-heavy design thinking. The correct solution for each is completely different. Understand why before you try to handle both in a full system.'},
-]},
-
-{id:'reliability-drills', name:'Reliability drills', phase:1, color:'var(--accent)', problems:[
-  {id:18, title:'When to use a circuit breaker', diff:'easy', type:'drill',
-   concepts:'Reliability',
-   desc:'Your payment service calls three external APIs: (A) card processor, (B) fraud detection, (C) marketing analytics. The card processor starts returning timeouts.',
-   reqs:['Without a circuit breaker: what happens to your thread pool when (A) is timing out?','What does a circuit breaker do when it "opens"?','Should (B) and (C) have circuit breakers too — and should they behave the same way?','When the circuit is open on (A), do you return an error to the user or queue the payment?'],
-   focus:'Circuit breaker is one of the most commonly asked reliability patterns. Understand what it prevents (cascade failure) before you need it in a full design.'},
-  {id:19, title:'Graceful degradation decisions', diff:'easy', type:'drill',
-   concepts:'Reliability',
-   desc:'A product page depends on: (A) product data, (B) personalised recommendations, (C) review counts, (D) real-time inventory count.',
-   reqs:['Rank A-D by criticality: which causes a broken page if unavailable?','For each non-critical dependency: what is the graceful degradation — what do you show instead?','For (D): would showing inventory from 5 minutes ago be acceptable — what does it depend on?','What is the difference between graceful degradation and a timeout?'],
-   focus:'Graceful degradation is a design decision, not a failure mode. You must consciously decide what degrades gracefully and what must never fail. Master this in isolation.'},
-  {id:20, title:'Rate limiting strategy selection', diff:'med', type:'drill',
-   concepts:'Reliability',
-   desc:'Three scenarios: (A) public API, limit 100 req/min per API key, (B) login endpoint, limit 5 attempts per IP per 10 minutes, (C) background job runner, limit 50 DB writes/sec globally.',
-   reqs:['For each: choose token bucket, sliding window, or fixed window — justify each','Where is the rate limit state stored — in memory, Redis, or DB?','For (A): what happens if the rate limit counter store (Redis) goes down — do you allow or deny?','For (B): why is IP-based rate limiting insufficient on its own?'],
-   focus:'Rate limiting algorithm selection. Fixed window, sliding window, token bucket each have specific trade-offs. Know them before you need to apply one in a system design.'},
-]},
-
-// ══ PHASE 2: COMPONENT PROBLEMS ══════════════════════════════════════════════
-// 2-3 concepts combined. Light estimation introduced. The goal is to apply
-// multiple concepts correctly to a bounded component of a larger system.
-
-{id:'api-components', name:'API & gateway components', phase:2, color:'var(--amber)', problems:[
-  {id:21, title:'Design a rate limiter service', diff:'easy', type:'partial',
-   concepts:'Reliability · API Design',
-   desc:'Design a standalone rate limiter service that other services call before processing requests. 10M API calls/day across 100K API keys.',
-   reqs:['Choose and justify a rate limiting algorithm (token bucket / sliding window)','Estimate: storage needed per API key, total storage for 100K keys','Design the API: what does the check endpoint look like?','What happens when the rate limiter itself is unavailable — fail open or closed?'],
-   focus:'Combine rate limiting concept + API design. Estimation enters here but is simple: storage per key × number of keys.'},
-  {id:22, title:'Design an API gateway', diff:'med', type:'partial',
-   concepts:'API Design · Reliability · Scalability',
-   desc:'Design an API gateway that sits in front of 10 microservices. Handles: routing, auth token validation, rate limiting, and request logging. 50K RPS peak.',
-   reqs:['Draw the request flow: client → gateway → service','Where does auth validation happen — gateway or each service?','How does the gateway stay stateless with 50K RPS across multiple gateway instances?','What is the single biggest SPOF in this design and how do you address it?'],
-   focus:'API gateway is a component that appears in almost every system design. Master it as an isolated component before using it in a full design.'},
-  {id:23, title:'Pagination for a 100M row table', diff:'easy', type:'partial',
-   concepts:'API Design · Storage',
-   desc:'A user has 10,000 orders. The API returns all of them today. You need to add pagination. The orders table has 100M rows total.',
-   reqs:['Explain why offset pagination breaks on page 500 of a live table','Design cursor-based pagination: what is the cursor, what does it encode?','What index is needed on the orders table for cursor pagination to be fast?','What does the API response envelope look like — include the next cursor field'],
-   focus:'Pagination is a component-level API decision with direct storage implications. Cursor vs offset is a classic interview trap.'},
-]},
-
-{id:'storage-components', name:'Storage layer components', phase:2, color:'var(--amber)', problems:[
-  {id:24, title:'Design a write-through cache layer', diff:'easy', type:'partial',
-   concepts:'Caching · Storage',
-   desc:'A product catalogue has 2M products. 90% of traffic is reads. Vendor price updates happen 500 times/day. Design the cache layer.',
-   reqs:['Estimate: how many products are "hot" (top 1% read) — what is that number?','Choose cache strategy and justify for this read:write ratio','How does a price update propagate — write to DB + cache in which order?','What TTL do you set — and what is the worst-case staleness for a price update?'],
-   focus:'Cache layer design with estimation. The "hot 1%" calculation is the estimation — round numbers are fine.'},
-  {id:25, title:'Design a time-series storage layer', diff:'med', type:'partial',
-   concepts:'Storage · Scalability',
-   desc:'A fleet of 10K IoT sensors each writes a reading every 10 seconds. Readings are queried for dashboards (last 24h) and anomaly detection (last 7 days). Older data is rarely queried.',
-   reqs:['Estimate: writes/second total across all sensors','Estimate: data volume per day (assume 100 bytes per reading)','Why does Postgres fail at this write rate — specifically what breaks?','What storage system do you choose and why (TimescaleDB / InfluxDB / Cassandra)?'],
-   focus:'Storage selection + estimation. The write rate estimate is: sensors × reads/sensor/sec. Then match the write pattern to the right storage type.'},
-  {id:26, title:'Hot vs cold storage tiering', diff:'med', type:'partial',
-   concepts:'Storage · Scalability',
-   desc:'A log storage service receives 1TB of logs/day. Logs are queried frequently in the first 7 days (debugging), rarely in days 7-30, and almost never after 30 days.',
-   reqs:['Estimate: storage cost difference between hot SSD and cold S3 for 1 year of logs','Design a tiering policy: which logs are in hot storage, which in cold?','How does a query for a 20-day-old log reach the cold tier transparently?','What is the latency difference a user experiences for hot vs cold log retrieval?'],
-   focus:'Storage tiering is a cost-optimisation + architecture decision. The estimation — hot vs cold cost — makes the decision concrete.'},
-]},
-
-{id:'async-components', name:'Async processing components', phase:2, color:'var(--amber)', problems:[
-  {id:27, title:'Design a notification fanout system', diff:'easy', type:'partial',
-   concepts:'Messaging · Scalability',
-   desc:'When a user posts on a social platform, all N followers receive a notification. Top influencers have 10M followers. Notification must appear within 30 seconds.',
-   reqs:['Estimate: if 1M users post/day with average 500 followers, what is total notification volume/day?','Push model vs pull model — what breaks in each for a 10M-follower account?','Design the fanout: what does the queue topology look like?','For celebrity accounts (>1M followers), what special handling is needed?'],
-   focus:'Fanout is a messaging architecture problem with a clear estimation (posts × avg followers = total notifications). The celebrity edge case is where most designs break.'},
-  {id:28, title:'Design an email delivery pipeline', diff:'easy', type:'partial',
-   concepts:'Messaging · Reliability',
-   desc:'Your app sends 5M transactional emails/day (receipts, password resets). The email provider has 0.1% failure rate. Failed emails must be retried and never lost.',
-   reqs:['Draw the pipeline: app → queue → email worker → provider','Estimate: at 0.1% failure rate, how many emails fail per day?','How many retries — and what backoff strategy?','What moves to the DLQ — and who monitors it?'],
-   focus:'Async pipeline with reliability. The estimate is simple: 5M × 0.001 = 5K failures/day. But what happens to those 5K is the entire reliability design.'},
-  {id:29, title:'Design a job scheduler', diff:'med', type:'partial',
-   concepts:'Messaging · Reliability · Storage',
-   desc:'Design a system that runs scheduled background jobs: daily reports at 9am, hourly data syncs, and one-off jobs triggered by users. 10K jobs run per day.',
-   reqs:['Where is the job definition stored — what schema?','How does a worker discover which jobs are due now — polling or push?','What prevents two workers from executing the same job concurrently?','If the scheduler crashes, how do orphaned in-progress jobs get recovered?'],
-   focus:'Job scheduler combines storage (job state), messaging (dispatch), and reliability (crash recovery). These three concepts must work together correctly.'},
-]},
-
-// ══ PHASE 3: PARTIAL SYSTEMS ══════════════════════════════════════════════════
-// Full estimation required. Design a major component or subsystem of a real
-// product. Multiple concepts must be combined correctly.
-
-{id:'partial-systems', name:'Partial system designs', phase:3, color:'var(--blue)', problems:[
-  {id:30, title:'Design the read path of a Twitter-like feed', diff:'med', type:'partial',
-   concepts:'Caching · Scalability · Storage',
-   desc:'Design only the read path: a user opens their feed and sees the latest 20 posts from people they follow. 100M DAU, each user opens feed 5 times/day.',
-   reqs:['Estimate: QPS for feed reads (DAU × opens/day ÷ 86400)','Where is the pre-computed feed stored — and in what format?','When a user opens the feed, describe the exact call sequence','What is the cache eviction strategy for inactive users (last active > 30 days)?'],
-   focus:'Isolating the read path. Full system estimation: 100M × 5 ÷ 86400 ≈ 5800 QPS. Then design for that number only — not writes, not follows, just reads.'},
-  {id:31, title:'Design a URL shortener storage + redirect layer', diff:'easy', type:'partial',
-   concepts:'Storage · Caching · Scalability',
-   desc:'Design the core of a URL shortener: shorten a URL, resolve a short code to the original URL. 100M URLs stored, 10B redirects/month.',
-   reqs:['Estimate: redirects/second (10B ÷ 30 days ÷ 86400)','Estimate: storage for 100M URLs at 500 bytes average','Design the redirect path — what is the exact sequence of lookups?','How much of the redirect load can be served from cache — justify the cache hit rate'],
-   focus:'URL shortener is a classic estimation problem. Do the numbers: 10B ÷ 2.6M seconds/month ≈ 3850 redirects/sec. Then design for that load.'},
-  {id:32, title:'Design the write path of a chat system', diff:'med', type:'partial',
-   concepts:'Messaging · Storage · Reliability',
-   desc:'Design the write path: a user sends a message, it must be durably stored, and delivered to the recipient. 50M DAU, 40 messages/user/day average.',
-   reqs:['Estimate: messages/second (50M × 40 ÷ 86400)','Which part of this pipeline must be synchronous — what does the sender wait for?','What storage guarantees do you need — can you afford eventual consistency?','If the recipient is offline, how is the message delivered when they come back?'],
-   focus:'Write path isolation + estimation. The sync/async boundary decision is the most important design choice in this problem.'},
-  {id:33, title:'Design a search autocomplete backend', diff:'med', type:'partial',
-   concepts:'Storage · Caching · Scalability',
-   desc:'Design the backend for search autocomplete: as the user types, return the top 5 matching suggestions within 50ms. 10M unique queries/day, top 10K queries cover 80% of traffic.',
-   reqs:['Estimate: QPS for autocomplete (assume each search = 5 keystrokes on average)','What data structure stores the trie — and is it in memory, Redis, or DB?','The top 10K queries cover 80% of traffic — how does this change your caching strategy?','What is the index update frequency — when does a new trending term appear in suggestions?'],
-   focus:'Autocomplete is a performance-critical component. The estimate (QPS) and the hot-query insight (80% from 10K) drive the entire storage and cache decision.'},
-  {id:34, title:'Design a ride-matching service', diff:'hard', type:'partial',
-   concepts:'Storage · Scalability · Messaging',
-   desc:'Design the matching component: given a rider request, find the nearest available driver within 5km and assign them. 500K active drivers, 100K ride requests/peak hour.',
-   reqs:['Estimate: driver location updates/second (500K drivers × update every 5 sec)','What data store can query "drivers within 5km of lat/lon" efficiently?','How do you prevent two riders from being matched to the same driver?','What happens when no drivers are available within 5km?'],
-   focus:'Geo-spatial storage + concurrency. The estimation (100K writes/sec from drivers) directly forces a specific storage choice. Relational databases fail here — why?'},
-]},
-
-// ══ PHASE 4: FULL SYSTEM DESIGNS ═════════════════════════════════════════════
-// Interview-level. Full estimation, all concepts, failure modes, trade-offs.
-// 7 problems per group — same density as LLD.
-
-{id:'full-systems-beginner', name:'Full systems \u2014 beginner', phase:4, color:'var(--purple)', problems:[
-  {id:35, title:'Design a URL shortener', diff:'easy', type:'full',
-   concepts:'Storage \xb7 Caching \xb7 Scalability \xb7 API Design',
-   desc:'Design a URL shortening service like bit.ly. Functional: create short URL, redirect to original. Non-functional: 100M URLs stored, 10B redirects/month, P99 redirect < 50ms.',
-   reqs:['Full estimation: read QPS, write QPS, storage (bytes per URL \xd7 100M), bandwidth','Short code generation: base62 vs hash \u2014 character count, collision probability','Full system diagram: client \u2192 LB \u2192 app servers \u2192 cache \u2192 DB','Scale the read path: what % of redirects never hit the DB?','Analytics: how do you count clicks without adding latency to the redirect?','What breaks first when load doubles \u2014 and what is the fix?','Custom aliases: a user wants bit.ly/my-brand \u2014 how does this change your design?'],
-   focus:'URL shortener is the canonical beginner system design. Estimation first, always. Then design. Then break it. The analytics requirement is where most candidates stop thinking.'},
-  {id:36, title:'Design a paste bin', diff:'easy', type:'full',
-   concepts:'Storage \xb7 Scalability \xb7 API Design',
-   desc:'Design a service where users paste text and get a unique URL. Pastes can be public or private, expire after a set time, and support syntax highlighting metadata. 10M pastes/day, 100:1 read:write.',
-   reqs:['Estimate: storage/day (avg 10KB per paste), reads/sec, writes/sec','Key generation: how do you generate unique paste IDs without a central counter?','Storage: where does paste content live \u2014 DB column or object store?','Expiry: how do you delete expired pastes without scanning the whole table?','Private pastes: how do you prevent enumeration of private paste URLs?','What index is needed to query "all pastes by user" efficiently?','What breaks at 10x write load \u2014 and what is the first thing you scale?'],
-   focus:'Pastebin is a gentler introduction to object storage decisions. The expiry deletion problem and private-paste enumeration are the two traps most candidates miss.'},
-  {id:37, title:'Design a web crawler', diff:'med', type:'full',
-   concepts:'Messaging \xb7 Storage \xb7 Scalability',
-   desc:'Design a web crawler that crawls 1 billion pages. Must handle: duplicate URLs, robots.txt, rate limiting per domain, and crawl politeness (no hammering one domain).',
-   reqs:['Estimate: pages/second needed to crawl 1B pages in 4 weeks, storage per page','URL frontier: how do you store and prioritise 1B URLs \u2014 what data structure?','Duplicate detection: Bloom filter for 1B URLs \u2014 what is the false positive rate and why is it acceptable?','Politeness: how do you rate-limit per domain across 100 distributed crawlers?','robots.txt: where is it cached \u2014 per-crawl or time-bounded?','DNS: why does DNS become a bottleneck and what do you do about it?','What happens when a site returns 301 redirects in a loop \u2014 how do you detect and break it?'],
-   focus:'Web crawler is estimation + queue + distributed coordination. Work through each requirement one at a time. The Bloom filter sizing and politeness-at-scale questions are the depth checks.'},
-  {id:38, title:'Design a key-value store', diff:'med', type:'full',
-   concepts:'Storage \xb7 Scalability \xb7 Reliability',
-   desc:'Design a distributed key-value store (like Redis or DynamoDB). Functional: get(key), set(key, value, ttl?), delete(key). Non-functional: 1M QPS reads, 100K QPS writes, 99.99% uptime, data must survive node failure.',
-   reqs:['Estimate: number of nodes needed for 1M QPS (assume 10K QPS per node)','Partitioning: consistent hashing with virtual nodes \u2014 how many vnodes per physical node and why?','Replication: replication factor 3, quorum reads/writes \u2014 what does W+R>N give you?','CAP trade-off: which side do you choose and what does it mean for a write during a network partition?','TTL expiry: lazy expiry vs active scan \u2014 which do you use and what are the trade-offs?','What happens when a node goes down mid-write \u2014 how does the system recover?','What happens when a node rejoins after being down for 2 hours \u2014 how does it catch up?'],
-   focus:'Key-value store forces every distributed systems concept at once. Do partitioning, then replication, then CAP, then failure \u2014 in that order. The node-rejoin scenario is the deepest question.'},
-  {id:39, title:'Design a parking lot system', diff:'easy', type:'full',
-   concepts:'Storage \xb7 API Design \xb7 Reliability',
-   desc:'Design a parking lot management system for a city with 500 lots, each with 200\u20132000 spots. Real-time availability display, reservation 30 min in advance, payment on exit. 50K reservations/day.',
-   reqs:['Estimate: peak concurrent reservations, DB write rate at peak entry/exit','Data model: lots, floors, spots, reservations \u2014 what are the key tables and indexes?','Real-time availability: 50K users checking availability simultaneously \u2014 how do you avoid hitting DB on every poll?','Reservation lock: two users trying to reserve the same spot at the same moment \u2014 how do you prevent double-booking?','Payment: the user drives away before completing payment \u2014 how do you handle it?','What happens when the system is offline for 5 minutes at a busy lot \u2014 how does the gate work?','Spot types: motorcycles, cars, EVs (need charger), disabled \u2014 how does this affect the allocation algorithm?'],
-   focus:'Parking lot seems simple but hides concurrency (double-booking), reliability (offline gate), and real-time availability problems. The double-booking prevention is the hardest part.'},
-  {id:40, title:'Design a task queue / job scheduler', diff:'med', type:'full',
-   concepts:'Messaging \xb7 Reliability \xb7 Storage \xb7 Scalability',
-   desc:'Design a distributed task queue (like Celery or SQS). Producers enqueue tasks, workers consume and execute them. Tasks can be scheduled for future execution. 1M tasks/day, tasks take 1ms\u201310min.',
-   reqs:['Estimate: average queue depth at steady state, worker count needed for 1M tasks/day','Task storage: where are tasks stored before a worker picks them up?','At-least-once delivery: a worker crashes mid-task \u2014 how does the task get retried?','Exactly-once: is true exactly-once delivery possible here \u2014 and what do you do instead?','Priority queues: urgent tasks must run before background tasks \u2014 how is this modelled?','Scheduled tasks (run at 3am): how does a future-scheduled task get dispatched at the right time?','Poison pills: a task crashes every worker that touches it \u2014 how do you detect and quarantine it?'],
-   focus:'Task queue forces you to confront at-least-once vs exactly-once delivery, crash recovery, and poison pill handling. These are the failure modes that distinguish a real design from a toy.'},
-  {id:41, title:'Design a leaderboard system', diff:'easy', type:'full',
-   concepts:'Storage \xb7 Caching \xb7 Scalability',
-   desc:'Design a real-time gaming leaderboard. Players submit scores after each game. Shows global top 100 and each player\'s rank among their friends. 10M players, 500K score updates/hour.',
-   reqs:['Estimate: score updates/second, read QPS (assume 10:1 read:write)','Global top 100: which Redis data structure gives O(log N) rank queries?','Score update: a player\'s score updates 20 times per session \u2014 update leaderboard every time or batch?','Friends leaderboard: each user has up to 500 friends \u2014 how do you compute rank among friends efficiently?','Historical leaderboards: weekly and monthly alongside all-time \u2014 how does this change your storage?','What breaks at 10M concurrent players during a tournament event?','A player is banned mid-tournament \u2014 their score must be removed and all ranks below must update. How?'],
-   focus:'Leaderboard is a Redis Sorted Set problem \u2014 but the friends leaderboard and the ban-then-rerank requirement are where the naive Redis solution breaks. Think through both carefully.'},
-]},
-
-{id:'full-systems-intermediate', name:'Full systems \u2014 intermediate', phase:4, color:'var(--purple)', problems:[
-  {id:42, title:'Design a rate limiter for a public API', diff:'med', type:'full',
-   concepts:'Reliability \xb7 Storage \xb7 Scalability \xb7 API Design',
-   desc:'Design a rate limiter for a public API with 10M registered API keys. Each key has a custom rate limit (10 to 10K req/min). 5M RPS total across all keys.',
-   reqs:['Estimate: storage for rate limit counters (10M keys \xd7 sliding window state), total memory needed','Choose algorithm: why does token bucket fit better than fixed window for variable per-key limits?','How do you handle 5M RPS through the rate limiter \u2014 is a single Redis node sufficient?','Distributed rate limiting: the same API key hits two different gateway nodes simultaneously \u2014 how do both nodes agree on the count?','What happens when the Redis rate limit cluster has a 500ms outage \u2014 fail open or closed?','Per-key custom limits: how do you enforce a different limit per key without a DB lookup on every request?','Burst allowance: a key has a 1K req/min limit but should be allowed to burst to 2K for up to 10 seconds \u2014 which algorithm supports this and how?'],
-   focus:'Rate limiter at full scale forces distributed counter consistency, failure mode decisions, and the burst vs sustained throughput trade-off. The distributed synchronisation problem (two nodes, one key) is where most designs break.'},
-  {id:43, title:'Design a notification system', diff:'med', type:'full',
-   concepts:'Messaging \xb7 Reliability \xb7 Scalability \xb7 Storage',
-   desc:'Design a notification system that sends push (iOS/Android), email, and SMS. 500M users, 2B notifications/day, P99 delivery < 30 seconds for push.',
-   reqs:['Estimate: notifications/second peak, storage for 7-day notification history per user','Channel routing: how does the system decide push vs email vs SMS per user per notification type?','Fan-out: one event triggers notifications to potentially millions of followers \u2014 describe the queue topology','Delivery guarantee: the push provider (APNs/FCM) is down for 5 minutes \u2014 what happens to queued notifications?','Opt-outs: a user disables email notifications \u2014 how is this preference stored and enforced at 500M user scale?','Deduplication: the same notification is dispatched twice due to a retry \u2014 how do you prevent the user seeing it twice?','Rate limiting: a single user should receive at most 10 push notifications per hour \u2014 enforced where and how?'],
-   focus:'Notification system touches every concept: fan-out (queues), delivery guarantees (reliability), opt-outs (storage at scale), and deduplication (idempotency). The fan-out queue topology is the architectural centrepiece.'},
-  {id:44, title:'Design Twitter / X timeline', diff:'med', type:'full',
-   concepts:'Storage \xb7 Caching \xb7 Scalability \xb7 Messaging',
-   desc:'Design the Twitter home timeline: a user opens the app and sees the latest tweets from accounts they follow, in reverse-chronological order. 300M DAU, each user follows avg 200 accounts, 500M tweets/day.',
-   reqs:['Estimate: timeline read QPS (DAU \xd7 opens per day \xf7 86400), tweet write QPS','Fan-out on write vs fan-out on read \u2014 which do you choose and for whom?','Celebrity problem: accounts with 10M+ followers \u2014 why does fan-out on write break and what do you do?','Timeline storage: what is the data structure stored per user in cache?','What happens when a followed account tweets and the follower\'s cache is cold?','Tweet deletion: a tweet is deleted \u2014 how do you remove it from all timelines that cached it?','How do you handle a user who hasn\'t opened the app in 30 days \u2014 is their timeline pre-computed?'],
-   focus:'Twitter timeline is the definitive fan-out problem. Fan-out on write vs read is the central trade-off. The celebrity problem forces a hybrid model. Deletion from distributed caches is the hardest follow-up.'},
-  {id:45, title:'Design a chat system (WhatsApp)', diff:'med', type:'full',
-   concepts:'Messaging \xb7 Storage \xb7 Reliability \xb7 Scalability',
-   desc:'Design a 1:1 and group chat system. Messages must be delivered in order, stored persistently, and show delivery/read receipts. 500M DAU, 100B messages/day, groups up to 500 members.',
-   reqs:['Estimate: messages/second, storage/day (assume 100 bytes per message), WebSocket connections','Message ordering: how do you guarantee messages appear in the order they were sent?','Offline delivery: a recipient is offline for 3 days \u2014 how are messages stored and delivered when they reconnect?','Group messages: a message to a 500-member group \u2014 describe the fan-out','Read receipts: how do you track that all 500 group members have read a message efficiently?','End-to-end encryption: where are keys stored \u2014 and what does the server never see?','What happens when a user\'s device is switched off for 30 days \u2014 do you store all their messages?'],
-   focus:'Chat forces message ordering, offline delivery, and group fan-out simultaneously. The read receipt tracking for large groups is the hardest sub-problem \u2014 naive approaches require one DB write per member per message.'},
-  {id:46, title:'Design Google Drive / Dropbox', diff:'med', type:'full',
-   concepts:'Storage \xb7 Scalability \xb7 Reliability \xb7 API Design',
-   desc:'Design a cloud file storage system. Users upload, download, and sync files across devices. Share files/folders with other users. 500M users, 50M file uploads/day, average file size 1MB.',
-   reqs:['Estimate: upload bandwidth (50M \xd7 1MB \xf7 86400), storage after 1 year, deduplication savings','Upload: how do you handle a 5GB video file upload \u2014 chunking, resumable uploads?','Deduplication: two users upload the same file \u2014 how do you detect and store only one copy?','Sync: a user edits a file on laptop \u2014 how does the phone detect and download the change?','Conflict resolution: user edits the same file on two devices simultaneously while offline \u2014 what happens?','Metadata vs content: where is file metadata stored vs file content?','Sharing: a shared folder with 1000 collaborators \u2014 how are permissions checked on every file access?'],
-   focus:'Drive combines large file upload (chunking), deduplication (content-addressed storage), and sync (delta detection). Conflict resolution and the separation of metadata from blob storage are the two architectural pillars.'},
-  {id:47, title:'Design video streaming (YouTube)', diff:'hard', type:'full',
-   concepts:'Storage \xb7 CDN \xb7 Scalability \xb7 Messaging',
-   desc:'Design YouTube\'s core: video upload, processing, and playback. 500M DAU, 500 hours of video uploaded per minute, 1B hours watched per day.',
-   reqs:['Estimate: upload bandwidth (500 hours/min \xd7 avg 1GB/hour), CDN egress for 1B hours watched/day','Upload pipeline: video uploaded \u2192 what happens before it is playable? Describe each step','Transcoding: a 1-hour video needs 6 quality variants (360p to 4K) \u2014 how is this parallelised?','Adaptive bitrate: user\'s connection drops mid-stream \u2014 how does the player switch quality without rebuffering?','Cold vs hot videos: 90% of views go to 10% of videos \u2014 how does your CDN placement reflect this?','Comments: 10K comments per popular video, users expect real-time updates as new comments arrive \u2014 how?','What breaks first if uploads spike 10x (a major live event) \u2014 and what is the first mitigation?'],
-   focus:'YouTube forces CDN architecture, async video processing pipelines, and adaptive streaming. The transcoding pipeline and adaptive bitrate streaming are the two concepts most candidates have never designed from scratch.'},
-  {id:48, title:'Design a ride-sharing platform (Uber)', diff:'hard', type:'full',
-   concepts:'Storage \xb7 Scalability \xb7 Messaging \xb7 Reliability',
-   desc:'Design the core of Uber: a rider requests a ride, nearby drivers are found and one is matched, the trip is tracked in real-time, and payment is processed on completion. 50M trips/day, 5M active drivers.',
-   reqs:['Estimate: driver location updates/second (5M drivers \xd7 every 5 sec), peak trip requests/second','Location storage: why does Postgres fail for 1M location updates/second \u2014 what do you use instead?','Matching: given a rider\'s location, find available drivers within 5km in < 500ms \u2014 what index/data structure?','Trip state machine: requested \u2192 accepted \u2192 in-progress \u2192 completed \u2192 paid \u2014 how is state stored?','Surge pricing: demand spikes 10x in one area \u2014 how does the system detect this and apply pricing dynamically?','Payment: driver completes trip but payment service is down \u2014 what happens?','What happens if the matching service goes down for 30 seconds during peak hours \u2014 do rides in progress break?'],
-   focus:'Uber is the hardest intermediate system. Location updates at scale, geo-spatial matching, and the trip state machine are three separate hard problems. Solve them in sequence, not simultaneously.'},
-  {id:49, title:'Design Instagram photo storage and delivery', diff:'hard', type:'full',
-   concepts:'Storage \xb7 Caching \xb7 Scalability \xb7 CDN',
-   desc:'Design the photo storage and delivery system. Users upload photos, followers view them. 500M DAU, 100M photos uploaded/day, 3B photo views/day.',
-   reqs:['Estimate: storage/day (100M photos \xd7 average 3MB), CDN bandwidth for 3B views','Upload path: client \u2192 where does the photo go first \u2014 app server or directly to object store?','How does a photo reach a follower in < 200ms globally?','How much of photo delivery traffic can the CDN absorb \u2014 and what % hits your origin?','What happens when a user deletes a photo \u2014 how is it removed from the CDN?','Multiple resolutions: thumbnail, feed, full-size \u2014 when are these generated and where are they stored?','What breaks at 10x upload spike (viral event) \u2014 and what is your first mitigation?'],
-   focus:'Photo delivery is a CDN-heavy design. The estimation reveals why CDN is not optional \u2014 bandwidth cost without CDN is prohibitive. Calculate it. The multi-resolution generation timing is the architectural decision most candidates skip.'},
-]},
-
-{id:'full-systems-advanced', name:'Full systems \u2014 advanced', phase:4, color:'var(--purple)', problems:[
-  {id:50, title:'Design a distributed message queue (Kafka)', diff:'hard', type:'full',
-   concepts:'Messaging \xb7 Storage \xb7 Scalability \xb7 Reliability',
-   desc:'Design a distributed, durable, high-throughput message queue. Producers publish to topics, consumers read in order, messages retained for 7 days. 1M messages/second, 10KB average message size.',
-   reqs:['Estimate: write throughput (1M \xd7 10KB = 10GB/s) \u2014 what does this require of the storage layer?','Partitioning: a topic has 100 partitions across 10 brokers \u2014 how does a producer know which partition to write to?','Ordering: messages within a partition are ordered \u2014 why can\'t you guarantee order across partitions?','Replication: partition leader + 2 followers \u2014 what happens when the leader fails?','Consumer groups: 5 consumers in one group consuming a 100-partition topic \u2014 how many partitions per consumer?','Retention: 7-day retention with 10GB/s write rate \u2014 estimate storage needed and how old segments are deleted','Exactly-once: producer retries a failed write and the broker received it the first time \u2014 how do you prevent duplicates?'],
-   focus:'Kafka design is the deepest messaging interview. Partitioning, replication, consumer groups, and exactly-once semantics are all interconnected. The storage estimation (10GB/s \xd7 7 days) immediately forces a conversation about tiered storage.'},
-  {id:51, title:'Design a distributed database (Cassandra)', diff:'hard', type:'full',
-   concepts:'Storage \xb7 Scalability \xb7 Reliability',
-   desc:'Design a distributed wide-column database. Functional: get(pk, ck), put(pk, ck, value), scan(pk, ck_range). Non-functional: 1M reads/sec, 500K writes/sec, 99.999% uptime, no SPOF.',
-   reqs:['Estimate: node count for 500K writes/sec (assume 10K writes/node/sec), replication storage overhead','Consistent hashing: how are rows mapped to nodes \u2014 what does the ring look like?','Replication: W=2, R=2, N=3 \u2014 what does this guarantee and when does it fail?','CAP: Cassandra is AP \u2014 describe what happens to a write during a network partition','LSM tree: why does Cassandra use an LSM tree instead of a B-tree \u2014 what is the write path?','Read repair: two replicas return different values for the same key \u2014 how is the conflict resolved?','Compaction: what is compaction, why is it needed, and what is its impact on read/write performance?'],
-   focus:'Cassandra design requires understanding LSM trees, quorum reads/writes, and the AP CAP choice. The write path (memtable \u2192 SSTable \u2192 compaction) is the core concept that differentiates this from a generic distributed system.'},
-  {id:52, title:'Design a CDN from scratch', diff:'hard', type:'full',
-   concepts:'CDN \xb7 Caching \xb7 Scalability \xb7 Reliability',
-   desc:'Design a CDN from scratch. Edge servers cache content close to users. Cache misses go to origin. 1B requests/day, 90% cache hit rate, 200TB of content, globally distributed.',
-   reqs:['Estimate: edge server count needed globally (assume 50K RPS/server), cache storage per PoP for 90% hit rate','Routing: how does a user\'s DNS query get directed to the nearest edge server?','Cache hierarchy: edge \u2192 regional PoP \u2192 origin \u2014 when does each layer fill and when does it miss?','Cache invalidation: a new JS bundle is deployed \u2014 how do you purge the old version from all 200 edge nodes in < 60 seconds?','Origin protection: edge hit rate drops to 50% (attack or cold cache) \u2014 what protects the origin from being overwhelmed?','HTTPS: how does TLS termination work at the edge \u2014 where are certificates stored?','What happens when an entire PoP (30 edge servers) goes down \u2014 how is traffic rerouted?'],
-   focus:'CDN design forces DNS-based routing, cache hierarchy decisions, and invalidation at global scale. Origin protection and PoP failure are the depth checks that separate a surface-level answer from a real design.'},
-  {id:53, title:'Design a distributed lock service (Zookeeper)', diff:'hard', type:'full',
-   concepts:'Reliability \xb7 Storage \xb7 Scalability',
-   desc:'Design a distributed lock service. Services use it to elect leaders, coordinate distributed transactions, and acquire exclusive locks on shared resources. 10K clients, 50K lock operations/second.',
-   reqs:['Estimate: lock state storage (assume 100K active locks \xd7 1KB metadata), operation QPS vs storage','Consensus: why does a distributed lock service need a consensus algorithm (Raft/Paxos) \u2014 what goes wrong without one?','Lock acquisition: describe the exact protocol for acquiring a lock \u2014 what guarantees does the client have after a successful acquire?','Lease-based locks: a client acquires a lock and then crashes \u2014 how does the lock get released automatically?','Fencing tokens: a client holds a lock, GC pause causes it to think it still has the lock after expiry \u2014 how do you prevent it from corrupting shared state?','Leader election: describe how clients use the lock service to elect exactly one leader among N candidates','What happens to lock holders when the lock service itself loses quorum for 10 seconds?'],
-   focus:'Distributed lock design requires understanding consensus, lease expiry, and the fencing token problem. The fencing token question is the single hardest question in distributed systems interviews \u2014 almost nobody gets it right the first time.'},
-  {id:54, title:'Design a real-time analytics pipeline', diff:'hard', type:'full',
-   concepts:'Messaging \xb7 Storage \xb7 Scalability',
-   desc:'Design a real-time analytics system: events stream in (clicks, purchases, page views), dashboards show metrics updated within 10 seconds. 1B events/day, 50 concurrent dashboard users.',
-   reqs:['Estimate: events/second (1B \xf7 86400), write throughput assuming 200 bytes/event','Ingestion: how do 1B events/day get into the system \u2014 what is the ingestion layer?','Stream processing: a dashboard shows "purchases per minute for the last hour" \u2014 how is this computed in real time?','Lambda vs Kappa architecture \u2014 which do you choose and why?','Pre-aggregation: storing raw events (1B/day) vs pre-aggregated buckets \u2014 what are the trade-offs?','Late-arriving events: an event arrives 5 minutes after its timestamp (mobile offline) \u2014 how does this affect your aggregations?','What breaks when event rate spikes 10x during a flash sale \u2014 and what is the first bottleneck?'],
-   focus:'Real-time analytics forces stream processing architecture (Kafka + Flink/Spark Streaming), pre-aggregation trade-offs, and late-arrival handling. Lambda vs Kappa is the architectural decision that interviewers love to probe.'},
-  {id:55, title:'Design a financial transaction ledger', diff:'hard', type:'full',
-   concepts:'Storage \xb7 Reliability \xb7 Scalability',
-   desc:'Design a double-entry accounting ledger for a payments platform. Every transfer debits one account and credits another. Must be tamper-evident, auditable to any point in time. 100M accounts, 10M transactions/day.',
-   reqs:['Estimate: transactions/second, storage for 10 years of transactions at 200 bytes each','Double-entry: describe the exact DB write for a $100 transfer \u2014 what is atomic and what is not?','Idempotency: a network retry causes the same transfer to be submitted twice \u2014 how do you guarantee exactly-once?','Tamper evidence: an internal attacker modifies a historical transaction record \u2014 how do you detect it?','Point-in-time balance: what was account A\'s balance on Jan 1st 2023 \u2014 how do you answer this efficiently?','Multi-region: ledger is replicated to 3 regions for disaster recovery \u2014 what consistency model do you use?','Regulatory audit: a regulator requests all transactions for account A for the past 5 years in 24 hours \u2014 how?'],
-   focus:'Financial ledger forces immutability, idempotency, and point-in-time queries simultaneously. The tamper-evidence requirement (hash chaining, append-only design) is the concept most engineers have never designed. Point-in-time balance requires event sourcing thinking.'},
-  {id:56, title:'Design a global auth / identity system', diff:'hard', type:'full',
-   concepts:'Reliability \xb7 Storage \xb7 Scalability \xb7 API Design',
-   desc:'Design an authentication service used by 100+ internal microservices. Issues JWTs, validates tokens, supports OAuth2, manages sessions for 500M users globally. 500K auth requests/second at peak.',
-   reqs:['Estimate: token validation QPS (500K/sec) \u2014 can every microservice call auth on every request?','JWT vs opaque tokens: what are the trade-offs for microservice-to-microservice validation?','Token validation at scale: how do 100 microservices validate tokens without hitting auth service on every request?','Token revocation: a user changes their password \u2014 all existing JWTs must be invalidated immediately. JWT is stateless \u2014 how?','Session storage: 500M active sessions \xd7 1KB session data \u2014 where is this stored and how is it partitioned?','Multi-region: a user in India must authenticate without a round-trip to a US datacenter \u2014 how?','What happens when the auth service is down for 60 seconds \u2014 do all 100 microservices stop working?'],
-   focus:'Auth system design forces the JWT statelessness vs revocation contradiction \u2014 a question with no perfect answer. The "validate without calling auth on every request" insight (shared secret / public key) is the core architectural decision.'},
-]},
-
-// ══ GAP-FILL DRILLS: PHASE 1 ════════════════════════════════════════════════
-// Problems added based on full gap analysis of all 6 concept domains.
-// Each targets a specific mechanism, consequence, or pattern that was absent.
-
-{id:'caching-gap-drills', name:'Caching \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:57, title:'Cache strategy call-sequence — draw before you choose', diff:'easy', type:'drill',
-   concepts:'Caching',
-   desc:'Product catalogue: 500 reads/sec, 2 price writes per product per day. DB read = 200ms, DB write = 50ms. A colleague proposes write-through to "reduce read latency."',
-   reqs:['Draw the call sequence for cache-aside read-hit and read-miss. Mark every synchronous hop and which party waits.','Draw the call sequence for write-through on a price update. How many synchronous hops does the caller wait for?','The colleague says write-through reduces read latency. Using the call sequences you drew, explain precisely why this is wrong in one sentence.','Given 500 reads/sec vs ~0.002 writes/sec, which strategy is correct? Justify from the call sequence, not the name.'],
-   focus:'Cache strategy selection is a call-sequence decision, not a naming exercise. Write-through adds a synchronous DB write to every cache write — it does not touch the read path at all. Write-through vs cache-aside confusion is one of the most common Phase 1 mistakes.'},
-  {id:58, title:'TTL expiry vs LRU eviction — what triggers each', diff:'easy', type:'drill',
-   concepts:'Caching',
-   desc:'Redis cache: 4GB memory limit, 2M keys, LRU eviction policy. Mix of keys with TTL=1h and keys with no TTL set. A viral product page is a hot key receiving 8,000 req/sec. Memory is at 3.8GB.',
-   reqs:['In one sentence each: what condition triggers TTL expiry? What condition triggers LRU eviction? Which is time-based, which is pressure-based?','The viral product\'s key expires at 2am. 8,000 concurrent requests hit it simultaneously. Which mechanism — TTL or LRU — caused this? What actually happens next?','A cold product with no TTL set. Memory fills to 4GB. What happens to it — and who decided to remove it?','A colleague proposes setting LRU eviction to fix cache stampede. Why does LRU have exactly zero effect on stampede? Name the correct mechanism class for stampede prevention.'],
-   focus:'TTL = time-based expiry triggered by clock. LRU = memory-pressure eviction triggered by capacity. Cache stampede occurs at TTL expiry under high concurrency — LRU is irrelevant. Confusing them produces solutions that address the wrong failure mode entirely.'},
-  {id:59, title:'Stale-while-revalidate — specify every fork in the flow', diff:'med', type:'drill',
-   concepts:'Caching',
-   desc:'Product page cache key expires under 500 QPS. DB read = 300ms. SLA: P99 < 50ms. You cannot afford any availability drop during cache refresh. You implement stale-while-revalidate with single-flight (request coalescing).',
-   reqs:['Define stale-while-revalidate precisely: what does the triggering request return to its caller? What does it launch asynchronously? What do all 499 other concurrent requests receive?','What is single-flight / request coalescing? How does it ensure exactly one background DB call when 500 requests miss simultaneously?','The background refresh takes 300ms. 150 more requests arrive during that window. Trace each: what do they receive and from where?','The background refresh fails (DB timeout). The stale value is still in cache. What happens at the next TTL expiry — is there still a stale value to serve?'],
-   focus:'Stale-while-revalidate + single-flight is the production-standard answer to stampede when availability must not drop. Specify every fork including the refresh-failure path. This pattern is not named in the caching concept lab — recognise it by its behaviour: serve stale immediately, refresh once in background, coalesce concurrent misses.'},
-  {id:60, title:'Distributed lock refresh — calculate the availability cost first', diff:'med', type:'drill',
-   concepts:'Caching',
-   desc:'Cache key expires under 500 QPS. You implement a distributed lock: one winner queries the DB (takes 300ms), all other requests wait and timeout after 500ms if the lock is not released.',
-   reqs:['During the 300ms DB query: how many new requests arrive? How many hold the lock? How many are blocked?','If blocked requests return an error on timeout: what is the availability percentage during the 300ms window? Show the arithmetic.','If blocked requests serve the previous stale value instead: recalculate availability. What staleness do they serve, and from where?','Compare: lock-with-error vs lock-with-stale vs stale-while-revalidate. For each: availability %, consistency guarantee, implementation complexity. Which is correct for a product catalogue vs a bank balance?'],
-   focus:'A distributed lock gives serialisation, not availability. Calculate requests-that-fail-per-refresh-cycle before choosing this pattern. At 500 QPS \xd7 300ms lock window = 150 requests blocked per cycle. If they all error, availability = 1/151 \u2248 0.66% during refresh. That number should force you to stale-while-revalidate.'},
-  {id:61, title:'Bounded vs unbounded staleness — define the SLA with numbers', diff:'med', type:'drill',
-   concepts:'Caching',
-   desc:'Leaderboard cache: cache-aside, TTL=60s. Freshness SLA: "data must be at most 2 seconds old." Circuit breaker: opens after 3 DB failures, stays open 30s, probes once in half-open. Circuit has been open for 4 minutes.',
-   reqs:['Define bounded staleness in one sentence with a concrete example: "data served is at most X seconds old under condition Y."','Under normal operation: what is the maximum staleness? Show the calculation using TTL.','Circuit breaker opens. After 60s: how stale is the cached data? After 4 minutes? Is this bounded or unbounded? Define both terms precisely.','State an explicit serving policy for when the circuit is open: (a) serve stale indefinitely, (b) serve stale up to N seconds then error, or (c) error immediately. For each, name one system type where it is the correct choice.'],
-   focus:'"Eventual consistency" is not an SLA — it is a hope. An SLA requires a number. Define maximum staleness under normal operation AND under failure. A 2-second freshness SLA combined with a circuit breaker that stays open for 30 seconds is a contradiction that must be resolved explicitly with a serving policy decision.'},
-]},
-
-{id:'messaging-gap-drills', name:'Messaging \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:62, title:'Idempotency key — design the mechanism, not just the concept', diff:'med', type:'drill',
-   concepts:'Messaging',
-   desc:'A payment confirmation consumer receives messages at-least-once from Kafka. Two identical messages (same payment_id) arrive 200ms apart due to a producer retry. You must process exactly once without DLQ-level intervention.',
-   reqs:['Design the idempotency key: what field(s) form it? Where is it stored (Redis, DB, or in-message)? What is the TTL and how did you derive it from the retry window?','Both messages arrive within 200ms — effectively simultaneously from the consumer\'s view. Describe the race condition in "check if key exists \u2192 process if not." What single atomic Redis operation prevents it?','The idempotency key store (Redis) goes down. Two choices: process and risk duplicate, or drop and risk data loss. Which do you choose for a payment — and why does "idempotent" not mean "safe to execute twice" for a payment charge?','TTL expires. The same payment_id is reused by a bug 26 hours later. What does the server do? What must be stored alongside the key — not just a flag — to detect this?'],
-   focus:'Idempotency is a mechanism you design, not a property you declare. SETNX (atomic set-if-not-exists) is the operation. Store the full original response alongside the key — not just "processed: true" — so duplicates receive the same response. TTL must exceed the maximum client retry window, often 24h not seconds.'},
-  {id:63, title:'Consumer group rebalancing — what happens to in-flight messages', diff:'med', type:'drill',
-   concepts:'Messaging',
-   desc:'Kafka consumer group: 5 consumers reading a 20-partition topic (4 partitions each). Consumer C3 crashes mid-processing of a batch of 50 messages. Offsets for those messages were not committed. The topic receives 10K new messages per minute.',
-   reqs:['Who detects C3\'s failure — consumer, broker, or group coordinator? What configuration controls detection speed, and what is the cost of making detection faster?','C3\'s 50 in-flight messages had uncommitted offsets. When a new consumer takes over C3\'s partitions, what does it consume first? Is there a duplicate risk, and who is responsible for handling it?','Rebalancing pauses all consumption in the group. The rebalance takes 30 seconds. How many messages accumulate in unread partitions during that window? What does this mean for a downstream system expecting < 5s latency?','Design a rebalance-safe consumer: commit offsets before processing, after processing, or in a two-phase approach? State exactly what each choice gives up (duplicate risk vs loss risk).'],
-   focus:'Consumer group rebalancing stops all consumption for its duration and re-delivers uncommitted messages to the new consumer — this is the primary source of duplicates in at-least-once Kafka systems. Tune session.timeout.ms and max.poll.interval.ms carefully: faster detection = more false rebalances on GC pauses.'},
-  {id:64, title:'Retry storm — calculate the thundering herd, then fix it', diff:'med', type:'drill',
-   concepts:'Messaging \xb7 Reliability',
-   desc:'A downstream service fails at T=0. 1,000 message consumers each retry at a fixed 1-second interval. The service recovers at T=10s. The service can handle 200 RPS sustainably.',
-   reqs:['At T=10s (recovery): how many retry requests hit the service in the first second? Show the calculation. What happens to the recovering service?','Add exponential backoff without jitter: retries at 1s, 2s, 4s, 8s, 16s... At T=10s, how many clients are in a retry window simultaneously? Does this eliminate the storm at recovery?','Add full jitter: each retry delay is random(0, backoff_interval). Estimate the peak RPS at recovery vs the no-jitter case. Why does jitter work where backoff alone does not?','A circuit breaker opens on the consumer side after 3 consecutive failures. How does this interact with the retry storm — does it help, hurt, or require a separate analysis?'],
-   focus:'Exponential backoff without jitter delays the thundering herd but does not distribute it — all clients that failed at T=0 still retry at the same backoff intervals. Jitter randomises within each backoff window, spreading load. This is calculable math: N clients \xd7 retry convergence = spike RPS. Always compute before designing the fix.'},
-]},
-
-{id:'scalability-gap-drills', name:'Scalability \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:65, title:'Hot-key mitigation — consistent hashing won\'t help you here', diff:'med', type:'drill',
-   concepts:'Scalability \xb7 Caching',
-   desc:'A Redis cluster uses consistent hashing across 10 nodes, each handling 5,000 RPS. One product goes viral and receives 80,000 reads/sec — all on a single cache key. The owning node is now at 16\xd7 its capacity.',
-   reqs:['Consistent hashing distributes many keys evenly. Why does it not solve a hot single-key problem? What is the distinction between "distributing N keys across nodes" and "a single key with N\xd7 normal load"?','Technique A: in-process L1 cache per app server, TTL=5s. You have 100 app servers each receiving 800 RPS of this key. How many Redis reads does L1 eliminate? Show the arithmetic.','Technique B: key sharding — store as product:123:shard:0 through product:123:shard:9 across 10 nodes, read from a random shard. How does this distribute load? What does write complexity become?','A price update must propagate to all 10 shards atomically. Design the write path. What is the maximum staleness across shards if one write fails? How do you detect and recover from a partial update?'],
-   focus:'Hot-key is a read amplification problem on a single key — consistent hashing cannot help because there is only one key to place. Solutions are replication (L1 per process) or artificial distribution (key sharding). Both have write-path consequences that must be designed explicitly before you use them.'},
-  {id:66, title:'Load balancer algorithm — classify, choose, justify', diff:'easy', type:'drill',
-   concepts:'Scalability',
-   desc:'Four scenarios requiring load balancer algorithm selection: (A) 10 stateless API servers, requests complete in < 10ms. (B) 10 app servers, some requests take 5 seconds (file processing jobs). (C) WebSocket connections — user must stay on the same server for the session. (D) Cache partitioning — same user_id must consistently reach the same cache node.',
-   reqs:['For each scenario: choose round-robin, least-connections, IP-hash, or consistent-hash LB. One sentence justification per choice.','For scenario B: draw what happens with round-robin when one server gets a run of slow file-processing requests. What metric does least-connections track that round-robin ignores?','For scenario C: IP-hash is proposed for WebSocket affinity. The user switches from WiFi to LTE (new IP). What breaks? What is the correct mechanism for WebSocket session affinity?','Define "stateful load balancer" and explain why it is an anti-pattern for horizontal scaling. What property of scenario A makes round-robin safe?'],
-   focus:'Load balancer algorithm selection appears in every system design but is almost never drilled in isolation. Wrong choice in B causes tail latency collapse. Wrong choice in C breaks session continuity. Know what problem each algorithm is solving before applying it to a full system.'},
-  {id:67, title:'Live resharding — double-write, cutover, and rollback', diff:'hard', type:'drill',
-   concepts:'Scalability \xb7 Storage',
-   desc:'Users table sharded by user_id % 4 (4 shards). Must expand to 8 shards without downtime. 10K writes/sec, 100K reads/sec in production right now.',
-   reqs:['Describe the double-write phase: writes go to both old and new shards simultaneously. What guarantees does this give? What is the failure mode if a write succeeds on the old shard but fails on the new shard?','When do you switch reads from old to new shards? What is the window where a read could go to a new shard whose data has not yet been migrated?','A read reaches a new shard before that user_id range has been migrated. The data does not exist. What does the application do: error, fallback to old shard, or something else? Design the read-fallback explicitly.','Post-cutover: old shards are decommissioned. A bug surfaces — 0.1% of user_ids were never migrated. How do you detect this? How do you recover without downtime?'],
-   focus:'Live resharding is what happens when you chose the wrong shard key in problem #12. The double-write pattern and read-fallback are not optional engineering niceties — they are the minimum viable migration plan for any production sharded system. Resharding is always harder than the original sharding decision.'},
-]},
-
-{id:'storage-gap-drills', name:'Storage \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:68, title:'Index design — choose, cost, and decide when not to add', diff:'med', type:'drill',
-   concepts:'Storage',
-   desc:'Orders table: (order_id PK, user_id, product_id, status, created_at, total_amount). 500M rows. 50K inserts/second. Three query patterns: (A) all orders for a given user_id. (B) orders WHERE status=\'pending\' AND created_at in last 24h. (C) orders by product_id sorted by total_amount DESC — runs twice daily in admin reports.',
-   reqs:['For each query pattern: name the index (columns and order) that makes it efficient. For pattern B, explain why column order in the composite index matters.','You add all 3 indexes. For every insert at 50K/sec: how many index entries are written per row? Define write amplification and state its impact on insert throughput.','Query C runs only twice per day for an internal admin tool. Should you add the index given the write amplification cost at 50K inserts/sec? Justify with an explicit trade-off.','A composite index exists on (user_id, created_at). A new query filters on created_at only with no user_id filter. Does this index help? Why or why not? State the leftmost-prefix rule in one sentence.'],
-   focus:'"Indexes are not free" is stated in the concept lab. This drill makes you feel the cost by calculating write amplification per insert. The decision to add or skip an index should always be made by comparing read gain vs write cost — never add indexes defensively.'},
-  {id:69, title:'Schema migration under live traffic — the 3-phase pattern', diff:'hard', type:'drill',
-   concepts:'Storage \xb7 Reliability',
-   desc:'A users table (user_id, email, created_at) has 200M rows and receives 10K writes/second. You must add a NOT NULL column country_code with a default value of \'US\'. Zero downtime. The table is in production Postgres.',
-   reqs:['Why does ALTER TABLE ADD COLUMN country_code VARCHAR(2) NOT NULL DEFAULT \'US\' on a 200M row table cause downtime in Postgres? What lock does it acquire?','Describe the 3-phase online migration: Phase 1 (additive), Phase 2 (backfill), Phase 3 (constrain). Why must each phase be deployed and stable before the next begins?','During Phase 2 backfill, new inserts arrive from the live application. These rows don\'t have country_code yet. What application code change must be deployed before Phase 2 starts — and what happens to rows inserted during the migration?','Post-migration: you deploy a bug in unrelated code and must rollback the application to the previous version. The new column has data. What happens when the old application (which doesn\'t write country_code) runs against the new schema?'],
-   focus:'Schema migrations under live traffic are a reliability problem disguised as a storage problem. A bad migration is an outage. The 3-phase pattern (add nullable \u2192 dual-write \u2192 backfill \u2192 constrain) ensures each step is independently deployable and rollback-safe. Every backend engineer needs this before touching a production database.'},
-  {id:70, title:'Event sourcing vs CRUD — choose the right model', diff:'med', type:'drill',
-   concepts:'Storage',
-   desc:'Two systems: (A) a blog post editor — users create, edit, delete posts. The current post content is all that matters. (B) a bank account — credits and debits flow in. The current balance is what users see, but regulators require full history. Both receive 1K writes/second.',
-   reqs:['For system A: would event sourcing add value over a simple CRUD posts table? Design both briefly and state which is simpler and why.','For system B: describe the event sourcing model precisely. What is an event? What is the current state? How do you compute the current balance from the event log efficiently?','System B discovers a bug: a transfer was posted with the wrong amount. In CRUD you UPDATE the row. In event sourcing you cannot modify or delete events. How do you correct the record while maintaining auditability?','System B: "What was account A\'s balance on January 1st 2023?" In a CRUD model, how do you answer this? In an event sourcing model? Which requires what data to exist and in what form?'],
-   focus:'Event sourcing = append-only log of immutable events, current state derived by replay or materialised view. CRUD = mutable current state only. Event sourcing provides: full audit trail, point-in-time queries, correction via compensating events (not edits). Required mental model for problems #55 (financial ledger) and any compliance-critical system.'},
-]},
-
-{id:'reliability-gap-drills', name:'Reliability \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:71, title:'Circuit breaker half-open — probe mechanics and multi-node risk', diff:'med', type:'drill',
-   concepts:'Reliability',
-   desc:'Payment service: circuit breaker on the card processor dependency. Opens after 5 failures in 10s. Stays open 30s. It has now been open for 30s. 10 gateway nodes all share the same circuit state. The card processor may or may not have recovered.',
-   reqs:['Describe the half-open state: who sends the probe request — which node, chosen how? How many requests are allowed through during half-open? What does the circuit do on probe success vs probe failure?','The probe succeeds. The circuit closes immediately. 2,000 requests flood through. The card processor was only partially recovered and fails under full load. What happens to the circuit — and what state does it re-enter?','Design a safer half-open: gradual ramp — 1 request \u2192 10 requests \u2192 100 requests \u2192 fully open. What state must the circuit breaker track to implement this? How long should each ramp stage last?','All 10 gateway nodes enter half-open simultaneously at T=30s. All send probes. All succeed. All close. What is the combined probe load and the combined traffic spike in the first second after close — and is this safe for a service that just recovered?'],
-   focus:'Half-open is where circuit breakers most often fail in production. "One probe then close" causes a re-trip on partial recovery. The gradual ramp prevents this. Multi-node simultaneous half-open means your 10 nodes send 10 probes simultaneously — coordinate who probes, or accept the N\xd7 probe multiplier as a deliberate design choice.'},
-  {id:72, title:'Timeout values — set the number and justify it', diff:'easy', type:'drill',
-   concepts:'Reliability',
-   desc:'A user-facing API calls three dependencies: (A) product DB — P99 latency 50ms, critical (page cannot load without it). (B) recommendation service — P99 latency 300ms, non-critical (page loads without recommendations). (C) inventory check — P99 latency 150ms, critical. Your API\'s own SLO: P99 < 500ms. Own processing overhead: 20ms.',
-   reqs:['Set a timeout for each dependency. Show that critical-path timeouts A + C + 20ms overhead leave enough headroom below your 500ms SLO. Explain why "exactly at SLO" is wrong.','Dependency B (recommendations) hits your timeout. What does the API return to the user? What must your graceful degradation design provide for this to work?','Dependency A\'s P99 spikes to 200ms (slow query incident). Your timeout is 100ms. It triggers constantly. What does the user see? Is this false-failure on a critical dependency acceptable, and what do you do about it?','You set all timeouts to 5ms to "fail fast." P99 latency of A is 50ms — your timeout triggers 99%+ of the time. Define false-failure rate and explain why it is a distinct problem from availability, separate from the cascade failure risk of long timeouts.'],
-   focus:'Timeout formula: P99(dependency) \xd7 safety factor (1.5\u20132\xd7), constrained so that sum of critical-path timeouts + own overhead < SLO. Too short = false failures on a healthy system. Too long = cascading thread-pool exhaustion from a slow dependency. Both are wrong and both are common interview mistakes.'},
-]},
-
-{id:'api-gap-drills', name:'API Design \u2014 gap drills', phase:1, color:'var(--teal)', problems:[
-  {id:73, title:'Idempotency key — design the storage and the race condition', diff:'med', type:'drill',
-   concepts:'API Design',
-   desc:'Payment API: POST /payments accepts {amount, currency, recipient, idempotency_key}. The client retries up to 3 times if it does not receive a response within 5 seconds. 10M payments/day. Exactly-once execution required.',
-   reqs:['Who generates the idempotency key — client or server? Why? What properties must a valid key have: uniqueness scope, length, and what it must encode?','Design the server-side store: schema (what fields exactly), storage system (Redis vs DB — justify), TTL. Derive the TTL value from the retry window — the client can retry tomorrow too, not just in the next 5 seconds.','Two retries arrive 200ms apart — effectively simultaneously. The naive flow "check if key exists \u2192 process if not" has a race condition. Describe it. What single Redis command prevents it and why is it atomic?','A valid idempotency key is reused 26 hours later with a different payment amount (client bug). What should the server return — 200 with original response, 400, or 409 conflict? What must be stored alongside the key to enable this check?'],
-   focus:'Idempotency keys are the correct answer to "safe payment retries." The mechanism — client-generated UUID, SETNX atomic check, full response stored not just a flag, TTL derived from retry window — must be precise. The 200ms simultaneous-retry race condition is the hardest part and the most common interview gap.'},
-  {id:74, title:'API versioning — migrate a breaking change without breaking clients', diff:'easy', type:'drill',
-   concepts:'API Design',
-   desc:'GET /orders/{id} currently returns {order_id, total, status}. You must: (1) add a required field shipping_address, (2) rename total to total_amount. 200 external clients use this API. You cannot force client upgrades or take them offline.',
-   reqs:['Classify each change: additive (non-breaking) or breaking. For each breaking change: explain precisely why it breaks existing clients who do not update.','Design a URL-versioned migration. What does /v1/orders/{id} return vs /v2/orders/{id}? How does the server handle v1 requests if its internal model has already migrated to v2?','A v1 client sends a request. The server transforms the v2 internal response to a v1-compatible shape. What does it return for shipping_address (which did not exist in v1)? What does it return for total (which was renamed)?','You deprecate /v1 with a 6-month sunset. What HTTP response headers communicate this deprecation to clients on every response? What happens on the sunset date — hard cutoff or gradual degradation?'],
-   focus:'An API version is a contract version. Breaking changes without a new version are outages for downstream clients. Run both versions simultaneously during migration. The v1\u2192v2 transformation layer in the server is the implementation burden you accept. Communicate sunset via Deprecation and Sunset headers — silence causes incident bridges at the cutoff date.'},
-]},
-
-];
-
-// ─── FLATTEN ──────────────────────────────────────────────────────────────────
 const ALL = [];
 GROUPS.forEach(g => g.problems.forEach(p => {
   ALL.push({...p, groupId: g.id, groupName: g.name, phase: g.phase});
@@ -874,11 +430,10 @@ let currentView = 'problems';
 let activeId = null;
 let isDark = true;
 const STORE_KEY = 'hld-idx-v1';
-let saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-let statuses = saved.statuses || {};
-let notes    = saved.notes    || {};
+let statuses = PrepStore.load('hld-status');
+let notes = PrepStore.load('hld-notes');
 
-function save(){ localStorage.setItem(STORE_KEY, JSON.stringify({statuses, notes})); }
+function save(){ PrepStore.save('hld-status',statuses); PrepStore.save('hld-notes',notes); }
 
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
 render();
@@ -1001,14 +556,14 @@ function renderProblems(){
       const typeTag=p.type==='drill'?`<span class="ptype-tag tag-drill">drill</span>`
                    :p.type==='full' ?`<span class="ptype-tag tag-full">full</span>`
                    :                 `<span class="ptype-tag tag-partial">partial</span>`;
-      h+=`<div class="prow" onclick="openModal(${p.id})">
+      h+=`<div class="prow" onclick="openModal('${p.id}')">
         <div class="pr-num">${p.id}</div>
         <div class="pr-title">${p.title}${hn?'<span class="pr-note">📝</span>':''}</div>
         <div class="pr-concepts">${p.concepts}</div>
         <div style="text-align:center">${typeTag}</div>
         <div><span class="dbadge d-${p.diff}">${p.diff}</span></div>
         <div>${sd}</div>
-        <div><button class="row-open" onclick="event.stopPropagation();openByIdClaude(${p.id})">→</button></div>
+        <div><button class="row-open" onclick="event.stopPropagation();openByIdClaude('${p.id}')">→</button></div>
       </div>`;
     });
     h+='</div>';
@@ -1054,7 +609,7 @@ function setView(v,btn){
 // ─── MODAL ────────────────────────────────────────────────────────────────────
 function openModal(id){
   const p=ALL.find(x=>x.id===id); if(!p) return;
-  activeId=id;
+  activeId=id; history.replaceState(null,"", "#"+id);
   const stLabel={solved:'✓ Solved',review:'↻ Needs review',audited:'★ Audited',todo:'Todo'};
   const typeLabel={drill:'concept drill',partial:'component / partial',full:'full system design'};
   document.getElementById('m-id').textContent=`#${p.id}`;
@@ -1065,8 +620,12 @@ function openModal(id){
   document.getElementById('m-phase').textContent=`Phase ${p.phase}`;
   document.getElementById('m-status').textContent=stLabel[statuses[id]||'todo'];
   document.getElementById('m-desc').textContent=p.desc;
-  document.getElementById('m-reqs').innerHTML=(p.reqs||[]).map(r=>`<div class="m-req">${r}</div>`).join('');
-  document.getElementById('m-focus').innerHTML=p.focus?`<strong>Focus:</strong> ${p.focus}`:'';
+  const reqs=document.getElementById('m-reqs');reqs.replaceChildren();for(const r of p.reqs||[]){const el=document.createElement('div');el.className='m-req';el.textContent=typeof r==='string'?r:r.text;reqs.append(el);}
+  const focus=document.getElementById('m-focus');focus.textContent=p.focus?'Focus: '+p.focus:'';
+  const examples=document.getElementById('m-examples');examples.replaceChildren();for(const example of p.examples||[]){const el=document.createElement('p');el.textContent=example;examples.append(el);}
+  const hints=document.getElementById('m-hint-list');hints.replaceChildren();for(const hint of p.hints||[]){const li=document.createElement('li');li.textContent=hint;hints.append(li);}
+  document.getElementById('m-hints').open=false;
+  document.getElementById('m-learn-link').href='learn.html#'+encodeURIComponent(p.topic);for(const [mode,id] of [['learn','m-session-learn'],['interview','m-session-attempt'],['revisit','m-session-revisit']])document.getElementById(id).href='../session.html?track=hld&problem='+encodeURIComponent(p.id)+'&mode='+mode;
   document.getElementById('m-notes').value=notes[id]||'';
   document.getElementById('moverlay').classList.add('open');
 }
@@ -1087,52 +646,7 @@ function markStatus(st){
 }
 
 // ─── CLAUDE PROMPTS ───────────────────────────────────────────────────────────
-function buildPrompt(p){
-  const reqs=(p.reqs||[]).map((r,i)=>`${i+1}. ${r}`).join('\n');
-  const focus=p.focus?`\nFocus constraint:\n${p.focus}\n`:'';
-  const typeDesc={drill:'concept drill (one concept in isolation)',partial:'component problem (2-3 concepts combined)',full:'full system design (all concepts, estimation required)'}[p.type]||p.type;
-  return `You are a Staff Engineer conducting a system design interview. Your style is calm, precise, and Socratic.
-
-Candidate profile: Senior Software Engineer preparing for system design interviews.
-
-Problem #${p.id}: ${p.title}
-Type: ${typeDesc}
-Concepts: ${p.concepts}
-Difficulty: ${p.diff}
-
-${p.desc}
-
-Requirements to address:
-${reqs}
-${focus}
-FORMAT RULES — follow these exactly, every turn:
-- Ask ONE question at a time. Never stack questions.
-- After the candidate answers, acknowledge what is correct in ONE sentence, then identify the single most important gap.
-- Do not reveal the answer. Ask a question that points toward it.
-- Do not over-validate. "Good instinct" maximum once every 3 exchanges.
-- If the candidate is stuck, give a single directional hint — not the solution.
-- If the candidate calls out a mistake in your behaviour, acknowledge it plainly and adjust.
-
-INTERVIEW STYLE:
-- Conversational, not adversarial.
-- Push on numbers — vague answers get: "Can you quantify that?"
-- Push on failure modes — working-state answers get: "What happens when X fails?"
-- Push on trade-offs — every technology choice gets: "Why not Y instead?"
-- Never ask about something the candidate has not designed yet.
-
-SCORING SIGNAL — not a perfect answer, but:
-- Can they reason under constraint?
-- Do they know what they don't know?
-- Can they defend trade-offs without memorised answers?
-
-OPENING MOVE:
-${p.type==='drill'
-  ? 'Ask one business-impact question that forces the candidate to think about consequences before touching any technical design. Wait for their answer before proceeding.'
-  : 'Ask: "Walk me through your estimation first — DAU, QPS, storage. Use round numbers." Wait for their full answer before continuing.'
-}
-
-Begin now.`;
-}
+function buildPrompt(p){return PrepPrompts.build('hld',p);}
 
 function buildPromptUrl(p){ return `https://claude.ai/new?q=${encodeURIComponent(buildPrompt(p))}`; }
 
@@ -1218,7 +732,7 @@ function openDebugClaude(){
   const thinking=document.getElementById('dbg-thinking').value.trim();
   if(!design){ alert('Your system sketch is required.'); return; }
   let probLabel='';
-  if(selVal){ const p=ALL.find(x=>x.id===parseInt(selVal)); if(p) probLabel=`#${p.id} — ${p.title}`; }
+  if(selVal){ const p=ALL.find(x=>x.id===selVal); if(p) probLabel=`#${p.id} — ${p.title}`; }
   const lines=[
     probLabel?`HLD Debug — ${probLabel}`:'HLD Debug session','',
     'You are a Staff Engineer conducting a system design debug session. Your style is calm, direct, and Socratic.','',
@@ -1263,6 +777,12 @@ function initMobileSidebar(){
   overlay.addEventListener('click',closeS);
   sidebar.querySelectorAll('button,a').forEach(el=>el.addEventListener('click',()=>{ if(window.innerWidth<=768) closeS(); }));
 }
+
+PrepStore.subscribe(()=>{ statuses=PrepStore.load('hld-status'); notes=PrepStore.load('hld-notes');  render(); });
+window.addEventListener('hashchange',openProblemHash);
+function openProblemHash(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch(e){return;} if(ALL.some(p=>p.id===id))openModal(id);}
+openProblemHash();
 </script>
+<script src="../assets/progress-ui.js"></script>
 </body>
 </html>

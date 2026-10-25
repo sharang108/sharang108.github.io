@@ -143,16 +143,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   <div class="hero-title">
     <span class="acc">DSA</span> · <span class="pur">LLD</span> · <span class="amb">HLD</span>
   </div>
-  <div class="hero-sub">Three tracks. One system. Track problems, learn patterns, debug your thinking, and open any problem directly in Claude with a pre-loaded mentor prompt.</div>
-  <div class="hero-cycle">
-    <span style="color:var(--accent)">DSA</span>
-    <span class="cycle-arrow">→</span>
-    <span style="color:var(--purple)">LLD</span>
-    <span class="cycle-arrow">→</span>
-    <span style="color:var(--amber)">HLD</span>
-    <span class="cycle-arrow">→</span>
-    <span style="color:var(--muted2)">repeat</span>
-  </div>
+  <div class="hero-sub">Nine connected tracks cover DSA, design, Python, HTTP, SQL and the three major Python API frameworks. Learn the idea, attempt a problem, and save an AI-written revision document wherever you choose.</div>
+  <div class="hero-cycle"><span style="color:var(--accent)">Learn</span><span class="cycle-arrow">→</span><span style="color:var(--purple)">Attempt</span><span class="cycle-arrow">→</span><span style="color:var(--amber)">Save revision</span><span class="cycle-arrow">→</span><span>Revisit</span></div>
 </div>
 
 <div class="status-strip" id="status-strip">
@@ -174,9 +166,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="ss-dot" style="background:var(--amber)"></div>
     <div class="ss-body">
       <div class="ss-label">HLD</div>
-      <div class="ss-val" style="color:var(--muted)">coming soon</div>
+      <div class="ss-val" id="ss-hld">Loading…</div>
     </div>
   </div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">Python solved</div><div class="ss-val" id="ss-python">loading...</div></div></div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">HTTP solved</div><div class="ss-val" id="ss-http">loading...</div></div></div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">SQL solved</div><div class="ss-val" id="ss-sql">loading...</div></div></div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">Flask solved</div><div class="ss-val" id="ss-flask">loading...</div></div></div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">Django/DRF solved</div><div class="ss-val" id="ss-django">loading...</div></div></div>
+  <div class="ss-item"><div class="ss-dot" style="background:#8cb9f1"></div><div class="ss-body"><div class="ss-label">FastAPI solved</div><div class="ss-val" id="ss-fastapi">loading...</div></div></div>
 </div>
 
 <div class="section-divider">
@@ -198,6 +196,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="cp-row"><span class="cp-label">Phase 2</span><span class="cp-val" id="dsa-p2-cnt">—/18</span></div>
       <div class="cp-bar"><div class="cp-fill" id="dsa-p2-bar" style="width:0%;background:var(--amber)"></div></div>
     </div>
+    <div class="cp-row"><span>Phase 3</span><span id="dsa-p3-cnt"></span></div><div class="cp-bar"><div class="cp-fill" id="dsa-p3-bar" style="background:var(--accent)"></div></div>
     <div class="card-tags">
       <span class="tag">Two pointers</span>
       <span class="tag">Sliding window</span>
@@ -216,7 +215,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="card-icon">🏛</div>
     <div class="card-label">Track 2</div>
     <div class="card-title">Low Level Design</div>
-    <div class="card-desc">20 patterns (17 GoF + 3 modern). 159 problems: micro-drills per pattern + full system designs. Pattern Lab teaches each pattern before you practice it.</div>
+    <div class="card-desc">177 independent problems, 21 design companions and 20 guided pattern challenges. Practice responsibilities, contracts, patterns and full systems.</div>
     <div class="card-progress" id="lld-progress">
       <div class="cp-row"><span class="cp-label">Micro-problems</span><span class="cp-val" id="lld-micro-cnt">—/136</span></div>
       <div class="cp-bar"><div class="cp-fill" id="lld-micro-bar" style="width:0%;background:var(--purple)"></div></div>
@@ -242,7 +241,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="card-icon">🌐</div>
     <div class="card-label">Track 3</div>
     <div class="card-title">High Level Design</div>
-    <div class="card-desc">25 canonical system design problems across 4 phases. 6 concept groups with trade-off frameworks. From URL shortener to distributed tracing — with a structured interview mentor prompt for every problem.</div>
+    <div class="card-desc">82 independent system design problems across 4 phases, 12 topic companions, 6 guided concept checks and 15 estimation drills. From URL shortener to distributed tracing — with a structured interview mentor prompt for every problem.</div>
     <div class="card-tags">
       <span class="tag">Scalability</span>
       <span class="tag">Databases</span>
@@ -253,12 +252,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     </div>
     <div class="card-actions">
       <a href="hld/index.html" class="cbtn cbtn-primary-amber">→ Problems</a>
-      <a href="hld/concepts.html" class="cbtn cbtn-ghost">⇄ Concept Lab</a>
+      <a href="hld/learn.html" class="cbtn cbtn-ghost">◇ Learn HLD</a><a href="hld/hld-concepts.html" class="cbtn cbtn-ghost">⇄ Concept Lab</a>
     </div>
   </div>
 
+  <div class="card" style="border-color:#5b82aa"><div class="card-icon">🐍</div><div class="card-label">Track 4</div><div class="card-title">Python Language & Runtime</div><div class="card-desc">19 topic guides, 36 focused and combined exercises, worked traces, templates, and AI-authored revision prompts.</div><div class="card-actions"><a href="python/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+
+  <div class="card"><div class="card-icon">🌐</div><div class="card-label">Track 5</div><div class="card-title">HTTP & Networking</div><div class="card-desc">6 topic guides and 15 mini, combined and complete exercises for request flow, transport, caching, browser behavior and connections.</div><div class="card-actions"><a href="http/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+  <div class="card"><div class="card-icon">🗄️</div><div class="card-label">Track 6</div><div class="card-title">SQL & Database Engineering</div><div class="card-desc">6 topic guides and 17 exercises spanning schema, queries, indexes, transactions and lifecycle.</div><div class="card-actions"><a href="sql/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+  <div class="card"><div class="card-icon">⚗️</div><div class="card-label">Track 7</div><div class="card-title">Flask</div><div class="card-desc">8 guides, 8 mini problems, 4 combined features and 2 complete local application problems.</div><div class="card-actions"><a href="flask/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+  <div class="card"><div class="card-icon">📚</div><div class="card-label">Track 8</div><div class="card-title">Django & DRF</div><div class="card-desc">10 guides, 10 mini problems, 4 combined features and 2 complete local application problems.</div><div class="card-actions"><a href="django/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+  <div class="card"><div class="card-icon">⚡</div><div class="card-label">Track 9</div><div class="card-title">FastAPI</div><div class="card-desc">8 guides, 8 mini problems, 4 combined features and 2 complete local application problems.</div><div class="card-actions"><a href="fastapi/index.html" class="cbtn cbtn-ghost">→ Learn & practice</a></div></div>
+
 </div>
 
+<script src="assets/catalog.js?v=final1"></script>
+<script src="assets/progress.js?v=final1"></script>
 <script>
 // ── THEME ─────────────────────────────────────
 let isDark = true;
@@ -268,71 +277,20 @@ function toggleTheme(){
   document.getElementById('theme-btn').textContent = isDark ? '🌙 theme' : '☀️ theme';
 }
 
-// ── READ DSA PROGRESS FROM localStorage ───────
-// DSA dashboard stores statuses under key 'dsa-s'
-function loadDSAProgress(){
-  try {
-    const statuses = JSON.parse(localStorage.getItem('dsa-s') || '{}');
-    const solved = s => s === 'solved' || s === 'audited';
-
-    // Phase 1: IDs 1–19 (27 problems seeded as solved by default in DSA dashboard)
-    // Phase 2: IDs 20–37 (18 problems)
-    const p1total = 27;
-    const p2total = 18;
-
-    // Count phase 2 solved (ids 20–37)
-    let p2solved = 0;
-    for(let i = 20; i <= 37; i++){
-      if(solved(statuses[i])) p2solved++;
-    }
-
-    const p2pct = Math.round(p2solved / p2total * 100);
-    document.getElementById('dsa-p2-cnt').textContent = `${p2solved}/${p2total}`;
-    document.getElementById('dsa-p2-bar').style.width = p2pct + '%';
-
-    // Status strip — total solved across both phases
-    // Phase 1 always 27 (seeded), phase 2 variable
-    document.getElementById('ss-dsa').textContent = `${27 + p2solved} / 45 solved`;
-  } catch(e){
-    document.getElementById('ss-dsa').textContent = 'open dashboard to load';
-  }
+function loadProgress(){
+ for(const track of ['dsa','lld','hld']){
+  const all=PrepCatalog.tracks[track].flatMap(g=>g.problems.map(p=>({...p,phase:g.phase}))),status=PrepStore.load(track+'-status');
+  const solved=p=>['solved','audited'].includes(status[p.id]);
+  document.getElementById('ss-'+track).textContent=all.filter(solved).length+' / '+all.length+' solved';
+  const desc=document.querySelector('.card.'+track+' .card-desc');
+  desc.textContent=all.length+' problems across '+PrepCatalog.tracks[track].length+' groups. Progress uses the actual problem catalogue.';
+  const parts=track==='dsa'?[[1,'dsa-p1'],[2,'dsa-p2'],[3,'dsa-p3']]:track==='lld'?[['micro','lld-micro'],['system','lld-sys']]:[];
+  for(const [part,id] of parts){const list=all.filter(p=>track==='dsa'?p.phase===part:p.type===part),n=list.filter(solved).length;document.getElementById(id+'-cnt').textContent=n+'/'+list.length;document.getElementById(id+'-bar').style.width=(list.length?100*n/list.length:0)+'%';}
+ }
+ for(const track of ['python','http','sql','flask','django','fastapi']){const all=PrepCatalog.tracks[track].flatMap(g=>g.problems),status=PrepStore.load(track+'-status');document.getElementById('ss-'+track).textContent=all.filter(p=>['solved','audited'].includes(status[p.id])).length+' / '+all.length+' solved';}
 }
-
-// ── READ LLD PROGRESS FROM localStorage ───────
-// LLD dashboard stores statuses under key 'lld-s'
-function loadLLDProgress(){
-  try {
-    const statuses = JSON.parse(localStorage.getItem('lld-s') || '{}');
-    const solved = s => s === 'solved' || s === 'audited';
-
-    // Micro: ids 1–136, System: 55–66, 158–159 (approx — just count by type from stored data)
-    // Simpler: count any key in lld-s that is solved
-    const allSolved = Object.values(statuses).filter(solved).length;
-    const microTotal = 136;
-    const sysTotal   = 23;
-    const total      = 159;
-
-    // We don't have type info here — show total with breakdown estimate
-    const microSolved = Math.min(allSolved, microTotal);
-    const sysSolved   = Math.max(0, allSolved - microTotal);
-
-    const microPct = Math.round(microSolved / microTotal * 100);
-    const sysPct   = sysSolved > 0 ? Math.round(sysSolved / sysTotal * 100) : 0;
-
-    document.getElementById('lld-micro-cnt').textContent = `${microSolved}/${microTotal}`;
-    document.getElementById('lld-micro-bar').style.width  = microPct + '%';
-    document.getElementById('lld-sys-cnt').textContent   = `${sysSolved}/${sysTotal}`;
-    document.getElementById('lld-sys-bar').style.width   = sysPct + '%';
-
-    document.getElementById('ss-lld').textContent = `${allSolved} / ${total} solved`;
-  } catch(e){
-    document.getElementById('ss-lld').textContent = 'open dashboard to load';
-  }
-}
-
-// ── BOOT ──────────────────────────────────────
-loadDSAProgress();
-loadLLDProgress();
+loadProgress(); PrepStore.subscribe(loadProgress);
 </script>
+<script src="assets/progress-ui.js"></script>
 </body>
 </html>

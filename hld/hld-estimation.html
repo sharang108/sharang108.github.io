@@ -145,12 +145,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   <div class="tb-dot"></div>
   <a class="tb-link" href="../index.html">prep-index</a>
   <span class="tb-sep"> / </span>
-  <a class="tb-link" href="hld-index.html">hld-prep</a>
+  <a class="tb-link" href="index.html">hld-prep</a>
   <span class="tb-sep"> / </span>
   <span class="tb-title">estimation-drills</span>
   <div class="tb-right">
     <button class="hamburger" id="ham-btn"><span></span><span></span><span></span></button>
-    <a class="icon-btn" href="hld-index.html">⇄ Problems</a>
+    <a class="icon-btn" href="learn.html">◇ Learn HLD</a><a class="icon-btn" href="index.html">⇄ Problems</a>
     <a class="icon-btn" href="hld-concepts.html">⇄ Concept lab</a>
     <button class="icon-btn" onclick="toggleTheme()">🌙 theme</button>
   </div>
@@ -175,6 +175,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 </div>
 </div>
 
+<script src="../assets/catalog.js?v=final1"></script>
+<script src="../assets/progress.js?v=final1"></script>
 <script>
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 // Each drill has steps. Each step has:
@@ -185,329 +187,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 //   unit    — unit label next to the input field
 //   insight — the "so what" shown after answer
 
-const CATS = [
-{id:'qps', icon:'⚡', name:'QPS & traffic', formula:'DAU × events/day ÷ 86,400 = avg QPS  |  avg QPS × 3 = peak QPS', drills:[
-  {id:1, title:'Social feed read QPS', diff:'easy',
-   scenario:'Instagram: 500M DAU. Each user opens the feed 8 times/day. Each open = 1 API call for feed data.',
-   steps:[
-     {q:'Average feed API calls per second?',
-      hint:'DAU × opens_per_day ÷ 86,400',
-      formula:'500,000,000 × 8 ÷ 86,400',
-      answer:'~46,300 QPS',
-      unit:'QPS',
-      insight:'<strong>~46K QPS average</strong>. This is why a single app server (handles ~5K RPS) is never enough. You need ~10 just for average load.'},
-     {q:'Peak QPS (assume 3× average)?',
-      hint:'avg QPS × 3',
-      formula:'46,300 × 3',
-      answer:'~139,000 QPS',
-      unit:'QPS peak',
-      insight:'<strong>~140K peak QPS</strong>. This is the number you design for. Now ask: how many load-balanced app servers at 5K RPS each? Answer: 28.'},
-     {q:'How many app servers at 5K RPS each to handle peak?',
-      hint:'peak QPS ÷ RPS per server — always round up',
-      formula:'139,000 ÷ 5,000',
-      answer:'~28 servers',
-      unit:'servers',
-      insight:'<strong>28 servers minimum at peak</strong>. Add 20% headroom → 34. This is how infrastructure sizing works: estimate → divide by per-unit capacity → add buffer.'},
-   ]},
-  {id:2, title:'Video upload write QPS', diff:'easy',
-   scenario:'YouTube: 500 hours of video uploaded every minute. Average video is 1 hour long.',
-   steps:[
-     {q:'How many video upload requests per second?',
-      hint:'uploads_per_minute ÷ 60',
-      formula:'500 ÷ 60',
-      answer:'~8.3 uploads/sec',
-      unit:'uploads/sec',
-      insight:'<strong>Only ~8 uploads/sec</strong>. Write QPS is often surprisingly low. The challenge is not QPS — it is the size of each write (each upload is gigabytes).'},
-     {q:'Upload bandwidth in GB/sec (assume average 1GB per 1-hour video)?',
-      hint:'uploads_per_sec × GB_per_upload',
-      formula:'8.3 × 1 GB',
-      answer:'~8.3 GB/sec',
-      unit:'GB/sec',
-      insight:'<strong>8.3 GB/sec ingest bandwidth</strong>. At $0.02/GB transfer cost, that\'s $166/sec in upload costs alone. This is why upload infrastructure is expensive and why chunked uploads matter.'},
-   ]},
-  {id:3, title:'Message throughput — chat app', diff:'med',
-   scenario:'WhatsApp: 500M DAU. Average user sends 40 messages/day. Average message size = 100 bytes.',
-   steps:[
-     {q:'Messages per second?',
-      hint:'DAU × messages_per_day ÷ 86,400',
-      formula:'500,000,000 × 40 ÷ 86,400',
-      answer:'~231,500 msg/sec',
-      unit:'msg/sec',
-      insight:'<strong>~230K messages/second</strong>. At this rate a single Kafka partition (50MB/sec, ~500K small messages/sec) could handle it — but you want partitions for parallelism and fault isolation.'},
-     {q:'Message throughput in MB/sec?',
-      hint:'msg_per_sec × bytes_per_msg ÷ 1,048,576',
-      formula:'231,500 × 100 ÷ 1,048,576',
-      answer:'~22 MB/sec',
-      unit:'MB/sec',
-      insight:'<strong>~22 MB/sec</strong>. Kafka partition capacity is typically 50–100 MB/sec. So 1–2 partitions suffice for throughput — but you use more for ordering guarantees (1 partition per conversation).'},
-   ]},
-]},
+const CATS = PrepCatalog.lessons.estimation;
 
-{id:'storage', icon:'💾', name:'Storage sizing', formula:'items × size_per_item × days × replication_factor = total storage', drills:[
-  {id:4, title:'Tweet storage — 1 year', diff:'easy',
-   scenario:'Twitter: 300M DAU, 2 tweets/user/day. Each tweet: 280 bytes text + 100 bytes metadata. 30% include an image (avg 500KB).',
-   steps:[
-     {q:'Raw text + metadata storage per day (in GB)?',
-      hint:'DAU × tweets_per_day × (text + metadata) bytes, then convert to GB (÷ 1,073,741,824)',
-      formula:'300M × 2 × 380 bytes ÷ 1,073,741,824',
-      answer:'~213 GB/day',
-      unit:'GB/day',
-      insight:'<strong>~213 GB/day</strong> just for text. That\'s manageable — text is cheap. The real storage cost is images.'},
-     {q:'Image storage per day (in TB)?',
-      hint:'DAU × tweets_per_day × 0.30 × 500KB, then convert to TB (÷ 1,099,511,627,776)',
-      formula:'300M × 2 × 0.3 × 500,000 ÷ 1,099,511,627,776',
-      answer:'~82 TB/day',
-      unit:'TB/day',
-      insight:'<strong>~82 TB/day</strong> for images alone. Text was 213GB — images are 400× larger. This is why object storage (S3) exists separately from the tweet DB.'},
-     {q:'Total storage for 1 year with 3× replication (in PB)?',
-      hint:'(text_per_day + image_per_day) × 365 × 3, convert to PB (÷ 1,024 if in TB)',
-      formula:'(0.213 + 82) × 365 × 3 TB',
-      answer:'~89.9 PB/year',
-      unit:'PB/year',
-      insight:'<strong>~90 PB/year</strong>. This is why Twitter uses tiered storage — hot (SSD, last 30 days), warm (HDD, last year), cold (S3 Glacier, everything older). You cannot afford 90 PB on SSDs.'},
-   ]},
-  {id:5, title:'Ride trip record storage', diff:'easy',
-   scenario:'Uber: 50M trips/day. Each trip record: 1KB. Trips are kept "hot" for 90 days, then archived. A DB node holds 2TB SSD.',
-   steps:[
-     {q:'Total hot storage needed (in TB)?',
-      hint:'trips_per_day × KB_per_trip × 90 days ÷ 1,073,741,824 (KB→TB)',
-      formula:'50,000,000 × 1,000 × 90 ÷ 1,073,741,824',
-      answer:'~4.2 TB',
-      unit:'TB',
-      insight:'<strong>~4.2 TB</strong> for 90 days of hot data. At 2TB per node, you need 3 nodes minimum for storage. But storage is rarely the binding constraint — read QPS usually is.'},
-     {q:'DB nodes needed for storage (at 2TB/node, with 3× replication)?',
-      hint:'ceil(total_TB ÷ node_TB) × replication_factor',
-      formula:'ceil(4.2 ÷ 2) × 3',
-      answer:'9 nodes',
-      unit:'nodes',
-      insight:'<strong>9 nodes</strong> for storage alone. Always compute QPS separately and take the larger number — you might need 20 nodes for QPS even though 9 suffice for storage.'},
-   ]},
-  {id:6, title:'Log retention storage', diff:'med',
-   scenario:'A platform ingests 1TB of logs per day. Logs are kept for 90 days hot, 1 year warm (compressed 5:1), and 7 years cold (compressed 10:1 on S3).',
-   steps:[
-     {q:'Hot storage needed (90 days, no compression, in TB)?',
-      hint:'1 TB/day × 90 days',
-      formula:'1 × 90',
-      answer:'90 TB',
-      unit:'TB',
-      insight:'<strong>90 TB hot</strong>. At $0.10/GB/month SSD, this is ~$9,000/month just for hot logs. Cost drives the tiering decision.'},
-     {q:'Warm storage (days 91–365, 5:1 compression, in TB)?',
-      hint:'1 TB/day × 275 days ÷ 5 (compression ratio)',
-      formula:'1 × 275 ÷ 5',
-      answer:'55 TB',
-      unit:'TB',
-      insight:'<strong>55 TB warm</strong>. At $0.02/GB/month HDD, that\'s ~$1,100/month. Compression alone saves ~$4,400/month vs hot storage.'},
-     {q:'Cold storage (years 2–7, 10:1 compression, in TB)?',
-      hint:'1 TB/day × (7 years − 1 year) × 365 days ÷ 10',
-      formula:'1 × 2,190 ÷ 10',
-      answer:'219 TB',
-      unit:'TB',
-      insight:'<strong>219 TB cold on S3 Glacier</strong>. At $0.004/GB/month, that\'s ~$876/month. Compare: same data on hot SSD would cost $21,900/month. Tiering saves 25×.'},
-   ]},
-]},
-
-{id:'bandwidth', icon:'📡', name:'Bandwidth & CDN', formula:'users × content_size × frequency = total bandwidth  |  bandwidth × CDN_hit_rate = CDN offload', drills:[
-  {id:7, title:'Video streaming egress', diff:'easy',
-   scenario:'YouTube: 1B DAU. Each user watches 30 minutes of video. 50% watch at 720p (2 Mbps), 30% at 1080p (5 Mbps), 20% at 360p (0.5 Mbps).',
-   steps:[
-     {q:'Weighted average bitrate per user (in Mbps)?',
-      hint:'(0.5 × 2) + (0.3 × 5) + (0.2 × 0.5)',
-      formula:'1.0 + 1.5 + 0.1',
-      answer:'2.6 Mbps',
-      unit:'Mbps avg',
-      insight:'<strong>2.6 Mbps average</strong>. Weighted average is the tool for "mix of users at different quality tiers." Always compute it before total bandwidth.'},
-     {q:'Total egress bandwidth right now (in Tbps)?',
-      hint:'DAU × avg_Mbps ÷ 1,000,000 (Mbps→Tbps)  — assume all users watching simultaneously (worst case)',
-      formula:'1,000,000,000 × 2.6 ÷ 1,000,000',
-      answer:'2,600 Tbps',
-      unit:'Tbps',
-      insight:'<strong>2,600 Tbps</strong>. The entire internet backbone is ~600 Tbps. This is why YouTube uses a global CDN — they push content to thousands of edge servers so egress is distributed, not centralised.'},
-     {q:'Daily CDN cost at $0.01/GB (assume 90% CDN hit rate)?',
-      hint:'total_GB_per_day × CDN_hit_rate × cost_per_GB. Total GB/day = avg_Mbps ÷ 8 × watch_seconds × DAU ÷ 1,073,741,824',
-      formula:'(2.6 ÷ 8 × 1800 × 1B) ÷ 1,073,741,824 × 0.9 × $0.01',
-      answer:'~$5.5M/day',
-      unit:'$/day',
-      insight:'<strong>~$5.5M/day in CDN costs</strong>. YouTube makes ~$20M/day in ad revenue. CDN is ~27% of revenue — which is why Google built its own CDN and ISP peering instead of paying AWS.'},
-   ]},
-  {id:8, title:'Image delivery bandwidth', diff:'easy',
-   scenario:'Instagram: 500M DAU. Each user views 50 photos/day. Average photo: 200KB (thumbnail) served via CDN. CDN hit rate: 95%.',
-   steps:[
-     {q:'Total image bandwidth per second (in GB/sec)?',
-      hint:'DAU × photos_per_day × size_KB ÷ 86,400 ÷ 1,048,576 (KB→GB)',
-      formula:'500M × 50 × 200 ÷ 86,400 ÷ 1,048,576',
-      answer:'~55 GB/sec',
-      unit:'GB/sec',
-      insight:'<strong>~55 GB/sec</strong>. At 95% CDN hit rate, only 5% hits origin — that\'s 2.75 GB/sec to your origin servers. Without CDN: all 55 GB/sec hits origin and your infrastructure collapses.'},
-     {q:'Daily CDN data transfer in PB (at 95% hit rate)?',
-      hint:'total_GB_per_sec × 86,400 × 0.95 ÷ 1,000,000 (GB→PB)',
-      formula:'55 × 86,400 × 0.95 ÷ 1,000,000',
-      answer:'~4.5 PB/day',
-      unit:'PB/day',
-      insight:'<strong>4.5 PB/day through CDN</strong>. At $0.01/GB, that\'s $45M/day. This is why Instagram negotiates bulk CDN contracts and why large platforms eventually build their own edge infrastructure.'},
-   ]},
-]},
-
-{id:'nodes', icon:'🖥️', name:'Node & cluster sizing', formula:'required_QPS ÷ QPS_per_node = nodes for QPS  |  required_storage ÷ storage_per_node = nodes for storage  →  take max', drills:[
-  {id:9, title:'Redis cluster sizing', diff:'easy',
-   scenario:'An e-commerce cache: 1M reads/sec, 100K writes/sec. Each Redis node: 10K ops/sec, 64GB RAM. Hot working set: 200GB (top 20% of 10M products × 1KB each).',
-   steps:[
-     {q:'Redis nodes needed for QPS (reads + writes)?',
-      hint:'(read_QPS + write_QPS) ÷ ops_per_node',
-      formula:'(1,000,000 + 100,000) ÷ 10,000',
-      answer:'110 nodes',
-      unit:'nodes (QPS)',
-      insight:'<strong>110 nodes for QPS</strong>. Redis is single-threaded per core — 10K ops/sec per node is realistic for mixed workloads. Cluster mode splits keyspace across nodes automatically.'},
-     {q:'Redis nodes needed for memory (200GB working set)?',
-      hint:'ceil(working_set_GB ÷ RAM_per_node)',
-      formula:'ceil(200 ÷ 64)',
-      answer:'4 nodes',
-      unit:'nodes (RAM)',
-      insight:'<strong>Only 4 nodes for memory</strong>. QPS (110 nodes) wins. This is the key insight: always compute both constraints and take the binding one. Memory is rarely the bottleneck in Redis clusters.'},
-   ]},
-  {id:10, title:'Kafka cluster sizing', diff:'med',
-   scenario:'An event pipeline: 1M messages/sec, 10KB average message size. Each Kafka broker: 1GB/sec throughput, 10TB disk. Messages retained 7 days. Replication factor: 3.',
-   steps:[
-     {q:'Ingestion throughput in GB/sec?',
-      hint:'messages_per_sec × message_size_KB ÷ 1,048,576 (KB→GB)',
-      formula:'1,000,000 × 10 ÷ 1,048,576',
-      answer:'~9.5 GB/sec',
-      unit:'GB/sec',
-      insight:'<strong>~9.5 GB/sec write throughput</strong>. This is the raw ingest rate before replication. With replication factor 3, each byte is written 3× — total broker write load is 28.5 GB/sec.'},
-     {q:'Total storage needed across cluster (7-day retention, 3× replication, in PB)?',
-      hint:'throughput_GB_per_sec × 86,400 × 7 days × replication_factor ÷ 1,000 (GB→TB→PB)',
-      formula:'9.5 × 86,400 × 7 × 3 ÷ 1,000,000',
-      answer:'~17.2 PB',
-      unit:'PB',
-      insight:'<strong>17.2 PB of Kafka storage</strong>. At 10TB per broker, that\'s 1,720 brokers — which is why real Kafka at this scale uses tiered storage (recent data on broker SSDs, older data on S3).'},
-     {q:'Brokers needed for throughput (at 1GB/sec per broker, with 3× replication)?',
-      hint:'(throughput × replication_factor) ÷ GB_per_sec_per_broker',
-      formula:'(9.5 × 3) ÷ 1',
-      answer:'~29 brokers',
-      unit:'brokers',
-      insight:'<strong>29 brokers for throughput</strong>. Storage needs 1,720 — storage wins by a factor of 60. This is the argument for tiered storage: decouple broker count from retention period.'},
-   ]},
-  {id:11, title:'WebSocket server sizing', diff:'med',
-   scenario:'Chat app: 50M DAU, 20% online simultaneously at peak. Each WebSocket connection: 65KB RAM on server. Each server handles 50K concurrent connections.',
-   steps:[
-     {q:'Peak simultaneous WebSocket connections?',
-      hint:'DAU × concurrent_percentage',
-      formula:'50,000,000 × 0.20',
-      answer:'10,000,000',
-      unit:'connections',
-      insight:'<strong>10M simultaneous connections</strong>. This is a stateful, persistent number — not requests per second. Each connection holds memory for its lifetime, not just during a request.'},
-     {q:'Memory per server for 50K connections (in GB)?',
-      hint:'connections_per_server × KB_per_connection ÷ 1,048,576 (KB→GB)',
-      formula:'50,000 × 65 ÷ 1,048,576',
-      answer:'~3.1 GB',
-      unit:'GB RAM',
-      insight:'<strong>3.1 GB per server</strong> just for connection state. Add OS overhead, app memory, buffers → realistically 8–16GB total per server. This is why chat servers need large RAM instances.'},
-     {q:'How many chat servers at 50K connections each?',
-      hint:'total_connections ÷ connections_per_server',
-      formula:'10,000,000 ÷ 50,000',
-      answer:'200 servers',
-      unit:'servers',
-      insight:'<strong>200 chat servers</strong>. This is why chat uses consistent hashing to route connections — user A is always on server #47, so messages to A go directly there without broadcasting.'},
-   ]},
-]},
-
-{id:'latency', icon:'⏱️', name:'Latency budgeting', formula:'SLA_ms − Σ(fixed_overheads_ms) = remaining budget for your code + DB', drills:[
-  {id:12, title:'200ms SLA decomposition', diff:'easy',
-   scenario:'Your API SLA: P99 < 200ms. Fixed overheads: DNS 10ms, TLS handshake 30ms (first request only — ignore), LB 2ms, serialisation 3ms, network round-trip to client 20ms.',
-   steps:[
-     {q:'Budget remaining for app server + DB (in ms)?',
-      hint:'SLA − DNS − LB − serialisation − network',
-      formula:'200 − 10 − 2 − 3 − 20',
-      answer:'165ms',
-      unit:'ms remaining',
-      insight:'<strong>165ms left</strong> for your actual business logic + DB query. Seems like a lot — but a cold Postgres query on a large table easily takes 100–200ms. Cache your reads.'},
-     {q:'If DB query takes 80ms, how much is left for app logic?',
-      hint:'remaining_budget − DB_ms',
-      formula:'165 − 80',
-      answer:'85ms',
-      unit:'ms for app logic',
-      insight:'<strong>85ms for app logic</strong>. This covers: auth check, business rules, response assembly. Sounds fine until you add a second DB call (permissions check): 165 − 80 − 80 = 5ms. No margin. Every extra DB call costs.'},
-     {q:'At 95% cache hit rate, what is the weighted average DB latency contribution?',
-      hint:'(hit_rate × cache_latency_ms) + (miss_rate × DB_latency_ms)',
-      formula:'(0.95 × 1) + (0.05 × 80)',
-      answer:'4.95ms',
-      unit:'ms avg DB',
-      insight:'<strong>~5ms average</strong> vs 80ms without cache. Caching converts a 80ms P99 DB call into a ~1ms average. The SLA becomes very achievable. This is the quantitative argument for caching.'},
-   ]},
-  {id:13, title:'Multi-region latency budget', diff:'med',
-   scenario:'Global SLA: P99 < 500ms worldwide. Speed of light US→India: ~170ms RTT. Your US datacenter handles all traffic. Each API request round-trips: client → US DC → DB → US DC → client.',
-   steps:[
-     {q:'Latency floor just from physics (US↔India round-trip, in ms)?',
-      hint:'RTT is round-trip: client→DC + DC→client. Speed-of-light RTT is already round-trip.',
-      formula:'170ms (physics floor)',
-      answer:'170ms',
-      unit:'ms floor',
-      insight:'<strong>170ms just from physics</strong> before any processing. With a 500ms SLA, you have 330ms left for everything else. But this assumes the user is at the DC. India users are further.'},
-     {q:'If India users add 200ms each way (400ms RTT), what is left in the 500ms budget?',
-      hint:'SLA − RTT_to_India',
-      formula:'500 − 400',
-      answer:'100ms',
-      unit:'ms remaining',
-      insight:'<strong>Only 100ms for processing</strong>. A cold DB query takes 80ms. You have 20ms of margin. One retry and you miss SLA. This is the quantitative argument for regional edge servers or read replicas near users.'},
-   ]},
-]},
-
-{id:'replication', icon:'🔄', name:'Replication & consistency', formula:'lag grows when write_rate > replication_throughput  |  max_staleness = lag_seconds', drills:[
-  {id:14, title:'Replication lag threshold', diff:'med',
-   scenario:'Primary DB: 10K writes/sec. Replication log to replica processes at 8K events/sec. Network RTT between primary and replica: 5ms.',
-   steps:[
-     {q:'Is replication lag growing or shrinking? At what rate (events/sec)?',
-      hint:'If write_rate > replication_rate, lag grows at (write_rate − replication_rate)',
-      formula:'10,000 − 8,000',
-      answer:'Growing at 2,000 events/sec',
-      unit:'events/sec behind',
-      insight:'<strong>Falling 2,000 events/sec behind</strong>. After 60 seconds, the replica is 120,000 events behind. This is not eventually consistent — it is diverging. You need to either reduce writes or increase replica throughput.'},
-     {q:'How many seconds until replica is 1 hour of writes behind (3.6M events)?',
-      hint:'events_to_fall_behind ÷ fall_rate_per_sec',
-      formula:'3,600,000 ÷ 2,000',
-      answer:'1,800 seconds (30 min)',
-      unit:'seconds',
-      insight:'<strong>30 minutes to fall 1 hour behind</strong>. At this point, reads from the replica are 1 hour stale. For most systems this is catastrophic. The fix: reduce writes (batching), increase replica hardware, or stop routing reads to this replica.'},
-     {q:'At what write rate does lag stabilise (neither growing nor shrinking)?',
-      hint:'lag stabilises when write_rate = replication_rate',
-      formula:'8,000 writes/sec',
-      answer:'8,000 writes/sec',
-      unit:'writes/sec break-even',
-      insight:'<strong>8K writes/sec is the break-even</strong>. Design your system to stay below this. If you expect bursts above it, size your replica throughput for peak, not average.'},
-   ]},
-  {id:15, title:'Quorum read/write sizing', diff:'hard',
-   scenario:'A distributed KV store: N=5 replicas per key. You want strong consistency on reads. Network partition tolerance required. Writes must succeed even if 1 node is down.',
-   steps:[
-     {q:'Minimum write quorum W to tolerate 1 node failure?',
-      hint:'W nodes must acknowledge the write. To tolerate 1 failure: W must be reachable with N-1 nodes. W ≤ N-1 and W > N/2 (majority).',
-      formula:'W = 3 (majority of 5, tolerates 2 failures for reads)',
-      answer:'W = 3',
-      unit:'nodes',
-      insight:'<strong>W=3</strong>. Write succeeds when 3 of 5 nodes acknowledge. If 1 node is down, 4 remain — W=3 is still reachable. The write does not block.'},
-     {q:'Minimum read quorum R to guarantee seeing the latest write (W=3, N=5)?',
-      hint:'Strong consistency requires W + R > N. Solve for R.',
-      formula:'3 + R > 5  →  R > 2  →  R = 3',
-      answer:'R = 3',
-      unit:'nodes',
-      insight:'<strong>R=3</strong>. W+R=6 > N=5. This guarantees at least 1 node in the read quorum saw the latest write. This is the mathematical basis of strong consistency in distributed systems.'},
-     {q:'If you relax to eventual consistency (R=1), what is the trade-off?',
-      hint:'With R=1, W+R = 3+1 = 4, which is NOT > N=5.',
-      formula:'W + R = 4, N = 5  →  4 < 5  →  NOT strongly consistent',
-      answer:'May read stale data',
-      unit:'consistency',
-      insight:'<strong>R=1 = eventual consistency</strong>. You might read from a replica that hasn\'t received the latest write yet. The benefit: 1-node read is faster and tolerates more failures. Trade: you can\'t guarantee freshness.'},
-   ]},
-]},
-];
-
-// ─── STATE ────────────────────────────────────────────────────────────────────
 const SKEY = 'hld-est-v1';
-let state = JSON.parse(localStorage.getItem(SKEY) || '{}');
+let state = PrepStore.load('hld-estimation');
 // state[drillId] = 'done' | 'wrong' | undefined
 let activeCat = CATS[0].id;
 let sessionGot = 0, sessionMiss = 0;
 let openCards = {}; // drillId → true
 
-function save(){ localStorage.setItem(SKEY, JSON.stringify(state)); }
+function save(){ PrepStore.save('hld-estimation',state); }
 
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
 renderNav();
@@ -554,74 +243,17 @@ function renderCat(id){
   </div>`;
 
   h += `<div class="cheat-sheet">
-    <div class="cs-title">⚡ Cold-start framework — say this before any estimation</div>
-    <div style="font-family:var(--mono);font-size:11px;color:var(--muted2);line-height:1.8;background:var(--bg4);padding:10px 14px;border-radius:5px;border:1px solid rgba(251,191,36,.15);margin-bottom:14px;">
-      1. <strong style="color:var(--text)">Users</strong> — DAU, concurrent % at peak<br/>
-      2. <strong style="color:var(--text)">Traffic</strong> — QPS avg (DAU × events ÷ 86,400), then peak (×2–3)<br/>
-      3. <strong style="color:var(--text)">Storage</strong> — per item size × items/day × retention × replication<br/>
-      4. <strong style="color:var(--text)">Bandwidth</strong> — QPS × payload size<br/>
-      5. <strong style="color:var(--text)">Servers</strong> — peak QPS ÷ QPS/server. Storage ÷ storage/server. Take the larger.
+    <div class="cs-title">Cold-start estimation framework</div>
+    <p>Define the operation and workload window first. Choose decimal (KB = 1,000 bytes) or binary (KiB = 1,024 bytes) units and keep them consistent. State average, peak, retention, replication, target utilization and failure reserve as separate assumptions.</p>
+    <div class="cs-grid">
+      <div class="cs-item"><div class="cs-key">Average request rate</div><div class="cs-val">events ÷ seconds</div><div class="cs-note">86,400 seconds/day</div></div>
+      <div class="cs-item"><div class="cs-key">Peak request rate</div><div class="cs-val">average × factor</div><div class="cs-note">Factor needs workload evidence or an explicit toy assumption</div></div>
+      <div class="cs-item"><div class="cs-key">Stored payload</div><div class="cs-val">items × bytes × retention × replicas</div><div class="cs-note">Add indexes, logs and free space separately</div></div>
+      <div class="cs-item"><div class="cs-key">Network payload</div><div class="cs-val">operations/s × bytes/operation</div><div class="cs-note">Check whether the direction is ingress, origin fetch or user delivery</div></div>
+      <div class="cs-item"><div class="cs-key">Node count</div><div class="cs-val">ceil(load ÷ usable capacity)</div><div class="cs-note">Check throughput and storage, then add reserve</div></div>
+      <div class="cs-item"><div class="cs-key">Latency</div><div class="cs-val">trace end-to-end</div><div class="cs-note">Adding component P99s does not prove end-to-end P99</div></div>
     </div>
-
-    <div class="cs-title">📐 Time & scale anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Seconds / day</div><div class="cs-val">86,400</div><div class="cs-note">≈ 10⁵ — use constantly</div></div>
-      <div class="cs-item"><div class="cs-key">Seconds / month</div><div class="cs-val">2.6M</div><div class="cs-note">≈ 30 × 86,400</div></div>
-      <div class="cs-item"><div class="cs-key">Peak multiplier</div><div class="cs-val">2–3×</div><div class="cs-note">Always size for peak</div></div>
-      <div class="cs-item"><div class="cs-key">Replication factor</div><div class="cs-val">3×</div><div class="cs-note">Standard for durability</div></div>
-      <div class="cs-item"><div class="cs-key">Order of magnitude OK</div><div class="cs-val">±3×</div><div class="cs-note">Within 3× = close enough</div></div>
-      <div class="cs-item"><div class="cs-key">Headroom buffer</div><div class="cs-val">+20–30%</div><div class="cs-note">Add after sizing</div></div>
-    </div>
-
-    <div class="cs-title">💾 Storage size anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Tweet / short text</div><div class="cs-val">280 B</div><div class="cs-note">UTF-8, ~280 chars</div></div>
-      <div class="cs-item"><div class="cs-key">Chat message</div><div class="cs-val">100–500 B</div><div class="cs-note">text + metadata</div></div>
-      <div class="cs-item"><div class="cs-key">User profile row</div><div class="cs-val">~1 KB</div><div class="cs-note">name, email, prefs</div></div>
-      <div class="cs-item"><div class="cs-key">DB row (avg)</div><div class="cs-val">1–10 KB</div><div class="cs-note">depends on columns</div></div>
-      <div class="cs-item"><div class="cs-key">Thumbnail image</div><div class="cs-val">50–200 KB</div><div class="cs-note">JPEG compressed</div></div>
-      <div class="cs-item"><div class="cs-key">Photo (full res)</div><div class="cs-val">2–5 MB</div><div class="cs-note">smartphone photo</div></div>
-      <div class="cs-item"><div class="cs-key">Video (1 min 720p)</div><div class="cs-val">~50 MB</div><div class="cs-note">compressed H.264</div></div>
-      <div class="cs-item"><div class="cs-key">Video (1 hr 720p)</div><div class="cs-val">~1–2 GB</div><div class="cs-note">×60 from above</div></div>
-      <div class="cs-item"><div class="cs-key">1 KB → GB</div><div class="cs-val">÷ 10⁶</div><div class="cs-note">1,048,576 exactly</div></div>
-      <div class="cs-item"><div class="cs-key">1 MB → GB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 MB = 1 GB</div></div>
-      <div class="cs-item"><div class="cs-key">1 GB → TB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 GB = 1 TB</div></div>
-      <div class="cs-item"><div class="cs-key">1 TB → PB</div><div class="cs-val">÷ 1,024</div><div class="cs-note">1,024 TB = 1 PB</div></div>
-    </div>
-
-    <div class="cs-title">🖥️ Server capacity anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">App server RPS</div><div class="cs-val">5–10K</div><div class="cs-note">simple REST API</div></div>
-      <div class="cs-item"><div class="cs-key">Nginx (static)</div><div class="cs-val">~50K RPS</div><div class="cs-note">static file serving</div></div>
-      <div class="cs-item"><div class="cs-key">Redis ops/sec</div><div class="cs-val">~10K</div><div class="cs-note">single-threaded / core</div></div>
-      <div class="cs-item"><div class="cs-key">Redis RAM node</div><div class="cs-val">64–256 GB</div><div class="cs-note">typical cloud instance</div></div>
-      <div class="cs-item"><div class="cs-key">Kafka broker throughput</div><div class="cs-val">1 GB/sec</div><div class="cs-note">per broker</div></div>
-      <div class="cs-item"><div class="cs-key">Kafka partition limit</div><div class="cs-val">50–100 MB/sec</div><div class="cs-note">per partition</div></div>
-      <div class="cs-item"><div class="cs-key">DB node SSD</div><div class="cs-val">2–10 TB</div><div class="cs-note">NVMe SSD per node</div></div>
-      <div class="cs-item"><div class="cs-key">WebSocket server</div><div class="cs-val">50K conns</div><div class="cs-note">50K concurrent WS</div></div>
-      <div class="cs-item"><div class="cs-key">WS RAM per conn</div><div class="cs-val">~65 KB</div><div class="cs-note">connection state</div></div>
-      <div class="cs-item"><div class="cs-key">CDN hit rate</div><div class="cs-val">90–99%</div><div class="cs-note">origin sees 1–10%</div></div>
-    </div>
-
-    <div class="cs-title">📊 Platform DAU anchors</div>
-    <div class="cs-grid" style="margin-bottom:14px">
-      <div class="cs-item"><div class="cs-key">Small startup</div><div class="cs-val">10K–1M</div><div class="cs-note">single region</div></div>
-      <div class="cs-item"><div class="cs-key">Mid-size product</div><div class="cs-val">10M–50M</div><div class="cs-note">multi-AZ</div></div>
-      <div class="cs-item"><div class="cs-key">WhatsApp / Instagram</div><div class="cs-val">500M</div><div class="cs-note">global multi-region</div></div>
-      <div class="cs-item"><div class="cs-key">YouTube / Facebook</div><div class="cs-val">1–2B</div><div class="cs-note">global CDN + edge</div></div>
-      <div class="cs-item"><div class="cs-key">Concurrent % (peak)</div><div class="cs-val">10–25%</div><div class="cs-note">of DAU online at once</div></div>
-      <div class="cs-item"><div class="cs-key">Events/user/day</div><div class="cs-val">10–100</div><div class="cs-note">depends on product</div></div>
-    </div>
-
-    <div class="cs-title">💸 Cost anchors (AWS ballpark)</div>
-    <div class="cs-grid" style="margin-bottom:4px">
-      <div class="cs-item"><div class="cs-key">S3 storage</div><div class="cs-val">$0.023/GB/mo</div><div class="cs-note">standard tier</div></div>
-      <div class="cs-item"><div class="cs-key">S3 Glacier</div><div class="cs-val">$0.004/GB/mo</div><div class="cs-note">cold archive</div></div>
-      <div class="cs-item"><div class="cs-key">CDN egress</div><div class="cs-val">$0.01–0.08/GB</div><div class="cs-note">varies by region</div></div>
-      <div class="cs-item"><div class="cs-key">SSD (EBS gp3)</div><div class="cs-val">$0.08/GB/mo</div><div class="cs-note">block storage</div></div>
-      <div class="cs-item"><div class="cs-key">HDD (EBS sc1)</div><div class="cs-val">$0.015/GB/mo</div><div class="cs-note">cold HDD</div></div>
-      <div class="cs-item"><div class="cs-key">EC2 (c5.xlarge)</div><div class="cs-val">~$0.17/hr</div><div class="cs-note">4 vCPU, 8 GB RAM</div></div>
-    </div>
+    <p>All prices and hardware capacities inside drills are hypothetical exercise inputs. Production sizing requires measurements and current quotes.</p>
   </div>`;
 
   cat.drills.forEach(d => { h += renderCard(d); });
@@ -742,6 +374,9 @@ function closeSidebar(){
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('ham-btn').classList.remove('open');
 }
+
+PrepStore.subscribe(()=>{state=PrepStore.load('hld-estimation');renderNav();renderCat(activeCat);updateScore();});
 </script>
+<script src="../assets/progress-ui.js"></script>
 </body>
 </html>
